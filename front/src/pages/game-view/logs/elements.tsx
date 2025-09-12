@@ -48,12 +48,17 @@ export const LogWrapper = styled.div<{
   `};
 `;
 
+/* contain: layout style;
+  这句修改部分浏览器下卡顿问题
+  */
+
 /**
  * Wrapper of chunk, used in fixed-size mode.
  */
 export const FixedSizeChunkWrapper = styled.div<{
   visible: boolean;
 }>`
+  contain: layout style;
   display: ${({ visible }) => (visible ? 'block' : 'none')};
 `;
 

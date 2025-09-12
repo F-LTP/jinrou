@@ -53,6 +53,30 @@ interface SpecialFormData {
      */
     killUsed: boolean;
   };
+  NormalGuard: {
+    /**
+     * 襲撃を既に使用したか
+     */
+    SuperGuardUsed: boolean;
+  };
+  SuperGuard: {
+    /**
+     * 襲撃を既に使用したか
+     */
+    SuperGuardUsed: boolean;
+  };
+  NormalDiviner: {
+    /**
+     * 襲撃を既に使用したか
+     */
+    SuperDivinerUsed: boolean;
+  };
+  SuperDiviner: {
+    /**
+     * 襲撃を既に使用したか
+     */
+    SuperDivinerUsed: boolean;
+  };
   // 歌人
   Poet1: {
     /**
