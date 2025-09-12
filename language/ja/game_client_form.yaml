@@ -20,6 +20,10 @@ specialName:
   CraftyWolf2: '狡猾的狼的能力'
   Poet1: '诗人的能力'
   Poet2: '诗人的能力'
+  SuperDiviner: '超占卜师的能力'
+  NormalDiviner: '超占卜师的能力'
+  NormalGuard: '超猎人的能力'
+  SuperGuard: '超猎人的能力'
   GachaAddicted_Normal: '课金者的能力'
   GachaAddicted_Premium: '课金者的能力'
   GachaAddicted_Commit: '课金者的能力'
@@ -33,8 +37,10 @@ messages:
   WolfDiviner: '请选择要占卜的对象'
   GreedyWolf: '在希望满足自身贪欲的场合下请选择'
   Diviner: '请选择要占卜的对象'
+  SuperDiviner: '请选择要额外占卜的对象（不影响猝死）'
   TinyFox: '请选择要占卜的对象'
   Guard: '请选择要护卫的对象'
+  SuperGuard: '请选择要额外护卫的对象（不影响猝死）'
   Magician: '请选择要复活的对象'
   Spy: '准备今晚离开村子的时候请选择'
   Fugitive: '请选择要逃亡到谁家里'
@@ -183,6 +189,22 @@ DragonKnight:
   killButton: '杀害（只限一次）'
   # kill button (already used)
   killButtonUsed: '杀害（已经使用）'
+
+SuperGuard:
+  description: '请选择护卫的使用对象'
+  Superdescription: '请选择超级护卫的使用对象'
+  # normal guard button.
+  GuardButton: '护卫'
+  SuperGuardUsedButton: '超级护卫（只限一次）'
+  SuperGuardUsedButtonUsed: '超级护卫（已经使用）'
+  
+SuperDiviner:
+  description: '请选择占卜的使用对象'
+  Superdescription: '请选择超级占卜的使用对象'
+  # normal guard button.
+  DivinerButton: '占卜'
+  SuperDivinerUsedButton: '超级占卜（只限一次）'
+  SuperDivinerUsedButtonUsed: '超级占卜（已经使用）'
 
 # Texts for Poet form.
 Poet:

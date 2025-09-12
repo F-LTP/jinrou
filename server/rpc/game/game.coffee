@@ -3629,7 +3629,6 @@ class Player
         befpl=game.getPlayer @id
         orig_jobname = befpl.originalJobname
         jobname1 = befpl.getJobname()
-
         # 完全なチェーンを作成
         res = getSubParentAndAllChain befpl, this
         unless res?
@@ -3650,12 +3649,10 @@ class Player
             complexChain = complexChain.filter (c)=> !playerEqualityById(c, this)
         # reconstruct the player object.
         newpl = Player.reconstruct complexChain, main
-
         if topParent?
             topParent.sub = newpl
         else
             game.setPlayer @id, newpl
-
         aftpl=game.getPlayer @id
         jobname2 = aftpl.getJobname()
         #前と後で比較
@@ -3944,6 +3941,120 @@ class Diviner extends Player
             to:@id
             comment:r.result
         splashlog game.id,game,log
+
+class SuperDiviner extends Diviner
+    type:"SuperDiviner"
+    midnightSort:80
+    sleeping:->@target? || @scapegoat
+    jobdone:->@target? && @flag[0].SuperDivinerUsed
+    constructor:->
+        super
+        @setFlag [{
+            # type of action this night
+            type: null
+            # day on which this action is taken.
+            day: 0
+            # whether kill is already used.
+            SuperDivinerUsed: false
+            SuperDivinerTarget: null
+        }]
+    job:(game,playerid,query)->
+        pl=game.getPlayer playerid
+        unless pl?
+            return game.i18n.t "error.common.nonexistentPlayer"
+        
+        type = query.commandname
+        unless type in ["SuperDiviner", "NormalDiviner"]
+            return game.i18n.t "error.common.invalidQuery"
+
+        # cannot use kill more than once
+        if @flag[0].SuperDivinerUsed && type == "SuperDiviner"
+            return game.i18n.t "error.common.alreadyUsed"
+
+        if(type == "SuperDiviner")
+            @flag[0].SuperDivinerUsed = true
+            @flag[0].SuperDivinerTarget = playerid
+
+        temptarget = null
+        if type == "SuperDiviner" && @target != null
+            temptarget = @target
+        @setTarget playerid
+        pl.touched game,@id
+        log=
+            mode:"skill"
+            to:@id
+            comment: if type == "NormalDiviner"
+                game.i18n.t "roles:Diviner.select", {name: @name, target: pl.name}
+            else
+                game.i18n.t "roles:SuperDiviner.SuperSelect", {name: @name, target: pl.name}
+        splashlog game.id,game,log
+        if game.rule.divineresult=="immediate"
+            @dodivine game
+            @showdivineresult game, @target
+        # 如果使用的是超占，不影响target判断行动
+        if type == "SuperDiviner"
+            @target = temptarget
+        null
+    getOpenForms:(game)->
+        if !@dead && Phase.isNight(game.phase)
+            res = []
+            if(!@target)
+                # manually generate form.
+                res.push {
+                    type: "NormalDiviner"
+                    options: @makeJobSelection game, false
+                    formType: FormType.required
+                    objid: @objid
+                }
+            if(!@flag[0].SuperDivinerUsed)
+                res.push {
+                    type: "SuperDiviner"
+                    options: @makeJobSelection game, false
+                    formType: FormType.optionalOnce
+                    objid: @objid
+                    # give data of whether kill is already used.
+                    data:
+                        SuperDivinerUsed: @flag[0].SuperDivinerUsed
+                }
+            return res
+        else
+            return super
+    isFormTarget:(jobtype)->
+        (jobtype in ["NormalDiviner", "SuperDiviner"]) || super
+    sunrise:(game)->
+        super
+        unless game.rule.divineresult=="immediate"
+            @showdivineresult game, @target
+            if @flag[0].SuperDivinerTarget != null
+                @showdivineresult game, @flag[0].SuperDivinerTarget
+                @flag[0].SuperDivinerTarget == null
+    sunset:(game)->
+        super
+        @setTarget null
+        # 占い対象
+        targets = game.players.filter (x)->!x.dead
+
+        if (@type == "SuperDiviner" || @type == "Hitokotonushinokami") && game.day == 1 && game.rule.firstnightdivine == "auto"
+            # 自動白通知
+            targets2 = targets.filter (x)=> x.id != @id && x.getFortuneResult(game) == FortuneResult.human && x.id != "替身君" && !x.isJobType("Fox") && !x.isJobType("XianFox") && !x.isJobType("NightRabbit") && !x.isJobType("Trickster") && !x.isJobType("VariationFox") && !x.isJobType("Actress")
+            if targets2.length > 0
+                # ランダムに決定
+                log=
+                    mode:"skill"
+                    to:@id
+                    comment:game.i18n.t "roles:Diviner.auto", {name: @name}
+                splashlog game.id,game,log
+
+                r=Math.floor Math.random()*targets2.length
+                @job game,targets2[r].id,{}
+                return
+    divineeffect:(game)->
+        super
+        if @flag[0].SuperDivinerTarget
+            p2=game.getPlayer game.skillTargetHook.get @flag[0].SuperDivinerTarget
+            if p2?
+                p2.divined game,this
+            
 class Psychic extends Player
     type:"Psychic"
     constructor:->
@@ -4044,6 +4155,157 @@ class Guard extends Player
         pl.transform game,newpl,true
         newpl.touched game,@id
         null
+
+class SuperGuard extends Guard
+    type:"SuperGuard"
+    midnightSort:80
+    formType: FormType.optional
+    hasDeadResistance:->true
+    sleeping:->@target? || @scapegoat
+    jobdone:(game)-> game.day <= 1 || @target? && @flag[0].SuperGuardUsed
+    constructor:->
+        super
+        @setFlag [{
+            # type of action this night
+            type: null
+            # day on which this action is taken.
+            day: 0
+            # whether kill is already used.
+            SuperGuardUsed: false
+            SuperGuardTarget: null
+        }]
+    job:(game, playerid, query)->
+        pl = game.getPlayer playerid
+        # must choose alive player other than myself
+        unless pl?
+            return game.i18n.t "error.common.nonexistentPlayer"
+        if pl.id == @id
+            return game.i18n.t "error.common.noSelectSelf"
+        if pl.dead
+            return game.i18n.t "error.common.alreadyDead"
+        # cannot guard same player twice in a row
+        if playerid==@id && game.rule.guardmyself!="ok"
+            return game.i18n.t "error.common.noSelectSelf"
+        else if playerid==@flag && game.rule.consecutiveguard=="no"
+            return game.i18n.t "roles:Guard.noGuardSame"
+        # validate type
+        type = query.commandname
+        unless type in ["SuperGuard", "NormalGuard"]
+            return game.i18n.t "error.common.invalidQuery"
+
+        # cannot use kill more than once
+        
+        if @flag.SuperGuardUsed && type == "SuperGuard"
+            return game.i18n.t "error.common.alreadyUsed"
+
+        if type == "SuperGuard"
+            @flag[0].SuperGuardUsed = true
+            @flag[0].SuperGuardTarget = playerid
+
+        temptarget = null
+        if type == "SuperGuard" && @target != null
+            temptarget = @target
+        @setTarget playerid
+        # touch targeted player.
+        pl.touched game, @id
+        # show selection log.
+        log=
+            mode:"skill"
+            to:@id
+            comment: if type == "NormalGuard"
+                game.i18n.t "roles:Guard.select", {name: @name, target: pl.name}
+            else
+                game.i18n.t "roles:SuperGuard.SuperSelect", {name: @name, target: pl.name}
+
+        splashlog game.id,game,log
+        # 如果使用的是超狩，不影响target判断行动
+        if type == "SuperGuard"
+            @target = temptarget
+        null
+    midnight:(game)->
+        # return unless @target?
+        # pl = game.getPlayer game.skillTargetHook.get @target
+        # return unless pl?
+
+        # if @flag.type == "NormalGuard"
+        #     pl.whenguarded game,this
+        #     newpl = Player.factory null, game, pl, null, Guarded
+        #     pl.transProfile newpl
+        #     newpl.cmplFlag = @id # 護衛元
+        #     pl.transform game, newpl, true
+        #     newpl.touched game, @id
+        #     @setFlag {
+        #         type: null
+        #         day: game.day
+        #         SuperGuardUsed: @flag.SuperGuardUsed
+        #     }
+        # else if @flag.type == "SuperGuard"
+        #     pl.whenguarded game,this
+        #     newpl = Player.factory null, game, pl, null, Guarded
+        #     pl.transProfile newpl
+        #     newpl.cmplFlag = @id # 護衛元
+        #     pl.transform game, newpl, true
+        #     newpl.touched game, @id
+        #     @setFlag {
+        #         type: null
+        #         day: game.day
+        #         SuperGuardUsed: true
+        #     }
+        pl = game.getPlayer game.skillTargetHook.get @target
+        unless pl?
+            return
+        pl.whenguarded game,this
+        # 複合させる
+        newpl=Player.factory null, game, pl,null,Guarded   # 守られた人
+        pl.transProfile newpl
+        newpl.cmplFlag=@id  # 護衛元cmplFlag
+        pl.transform game,newpl,true
+        newpl.touched game,@id
+        # 进入if前先保存target的原始值
+        originalTarget = @target
+
+        if @flag[0].SuperGuardTarget != null
+            @setTarget @flag[0].SuperGuardTarget
+            superpl = game.getPlayer game.skillTargetHook.get @target
+            unless superpl?
+                return
+            superpl.whenguarded game, this
+            newpl = Player.factory null, game, superpl, null, Guarded
+            superpl.transProfile newpl
+            newpl.cmplFlag = @id
+            superpl.transform game, newpl, true
+            newpl.touched game, @id
+            @flag[0].SuperGuardTarget = null
+            @target = originalTarget
+        null
+
+    getOpenForms:(game)->
+            if !@dead && Phase.isNight(game.phase)
+                res = []
+                if(!@target)
+                    # manually generate form.
+                    res.push {
+                        type: "NormalGuard"
+                        options: @makeJobSelection game, false
+                        formType: FormType.required
+                        objid: @objid
+                    }
+                if(!@flag[0].SuperGuardUsed)
+                    res.push {
+                        type: "SuperGuard"
+                        options: @makeJobSelection game, false
+                        formType: FormType.optionalOnce
+                        objid: @objid
+                        # give data of whether kill is already used.
+                        data:
+                            SuperGuardUsed: @flag[0].SuperGuardUsed
+                    }
+                return res
+            else
+                return super
+    isFormTarget:(jobtype)->
+        (jobtype in ["NormalGuard", "SuperGuard"]) || super
+
 class Couple extends Player
     type:"Couple"
     makejobinfo:(game,result)->
@@ -4094,7 +4356,7 @@ class Poisoner extends Player
     hasDeadlyWeapon:->true
     dying:(game,found,from)->
         super
-        # 埋毒者の逆襲
+        # 猫又の逆襲
         canbedead = game.players.filter (x)->!x.dead    # 生きている人たち
         if Found.isNormalWerewolfAttack found
             # 噛まれた場合は狼のみ
@@ -4736,6 +4998,17 @@ class Fanatic extends Madman
         # 狂信者は人狼が分かる
         res.wolves = true
         res
+class HearMadman extends Fanatic
+    type:"HearMadman"
+    getVisibilityQuery:->
+        res = super
+        # 聽狂人可以聽到人狼對話
+        res.wolves = true
+        res
+    isListener:(game,log)->
+        if log.mode=="werewolf"
+            true
+        else super
 class Immoral extends Player
     type:"Immoral"
     team:"Fox"
@@ -5552,6 +5825,30 @@ class Tanner extends Player
             # 突然死はダメ
             @setFlag "gone"
     isWinner:(game,team)->@dead && @flag!="gone"
+    
+class Teruteru extends Player
+    type:"Teruteru"
+    team:""
+    checkDeathResistance:(game, found)->
+        if found=="punish" && !@flag?
+            # 処刑された
+            if @target==true
+                @setFlag "win"
+            return false
+        else
+            return false
+    isWinner:(game,team)->@dead && @flag=="win"
+    sunrise:(game)->
+        if ((game.players.length <= 4 && game.day == 2) || (game.players.length <= 6 && game.day == 3) || (game.players.length <= 10 && game.day == 4)  || (game.day >= 5)) && @target!=true
+            @setTarget true
+            log=
+                mode: "skill"
+                to: @id
+                comment: game.i18n.t "roles:Teruteru.announce", {
+                    name: @name,
+                }
+            splashlog game.id, game, log
+    
 class OccultMania extends Player
     type:"OccultMania"
     midnightSort:102
@@ -13836,8 +14133,10 @@ jobs=
     Human:Human
     Werewolf:Werewolf
     Diviner:Diviner
+    SuperDiviner:SuperDiviner
     Psychic:Psychic
     Madman:Madman
+    SuperGuard:SuperGuard
     Guard:Guard
     Couple:Couple
     Fox:Fox
@@ -13860,6 +14159,7 @@ jobs=
     Copier:Copier
     Light:Light
     Fanatic:Fanatic
+    HearMadman:HearMadman
     Immoral:Immoral
     Devil:Devil
     ToughGuy:ToughGuy
@@ -13882,6 +14182,7 @@ jobs=
     Witch:Witch
     Oldman:Oldman
     Tanner:Tanner
+    Teruteru:Teruteru
     OccultMania:OccultMania
     MinionSelector:MinionSelector
     WolfCub:WolfCub
@@ -14117,6 +14418,7 @@ jobStrength=
     Copier:10
     Light:30
     Fanatic:20
+    HearMadman:25
     Immoral:5
     Devil:20
     ToughGuy:11
@@ -14139,6 +14441,7 @@ jobStrength=
     Witch:23
     Oldman:4
     Tanner:15
+    Teruteru:15
     OccultMania:10
     MinionSelector:0
     WolfCub:70

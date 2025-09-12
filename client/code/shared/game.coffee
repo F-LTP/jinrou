@@ -9,9 +9,9 @@ exports.jobs=["Human","Werewolf","Diviner","Psychic","Madman","Guard","Couple","
 # ミラーズホロウの人狼
 "Hunter","Cupid",
 # 特殊役職?
-"Poisoner","BigWolf","TinyFox","Cat",
+"Poisoner","BigWolf","TinyFox","Cat","Teruteru",
 # るる鯖で見つけた职业
-"Fanatic","Immoral"
+"Fanatic","HearMadman","Immoral","SuperDiviner","SuperGuard",
 # 特殊役職2
 "Devil","Stalker","WhisperingMad","Dog",
 # 桃栗基本特殊役職
@@ -118,8 +118,8 @@ exports.blacks=["Werewolf","WolfDiviner","MadWolf","Lycan","LoneWolf","WolfCub",
 
 # チームたち
 exports.teams=teams=
-    Human:["Human","Diviner","Psychic","Guard","Couple","Poisoner","ToughGuy","Noble","Slave","Magician","Fugitive","Merchant","QueenSpectator","MadWolf","Liar","Light","Cursed","ApprenticeSeer","Diseased","Spellcaster","Lycan","Priest","Prince","PI","Cat","Witch","Oldman","OccultMania","Dog","Dictator","SeersMama","Trapper","RedHood","Counselor","Miko","HolyMarked","WanderingGuard","TroubleMaker","FrankensteinsMonster","BloodyMary","King","SantaClaus","Phantom","DrawGirl","Pyrotechnist","Baker","SpiritPossessed","GotChocolate","Forensic","Cosplayer","TinyGhost","Ninja","Twin","Hunter","Emma","Idol","HomeComer","Illusionist","DragonKnight","Samurai","Elementaler","Poet","Sacrifice","Oracle","GachaAddicted","Fate","Synesthete","Reindeer","Streamer","Tarzan","Hitokotonushinokami","RemoteWorker","Gambler","Sleepwalker","Disguised","Saint","SpaceWerewolfCrew","SpaceWerewolfObserver","SpaceWerewolfGuard","Hanami","Reincarnator","MementoDisposer","Interpreter","Dreamer","Assassin","StraySheep","Secretary","HouseKeeper","DarkPsychic","Itako"]
-    Werewolf:["Werewolf","Madman","BigWolf","Fanatic","Spy","WolfDiviner","Spy2","Sorcerer","LoneWolf","MinionSelector","WolfCub","WhisperingMad","WolfBoy","GreedyWolf","FascinatingWolf","SolitudeWolf","ToughWolf","ThreateningWolf","ObstructiveMad","PsychoKiller","CautiousWolf","Bomber","Ushinotokimairi","MadDog","Hypnotist","CraftyWolf","Pumpkin","MadScientist","MadHunter","MadCouple","EyesWolf","TongueWolf","BlackCat","LurkingMad","DecoyWolf","Satori","AbsoluteWolf","QueenOfNight","CurseWolf","IntuitionWolf","Faker","SealWolf","CynthiaWolf","NetherWolf","DarkWolf","SpaceWerewolfImposter","Acrobat","BloodWolf","Shadow","AttractiveWoman","DestroyCraziest","RainyBoy"]
+    Human:["Human","Diviner","SuperDiviner","Psychic","Guard","SuperGuard","Couple","Poisoner","ToughGuy","Noble","Slave","Magician","Fugitive","Merchant","QueenSpectator","MadWolf","Liar","Light","Cursed","ApprenticeSeer","Diseased","Spellcaster","Lycan","Priest","Prince","PI","Cat","Witch","Oldman","OccultMania","Dog","Dictator","SeersMama","Trapper","RedHood","Counselor","Miko","HolyMarked","WanderingGuard","TroubleMaker","FrankensteinsMonster","BloodyMary","King","SantaClaus","Phantom","DrawGirl","Pyrotechnist","Baker","SpiritPossessed","GotChocolate","Forensic","Cosplayer","TinyGhost","Ninja","Twin","Hunter","Emma","Idol","HomeComer","Illusionist","DragonKnight","Samurai","Elementaler","Poet","Sacrifice","Oracle","GachaAddicted","Fate","Synesthete","Reindeer","Streamer","Tarzan","Hitokotonushinokami","RemoteWorker","Gambler","Sleepwalker","Disguised","Saint","SpaceWerewolfCrew","SpaceWerewolfObserver","SpaceWerewolfGuard","Hanami","Reincarnator","MementoDisposer","Interpreter","Dreamer","Assassin","StraySheep","Secretary","HouseKeeper","DarkPsychic","Itako"]
+    Werewolf:["Werewolf","Madman","BigWolf","Fanatic","HearMadman","Spy","WolfDiviner","Spy2","Sorcerer","LoneWolf","MinionSelector","WolfCub","WhisperingMad","WolfBoy","GreedyWolf","FascinatingWolf","SolitudeWolf","ToughWolf","ThreateningWolf","ObstructiveMad","PsychoKiller","CautiousWolf","Bomber","Ushinotokimairi","MadDog","Hypnotist","CraftyWolf","Pumpkin","MadScientist","MadHunter","MadCouple","EyesWolf","TongueWolf","BlackCat","LurkingMad","DecoyWolf","Satori","AbsoluteWolf","QueenOfNight","CurseWolf","IntuitionWolf","Faker","SealWolf","CynthiaWolf","NetherWolf","DarkWolf","SpaceWerewolfImposter","Acrobat","BloodWolf","Shadow","AttractiveWoman","DestroyCraziest","RainyBoy"]
     Fox:["Fox","TinyFox","Immoral","Blasphemy","XianFox","NightRabbit","Trickster","VariationFox","Actress"]
     Devil:["Devil"]
     Friend:["Cupid","Lover","BadLady","Patissiere","SnowLover","LunaticLover"]
@@ -129,7 +129,7 @@ exports.teams=teams=
     Hooligan:["Hooligan", "HooliganAttacker"]
     Duel:["Duelist"]
     Lorelei:["Lorelei"]
-    Others:["Bat","Stalker","Doppleganger","Copier","Tanner","Thief","Hoodlum","QuantumPlayer","Shishimai","HooliganGuard","Amanojaku","DarkClown","DualPersonality","Oni","GoldOni","FrontOni","BackOni","ResidualHaunting"],
+    Others:["Bat","Stalker","Doppleganger","Copier","Tanner","Teruteru","Thief","Hoodlum","QuantumPlayer","Shishimai","HooliganGuard","Amanojaku","DarkClown","DualPersonality","Oni","GoldOni","FrontOni","BackOni","ResidualHaunting"],
     Neet:["Neet"]
 
 # カテゴリ分け(手调黑暗火锅でつかうぞ!)
@@ -137,11 +137,11 @@ exports.categories=
     Human: teams.Human.filter((x)->
         not (x in ["GotChocolate", "Phantom", "OccultMania", "Cursed", "BloodyMary","Dreamer","Listener","SpaceWerewolfCrew","SpaceWerewolfObserver","SpaceWerewolfGuard"]))
     Werewolf:["Werewolf","BigWolf","WolfDiviner","LoneWolf","WolfCub","GreedyWolf","FascinatingWolf","SolitudeWolf","ToughWolf","ThreateningWolf","CautiousWolf","CraftyWolf","EyesWolf","TongueWolf","DecoyWolf","AbsoluteWolf","CurseWolf","IntuitionWolf","SealWolf","CynthiaWolf","NetherWolf","DarkWolf","BloodWolf"]
-    Madman:["Madman","Fanatic","Spy","Spy2","Sorcerer","WhisperingMad","WolfBoy","ObstructiveMad","PsychoKiller","Bomber","Ushinotokimairi","MadDog","Hypnotist","Pumpkin","MadScientist","MadHunter","MadCouple","BlackCat","LurkingMad","Satori","QueenOfNight","Faker","Acrobat","Shadow","AttractiveWoman","DestroyCraziest","RainyBoy"]
+    Madman:["Madman","Fanatic","HearMadman","Spy","Spy2","Sorcerer","WhisperingMad","WolfBoy","ObstructiveMad","PsychoKiller","Bomber","Ushinotokimairi","MadDog","Hypnotist","Pumpkin","MadScientist","MadHunter","MadCouple","BlackCat","LurkingMad","Satori","QueenOfNight","Faker","Acrobat","Shadow","AttractiveWoman","DestroyCraziest","RainyBoy"]
     Fox:["Fox","TinyFox","XianFox","NightRabbit","Trickster","VariationFox","Actress"]
     Immoral:["Immoral","Blasphemy"]
     # sort by teams （恋人陣営、単独陣営、その他、変化系その他、変化系村人陣営）
-    Others:["Cupid","Lover","BadLady","Patissiere","SnowLover","LunaticLover","Devil","CultLeader","Hierarch","Vampire","Dracula","VampireClan","Raven","Ascetic","Hooligan","Lorelei","Bat","Tanner","Hoodlum","Shishimai","Amanojaku","DarkClown","Oni","GoldOni","Duelist","FrontOni","BackOni","ResidualHaunting"]
+    Others:["Cupid","Lover","BadLady","Patissiere","SnowLover","LunaticLover","Devil","CultLeader","Hierarch","Vampire","Dracula","VampireClan","Raven","Ascetic","Hooligan","Lorelei","Bat","Tanner","Teruteru","Hoodlum","Shishimai","Amanojaku","DarkClown","Oni","GoldOni","Duelist","FrontOni","BackOni","ResidualHaunting"]
     Switching:["Stalker","Copier","Doppleganger","DualPersonality","OccultMania","Cursed","BloodyMary","Phantom","Thief","Dreamer"]
     # Special category for "no category"
     None:[
@@ -185,67 +185,271 @@ normal1=(number)->
     ret.Werewolf=1
     if number>=8
         ret.Werewolf++
-        if number>=13
+        if number>=14
             ret.Werewolf++
-            if number>=20
+            if number>=17
                 ret.Werewolf++
-                if number>=25
+                if number>=20
                     ret.Werewolf++
-                    if number>=30
+                    if number>=23
                         ret.Werewolf++
+                        if number>=27
+                            ret.Werewolf++
+                            if number>=29
+                                ret.Werewolf++
     ret.Diviner=1 #占い
-    if number>=22
+    if number>=23
         ret.Diviner++
     if number>=8
         ret.Psychic=1 #灵能
+        if number>=23
+            ret.Psychic++
     if number>=6
         ret.Madman=1 #狂人
         ret.Guard=1 #猎人
-        if 18 <= number <= 19 || number >= 23
+        if number==13
+            ret.Madman--
+            ret.HearMadman=1  #13人是听狂配置
+            ret.Baker=1
+        if 15<=number<=16
+            ret.Madman--
+            ret.Fanatic=1 #狂信者
+            if number==16
+                ret.Immoral=1
+        if 19<=number<=22
+            ret.Immoral=1 
+            if number==19
+                ret.Madman--
+                ret.Fanatic=1 #狂信者
+            if number==22
+                ret.Madman--
+                ret.Fanatic=1 #狂信者
+        if number>=23
             ret.Madman++
-        if number>=20
-            ret.Guard++
-    if number>=13
+    if number>=14
         ret.Couple=2 #共有
-        if number>=18
+        if number>=25
             ret.Couple++
-    if number>=11
+    if number>=12
         ret.Fox=1 #狐
-        if number>=19
+        if number>=23
             ret.Fox++
+            if number>=24
+                ret.Fox++
+    if number>=17
+        ret.Poisoner=1 #猫
     ret
 normal2=(number)->
     ret={}
-    # 人狼
+    #狼
     ret.Werewolf=1
     if number>=8
         ret.Werewolf++
-        if number>=16
+        if number>=14
             ret.Werewolf++
-            if number>=20
+            if number>=17
                 ret.Werewolf++
-                if number>=25
+                if number>=20
                     ret.Werewolf++
-                    if number>=29
+                    if number>=23
                         ret.Werewolf++
-    ret.Diviner=1 #占卜师
+                        if number>=27
+                            ret.Werewolf++
+                            if number>=29
+                                ret.Werewolf++
+    ret.Diviner=1 #占い
+    if number>=23
+        ret.Diviner++
     if number>=8
-        ret.Psychic=1 #灵能者
-    if number>=10
+        ret.Psychic=1 #灵能
+        if number>=23
+            ret.Psychic++
+    if number>=6
         ret.Madman=1 #狂人
-        if number>=28
-            ret.Madman++
-    if number>=11
         ret.Guard=1 #猎人
-    if number>=13
-        ret.Couple=2 #共有者
-        if number>=28
-            ret.Couple++
-    if number>=15
+        if 12<=number<=13
+            ret.Madman--
+            ret.HearMadman=1  #1213人是听狂配置
+            ret.Baker=1
+        if 14<=number<=16
+            ret.Madman--
+            ret.Fanatic=1 #狂信者
+            if 14<=number<=16
+                ret.Immoral=1
+        if 19<=number<=22
+            ret.Immoral=1 
+            if number==19
+                ret.Madman--
+                ret.Fanatic=1 #狂信者
+            if number==22
+                ret.Madman--
+                ret.Fanatic=1 #狂信者
+        if number>=23
+            ret.Madman++
+    if number>=14
+        ret.Poisoner=1 #猫
+    if number>=12
         ret.Fox=1 #狐
+        if number>=23
+            ret.Fox++
+            if number>=24
+                ret.Fox++
+    if number>=14
+        ret.Couple=2
+        if number>=25
+            ret.Couple++
     ret
 
-exports.normal1 = normal1
+koi=(number)->
+    ret={}
+    #狼
+    ret.Werewolf=1
+    if number>=8
+        ret.Werewolf++
+        if number>=14
+            ret.Werewolf++
+            if number>=18
+                ret.Werewolf++
+                if number>=21
+                    ret.Werewolf++
+                    if number>=23
+                        ret.Werewolf++
+                        if number>=27
+                            ret.Werewolf++
+                            if number>=29
+                                ret.Werewolf++
+    ret.Diviner=1 #占い
+    if number>=23
+        ret.Diviner++
+    if number>=12
+        ret.Madman=1 #狂人
+        if number==13
+            ret.Madman--
+            ret.Fanatic=1 #狂信者
+        if number==14
+            ret.Madman--
+        if number>=15
+            ret.Madman--
+            ret.Fanatic=1 #狂信者
+    if number>=8
+        ret.Psychic=1 #灵能
+        if number>=23
+            ret.Psychic++
+    if number>=11
+        ret.Cupid=1 #丘比特
+        if number==15
+            ret.Cupid--
+            ret.Lover=1 
+        if number==16
+            ret.Cupid--
+            ret.Lover=1 
+        if 12<=number<=13
+            ret.Cupid--
+            ret.Lover=1 
+    if number>=6
+        ret.Guard=1 #猎人
+    if number>=14
+        ret.Couple=2 #共有
+        if number>=25
+            ret.Couple++
+    if number>=16
+        ret.Fox=1 #狐
+        if number>=23
+            ret.Fox++
+            if number>=24
+                ret.Fox++
+    if number>=18
+        ret.Poisoner=1 #猫
+    ret
+
+normal3=(number)->
+    ret={}
+    #狼
+    ret.Werewolf=1
+    if number>=8
+        ret.Werewolf++
+        if number>=14
+            ret.Werewolf++
+            if number>=18
+                ret.Werewolf++
+                if number>=20
+                    ret.Werewolf++
+                    if number>=23
+                        ret.Werewolf++
+                        if number>=27
+                            ret.Werewolf++
+                            if number>=29
+                                ret.Werewolf++
+    if number<=12
+        ret.Diviner=1 #占い
+        ret.Guard=1 #狩人
+        ret.Baker=1
+        ret.HearMadman=1
+    if number>=13
+        ret.SuperDiviner=1 #超占い
+        ret.SuperGuard=1 #超猎人
+        ret.HearMadman=1
+        if number>=14
+            ret.Couple=2 #共有
+        if number>=16
+            ret.Immoral=1
+            if number>=18
+                ret.Poisoner=1
+    if number>=23
+        ret.SuperDiviner++
+    if number>=8
+        ret.Psychic=1 #灵能
+        if number>=23
+            ret.Psychic++
+    if number>=12
+        ret.Fox=1 #狐
+        if number>=23
+            ret.Fox++
+    ret
+
+super1=(number)->
+    ret={}
+    #狼
+    ret.Werewolf=1
+    if number>=8
+        ret.Werewolf++
+        if number>=14
+            ret.Werewolf++
+            if number>=18
+                ret.Werewolf++
+                if number>=20
+                    ret.Werewolf++
+                    if number>=23
+                        ret.Werewolf++
+                        if number>=27
+                            ret.Werewolf++
+                            if number>=29
+                                ret.Werewolf++
+    ret.SuperDiviner=1 #超占い
+    if number>=6
+        ret.SuperGuard=1 #超猎人
+        ret.HearMadman=1
+        if number>=14
+            ret.Couple=2 #共有
+        if number>=16
+            ret.Immoral=1
+            if number>=18
+                ret.Poisoner=1
+    if number>=23
+        ret.SuperDiviner++
+        ret.Madman=1
+    if number>=8
+        ret.Psychic=1 #灵能
+        if number>=23
+            ret.Psychic++
+    if number>=12
+        ret.Fox=1 #狐
+        if number>=17
+            ret.Fox--
+            ret.XianFox=1 #仙狐
+            if number>=23
+                ret.XianFox++
+    ret
 
 exports.jobrules=[
   {
@@ -264,13 +468,7 @@ exports.jobrules=[
       {
         name:"普通3"
         minNumber:4
-        rule:(number)->
-          ret=normal1 number
-          ret.Fox ?= 0
-          ret.Fox++
-          if number<10 && ret.Werewolf>1
-            ret.Werewolf--
-          ret
+        rule:normal3
       }
     ]
   }
@@ -280,24 +478,17 @@ exports.jobrules=[
       {
         name:"恋人"
         rule:(number)->
-          ret=normal1 number
-          if ret.Fox>0  #NaNかも
-            ret.Fox--
-          ret.Cupid ?= 0
-          ret.Cupid++
+          ret=koi number
           ret
       }
       {
-        name:"背德者"
+        name:"超职业"
         rule:(number)->
-          ret=normal1 number
-          if ret.Fox>0
-            ret.Immoral?=0
-            ret.Immoral+=1
+          ret=super1 number
           ret
       }
       {
-        name:"埋毒者"
+        name:"猫又"
         rule:(number)->
           ret=normal1 number
           ret.Poisoner=1
@@ -305,7 +496,7 @@ exports.jobrules=[
           ret
       }
       {
-        name:"猫又"
+        name:"九命妖猫"
         rule:(number)->
           ret=normal1 number
           ret.Cat=1
@@ -614,7 +805,7 @@ exports.jobrules=[
               if number>=14
                 ret.Dictator++
                 count++
-          # 埋毒者
+          # 猫又
           if number>=22
             ret.Poisoner=1
             count++
@@ -766,10 +957,14 @@ exports.jobinfo=
             color:"#dddddd"
         Diviner:
             color:"#00b3ff"
+        SuperDiviner:
+            color:"#49AF58"
         Psychic:
             color:"#bb00ff"
         Guard:
             color:"#969ad4"
+        SuperGuard:
+            color:"#25582C"
         Couple:
             color:"#ffffab"
         Poisoner:
@@ -959,6 +1154,8 @@ exports.jobinfo=
             color:"#d3b959"
         Fanatic:
             color:"#94782b"
+        HearMadman:
+            color:"#1A435C"
         Sorcerer:
             color:"#b91be0"
         LoneWolf:
@@ -1135,6 +1332,8 @@ exports.jobinfo=
             color:"#ffffff"
         Tanner:
             color:"#ede4b9"
+        Teruteru:
+            color:"#66ccff"
         Thief:
             color:"#a4a4a4"
         Hoodlum:
@@ -1309,7 +1508,7 @@ exports.new_rules=[
                 value:
                     type:"time"
                     id: 'night'
-                    defaultValue: 150
+                    defaultValue: 210
             }
             {
                 type: 'item'
@@ -1324,7 +1523,7 @@ exports.new_rules=[
                 value:
                     type:"time"
                     id: 'voting'
-                    defaultValue: 0
+                    defaultValue: 180
             }
             {
                 type: 'item'
@@ -1369,7 +1568,7 @@ exports.new_rules=[
                 value:
                     type:"checkbox"
                     id:"will"
-                    defaultChecked: true
+                    defaultChecked: false
                     value:"die"
             }
             {
@@ -1377,7 +1576,7 @@ exports.new_rules=[
                 value:
                     type:"select"
                     id:"heavenview"
-                    defaultValue: 'norevive'
+                    defaultValue: ''
                     values:[
                         "view"
                         "norevive"
@@ -1449,7 +1648,7 @@ exports.new_rules=[
                 value:
                     type:"integer"
                     id:"silentrule"
-                    defaultValue: 0
+                    defaultValue: 15
                     minValue: 0
                     getstr:(t, value)->
                         {
@@ -1506,20 +1705,20 @@ exports.new_rules=[
             }
             # Losemode is temporarily disabled because
             # it doesn't result in a fun game.
-            # {
-            #     type: 'item'
-            #     value:
-            #         type:"checkbox"
-            #         id:"losemode"
-            #         value:"on"
-            # }
             {
                 type: 'item'
                 value:
-                    type: "hidden"
-                    id: "losemode"
-                    value: ""
+                    type:"checkbox"
+                    id:"losemode"
+                    value:"on"
             }
+            # {
+            #     type: 'item'
+            #     value:
+            #         type: "hidden"
+            #         id: "losemode"
+            #         value: ""
+            # }
             {
                 type: 'item'
                 value:
@@ -1560,7 +1759,7 @@ exports.new_rules=[
                 value:
                     type:"checkbox"
                     id:"wolfsound"
-                    defaultChecked: true
+                    defaultChecked: false
                     value:"aloud"
             }
             {
@@ -1579,7 +1778,7 @@ exports.new_rules=[
             id: 'diviner'
             visible:(rule)->
                 return true if isAllJobsMode rule
-                for job in ["Diviner","ApprenticeSeer","WolfDiviner","TinyFox"]
+                for job in ["Diviner","ApprenticeSeer","WolfDiviner","TinyFox","SuperDiviner"]
                     if rule.jobNumbers[job]>0
                         return true
                 return false
@@ -1589,7 +1788,7 @@ exports.new_rules=[
                 value:
                     type:"select"
                     id:"divineresult"
-                    defaultValue: 'sunrise'
+                    defaultValue: 'immediate'
                     values:[
                         "immediate"
                         "sunrise"
@@ -1622,7 +1821,7 @@ exports.new_rules=[
                 value:
                     type:"select"
                     id:"psychicresult"
-                    defaultValue: 'sunrise'
+                    defaultValue: 'sunset'
                     values:[
                         "sunset"
                         "sunrise"
@@ -1644,6 +1843,7 @@ exports.new_rules=[
                 value:
                     type:"checkbox"
                     id:"couplesound"
+                    defaultChecked: false
                     value:"aloud"
             }
             {
@@ -1662,7 +1862,7 @@ exports.new_rules=[
             id: 'guard'
             visible:(rule)->
                 return true if isAllJobsMode rule
-                for job in ["Guard","Trapper","WanderingGuard","Cosplayer"]
+                for job in ["Guard","Trapper","WanderingGuard","Cosplayer","SuperGuard"]
                     if rule.jobNumbers[job]>0
                         return true
                 return false
@@ -1734,7 +1934,7 @@ exports.new_rules=[
             }
         ]
     }
-    # 埋毒者、猫又
+    # 猫又、九命妖猫
     {
         type: 'group'
         label:

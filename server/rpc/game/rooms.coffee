@@ -401,9 +401,9 @@ module.exports.actions=(req,res,ss)->
                 nowprize:su.nowprize
             # 同IP制限
                 
-            if room.players.some((x)->x.ip==su.ip) && su.ip?.match("127.0.0.1")==null
-                res error:"禁止多开 #{su.ip}"
-                return
+            # if room.players.some((x)->x.ip==su.ip) && su.ip?.match("127.0.0.1")==null
+            #     res error:"禁止多开 #{su.ip}"
+            #     return
                 
             # please no, link of data:image/jpeg;base64 would be a disaster
             if user.icon?.length > Config.maxlength.user.icon
@@ -418,8 +418,8 @@ module.exports.actions=(req,res,ss)->
                 if !theme.isAvailable?()
                     res {error: i18n.t "error.theme.notAvailable", {name: theme.name}}
                     return
-                if room.quitfromtheme? && room.quitfromtheme[req.session.userId]? && room.quitfromtheme[req.session.userId] + 10*1000 > Date.now()
-                    res {error: i18n.t "error.theme.tooFrequent", {time: 10 + Math.floor((room.quitfromtheme[req.session.userId] - Date.now())/1000)}}
+                if room.quitfromtheme? && room.quitfromtheme[req.session.userId]? && room.quitfromtheme[req.session.userId] + 0*1000 > Date.now()
+                    res {error: i18n.t "error.theme.tooFrequent", {time: 0 + Math.floor((room.quitfromtheme[req.session.userId] - Date.now())/1000)}}
                     return
 
             if room.blind

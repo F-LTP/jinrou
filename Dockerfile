@@ -9,6 +9,7 @@ RUN npm install --production
 # copy source files.
 COPY ./prizedata ./prizedata/
 COPY ./public ./public/
+COPY ./config ./config/
 COPY ./app.js ./
 COPY ./manual ./manual/
 COPY ./client ./client/
