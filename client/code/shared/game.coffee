@@ -459,19 +459,19 @@ super1=(number)->
     ret={}
     #狼
     ret.Werewolf=1
-    if number>=8
+    if number>=7
         ret.Werewolf++
-        if number>=14
+        if number>=13
             ret.Werewolf++
             if number>=17
                 ret.Werewolf++
-                if number>=20
+                if number>=19
                     ret.Werewolf++
-                    if number>=23
+                    if number>=22
                         ret.Werewolf++
-                        if number>=27
+                        if number>=26
                             ret.Werewolf++
-                            if number>=29
+                            if number>=28
                                 ret.Werewolf++
     ret.Werewolf--
     ret.SuperWerewolf=1
@@ -480,7 +480,7 @@ super1=(number)->
         ret.SuperDiviner++
     if number>=8
         ret.Psychic=1 #灵能
-        if number>=23
+        if number>=22
             ret.Psychic++
     if number>=6
         ret.Madman=1 #狂人
@@ -1520,7 +1520,7 @@ exports.new_rules=[
                     defaultValue: 'on'
                     values: [
                         "on"
-                        "off"
+                        # "off"
                         "no"
                     ]
             }
