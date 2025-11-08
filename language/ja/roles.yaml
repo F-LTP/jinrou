@@ -5,16 +5,17 @@ jobname:
   Human: '村人'
   Werewolf: '人狼'
   Diviner: '占卜师'
-  SuperDiviner: '超占卜师'
+  SuperDiviner: 'SP占卜师'
   Psychic: '灵能者'
   Madman: '狂人'
   Guard: '猎人'
-  SuperGuard: '超猎人'
+  SuperGuard: 'SP猎人'
   Couple: '共有者'
   Fox: '妖狐'
   Poisoner: '猫又'
   BigWolf: '大狼'
   TinyFox: '小狐'
+  SuperFox: 'SP妖狐'
   Bat: '蝙蝠'
   Noble: '贵族'
   Slave: '奴隶'
@@ -55,6 +56,7 @@ jobname:
   Oldman: '老人'
   Tanner: '皮革匠'
   Teruteru: '晴天娃娃'
+  ButaOtoko: '猪男'
   Thief: '小偷'
   OccultMania: '怪诞狂热者'
   WolfCub: '狼之子'
@@ -72,6 +74,7 @@ jobname:
   Counselor: '策士'
   Miko: '巫女'
   GreedyWolf: '贪婪的狼'
+  SuperWerewolf: 'SP人狼'
   FascinatingWolf: '魅惑的女狼'
   SolitudeWolf: '孤独的狼'
   ToughWolf: '硬汉人狼'
@@ -104,7 +107,7 @@ jobname:
   MadScientist: '疯狂科学家'
   SpiritPossessed: '恶灵凭依'
   Forensic: '法医学者'
-  Cosplayer: 'Cosplayer'
+  Cosplayer: '黑骑士'
   TinyGhost: '妖怪'
   Ninja: '忍者'
   Twin: '双胞胎'
@@ -259,6 +262,13 @@ Diviner:
   select: '{{name}} 占卜了 {{target}} 的身份。'
   # Divining result.
   resultlog: '{{name}} 占卜了 {{target}} 的身份，他是 {{result}}。'
+
+# SuperFox
+SuperFox:
+  # Selected a target.
+  select: 'SP妖狐 {{name}} 占卜了 {{target}} 的真实身份。'
+  # Divining result.
+  resultlog: 'SP妖狐 {{name}} 占卜了 {{target}} 的真实身份，他是 {{result}}。'
 
 SuperDiviner:
   # Divine result
@@ -551,6 +561,11 @@ Miko:
 GreedyWolf:
   # Select a greed.
   select: '为了满足 {{name}} 的贪欲。人狼们今晚可以多袭击一个人。'
+
+# SuperWerewolf
+SuperWerewolf:
+  # Select a greed.
+  select: '人狼 {{name}} 发动了SP能力。人狼们今晚可以多袭击一个人。'
 
 # FascinatingWolf
 FascinatingWolf:

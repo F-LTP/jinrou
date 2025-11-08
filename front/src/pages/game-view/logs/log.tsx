@@ -514,8 +514,8 @@ const LogPart = styled.div<{
       : 'none'};
   font-weight: ${props => (props.logStyle.bold ? 'bold' : 'normal')};
   overflow: hidden;
-
-  line-height: 1;
+  letter-spacing: 0.05em;
+  line-height: 1.1;
   word-break: break-all;
   overflow-wrap: break-word;
   word-break: break-word;
@@ -585,12 +585,12 @@ interface IPropComment {
 
 const getFontSize = (size: 'big' | 'small' | undefined) =>
   size === 'big'
-    ? 'calc(1.2 * var(--base-font-size))'
+    ? 'calc(1.1 * var(--base-font-size))'
     : size === 'small'
-      ? 'calc(0.8 * var(--base-font-size))'
+      ? 'calc(1 * var(--base-font-size))'
       : 'var(--base-font-size)';
 const getLineHeight = (size: 'big' | 'small' | undefined) =>
-  size === 'big' ? '1' : size === 'small' ? '1.3' : '1';
+  size === 'big' ? '1.1' : size === 'small' ? '1.1' : '1.1';
 /**
  * Log comment box.
  */
@@ -598,7 +598,12 @@ const Comment = styled(Main)<IPropComment>`
   white-space: pre-wrap;
   font-size: ${({ size }) => getFontSize(size)};
   line-height: ${({ size }) => getLineHeight(size)};
-  ${({ size }) => (size === 'big' ? 'font-weight: bold;' : '')};
+  ${({ size }) =>
+    size === 'big'
+      ? 'font-weight: bold;'
+      : size === 'small'
+        ? 'text-decoration: underline;'
+        : ''};
 `;
 
 /**

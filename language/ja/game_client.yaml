@@ -118,10 +118,10 @@ speak:
   # size of comment.
   size:
     # description of size selection.
-    description: '发言字体大小'
-    small: '小字号'
+    description: '发言字体样式'
+    small: '下划线'
     normal: '普通'
-    big: '大字号'
+    big: '粗体'
   # kind of speech.
   kind:
     description: '发言种类'
