@@ -39,7 +39,7 @@ messages:
   SuperWerewolf: '在想要发动SP能力，额外杀死1人的情况下请选择'
   Diviner: '请选择要占卜的对象'
   SuperDiviner: '请选择要SP占卜的对象'
-  TinyFox: '请选择要使用SP能力的对象'
+  TinyFox: '请选择要占卜的对象'
   SuperFox: '请选择要占卜的对象'
   Guard: '请选择要护卫的对象'
   SuperGuard: '请选择要SP护卫的对象'
