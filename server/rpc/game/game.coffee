@@ -1771,7 +1771,7 @@ class Game
                         break
         @werewolf_flag=@werewolf_flag.filter (fl)->
             # こいつらは1夜限り
-            return !(/^(?:GreedyWolf|ToughWolf)_/.test fl)
+            return !(/^(?:GreedyWolf|ToughWolf|SuperWerewolf)_/.test fl)
     # ドラキュラの攻撃を処理する
     midnightDraculaAttack:->
         if @day == 1
@@ -4367,6 +4367,8 @@ class Poisoner extends Player
                 canbedead=canbedead.filter (x)->x.isWerewolf() && x.isAttacker()
         else if found=="vampire"
             canbedead=canbedead.filter (x)->x.id==from
+        else if found=="gmpunish"
+            canbedead=[]
         return if canbedead.length==0
         r=Math.floor Math.random()*canbedead.length
         pl=canbedead[r] # 被害者
@@ -4411,6 +4413,91 @@ class TinyFox extends Diviner
             @addGamelog game,"foxdivine",success,p.id
     divineeffect:(game)->
 
+class SuperFox extends Fox
+    type:"SuperFox"
+    team:"Fox"
+    midnightSort:100
+    formType: FormType.optionalOnce
+    isFox:->true
+    constructor:->
+        super
+        @setFlag []
+            # {player:Player, result:String, day: number}
+    sleeping:(game)->true # 占いは必須ではない
+    jobdone:(game)->@flag.length > 0
+    job:(game,playerid,query)->
+        # 占い
+        if @flag.length > 0
+            return game.i18n.t "error.common.alreadyUsed"
+        pl=game.getPlayer playerid
+        unless pl?
+            return game.i18n.t "error.common.nonexistentPlayer"
+        @setFlag [{
+            results: @flag.results
+            target: playerid
+        }]
+        @setTarget playerid
+        pl.touched game,@id
+        log=
+            mode:"skill"
+            to:@id
+            comment: game.i18n.t "roles:SuperFox.select", {name: @name, target: pl.name}
+        splashlog game.id,game,log
+        if game.rule.divineresult=="immediate"
+            @dodivine game
+            @showdivineresult game, playerid
+        null
+    sunrise:(game)->
+        super
+        unless game.rule.divineresult=="immediate"
+            @showdivineresult game, @flag.target
+    midnight:(game,midnightSort)->
+        super
+        unless game.rule.divineresult=="immediate"
+            @dodivine game
+        @divineeffect game
+    #占い実行
+    dodivine:(game)->
+        target = game.skillTargetHook.get @target
+        origp = game.getPlayer @target
+        p=game.getPlayer target
+        if p? && origp?
+            # show original target's name even if target is forced to another player.
+            @setFlag @flag.concat {
+                player: origp.publicinfo()
+                result: game.i18n.t "roles:SuperFox.resultlog", {name: @name, target: origp.name, result: p.getMainJobname()}
+                day: game.day
+            }
+            @addGamelog game,"divine",p.type,@target    # 占った
+    showdivineresult:(game, target)->
+        r=@flag[@flag.length-1]
+        return unless r?
+        # result of which day to show?
+        resday = (
+            if game.rule.divineresult == "immediate"
+                game.day
+            else
+                game.day - 1)
+        return if r.day != resday
+
+        log=
+            mode:"skill"
+            to:@id
+            comment:r.result
+        splashlog game.id,game,log
+    getOpenForms:(game)->
+        res = super
+        if Phase.isNight(game.phase)
+            unless @flag?
+                # 占いが可能
+                res.push {
+                    type: @type
+                    options: @makeJobSelection game, false
+                    formType: FormType.optionalOnce
+                    objid: @objid
+                }
+        return res
+    divineeffect:(game)->
 
 class Bat extends Player
     type:"Bat"
@@ -5848,7 +5935,18 @@ class Teruteru extends Player
                     name: @name,
                 }
             splashlog game.id, game, log
-    
+
+class ButaOtoko extends Player
+    type:"ButaOtoko"
+    team:""
+    checkDeathResistance:(game, found)->
+        if Found.isNormalWerewolfAttack found
+            @setFlag "win"
+            return false
+        else
+            return false
+    isWinner:(game,team)->@dead && @flag=="win"
+
 class OccultMania extends Player
     type:"OccultMania"
     midnightSort:102
@@ -6719,6 +6817,48 @@ class GreedyWolf extends Werewolf
             return super
     checkJobValidity:(game,query)->
         if query.jobtype=="GreedyWolf"
+            # なしでOK!
+            return true
+        return super
+class SuperWerewolf extends Werewolf
+    type:"SuperWerewolf"
+    sleeping:(game)->game.werewolf_target_remain<=0 # 占いは必須ではない
+    jobdone:(game)->game.werewolf_target_remain<=0 && (@flag || game.day==1)
+    job:(game,playerid,query)->
+        if query.jobtype!="SuperWerewolf"
+            # 人狼の仕事
+            return super
+        if @flag
+            return game.i18n.t "error.common.alreadyUsed"
+        @setFlag true
+        if game.werewolf_target_remain+game.werewolf_target.length ==0
+            return game.i18n.t "error.common.cannotUseSkillNow"
+        log=
+            mode:"wolfskill"
+            comment: game.i18n.t "roles:SuperWerewolf.select", {name: @name}
+        splashlog game.id,game,log
+        game.werewolf_target_remain++
+        game.werewolf_flag.push "SuperWerewolf_#{@id}"
+        game.splashjobinfo game.players.filter (x)=>x.id!=@id && x.isWerewolf()
+        null
+    getOpenForms:(game)->
+        res = super
+        if Phase.isNight(game.phase) && !@flag && game.day >= 2
+            res.push {
+                type: "SuperWerewolf"
+                options: []
+                formType: FormType.optionalOnce
+                objid: @objid
+            }
+        return res
+    makeJobSelection:(game, isvote)->
+        if !isvote && @sleeping(game) && !@jobdone(game)
+            # 欲張る選択肢のみある
+            return []
+        else
+            return super
+    checkJobValidity:(game,query)->
+        if query.jobtype=="SuperWerewolf"
             # なしでOK!
             return true
         return super
@@ -12233,6 +12373,11 @@ class GameMaster extends Player
     chooseJobDay:(game)->true   # 昼でも対象選択
     makeJobSelection:(game)->
         # 常に全員
+        console.log "=== GM检测 ==="
+        console.log game.players.map((pl)-> {
+            name: pl.name
+            value: pl.id
+        })
         return game.players.map((pl)-> {
             name: pl.name
             value: pl.id
@@ -14143,6 +14288,7 @@ jobs=
     Poisoner:Poisoner
     BigWolf:BigWolf
     TinyFox:TinyFox
+    SuperFox:SuperFox
     Bat:Bat
     Noble:Noble
     Slave:Slave
@@ -14183,6 +14329,7 @@ jobs=
     Oldman:Oldman
     Tanner:Tanner
     Teruteru:Teruteru
+    ButaOtoko:ButaOtoko
     OccultMania:OccultMania
     MinionSelector:MinionSelector
     WolfCub:WolfCub
@@ -14200,6 +14347,7 @@ jobs=
     Counselor:Counselor
     Miko:Miko
     GreedyWolf:GreedyWolf
+    SuperWerewolf:SuperWerewolf
     FascinatingWolf:FascinatingWolf
     SolitudeWolf:SolitudeWolf
     ToughWolf:ToughWolf
@@ -14402,6 +14550,7 @@ jobStrength=
     Poisoner:20
     BigWolf:80
     TinyFox:10
+    SuperFox:10
     Bat:10
     Noble:12
     Slave:5
@@ -14442,6 +14591,7 @@ jobStrength=
     Oldman:4
     Tanner:15
     Teruteru:15
+    ButaOtoko:15
     OccultMania:10
     MinionSelector:0
     WolfCub:70
@@ -14459,6 +14609,7 @@ jobStrength=
     Counselor:25
     Miko:14
     GreedyWolf:60
+    SuperWerewolf:60
     FascinatingWolf:52
     SolitudeWolf:20
     ToughWolf:55
@@ -15109,8 +15260,8 @@ module.exports.actions=(req,res,ss)->
                         exceptions.push "VampireClan"
 
                     # 妖狐陣営
-                    if frees>0 && (joblist.Fox>0 || joblist.TinyFox > 0 || joblist.XianFox > 0 || joblist.NightRabbit > 0 || joblist.Trickster > 0 || joblist.VariationFox > 0)
-                        if joblist.Fox + joblist.TinyFox + joblist.XianFox + joblist.NightRabbit + joblist.Trickster + joblist.VariationFox == 1
+                    if frees>0 && (joblist.Fox>0 || joblist.TinyFox > 0 || joblist.SuperFox > 0 || joblist.XianFox > 0 || joblist.NightRabbit > 0 || joblist.Trickster > 0 || joblist.VariationFox > 0)
+                        if joblist.Fox + joblist.TinyFox + joblist.SuperFox + joblist.XianFox + joblist.NightRabbit + joblist.Trickster + joblist.VariationFox == 1
                             if playersnumber>=14
                                 # 1人くらいは…
                                 if Math.random()<0.25 && !nonavs.Immoral
@@ -15834,6 +15985,10 @@ module.exports.actions=(req,res,ss)->
 
             if ruleobj.rolerequest=="on" && !(query.jobrule in ["特殊规则.黑暗火锅","特殊规则.手调黑暗火锅","特殊规则.量子人狼","特殊规则.Endless黑暗火锅"])
                 # 希望役職制あり
+                console.log "=== 希望制开始 ==="
+                console.log "房间玩家:", room.players
+                console.log "game.players:", game.players
+                console.log "game.participants:", game.participants
                 # とりあえず入れなくする
                 M.rooms.update {id:roomid},{$set:{mode:"playing"}}
                 # 役職選択中
