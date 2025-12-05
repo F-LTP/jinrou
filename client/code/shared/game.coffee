@@ -247,7 +247,7 @@ normal2=(number)->
         ret.Werewolf++
         if number>=14
             ret.Werewolf++
-            if number>=17
+            if number>=16
                 ret.Werewolf++
                 if number>=20
                     ret.Werewolf++
@@ -277,6 +277,7 @@ normal2=(number)->
             ret.Immoral=1
         if number==16
             ret.HearMadman=1
+            ret.Madman--
         if 18<=number<=22
             ret.Immoral=1 
             if number==19
