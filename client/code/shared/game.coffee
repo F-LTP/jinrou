@@ -1525,7 +1525,7 @@ exports.new_rules=[
                     defaultValue: 'on'
                     values: [
                         "on"
-                        # "off"
+                        "off"
                         "no"
                     ]
             }
