@@ -16035,10 +16035,6 @@ module.exports.actions=(req,res,ss)->
 
             if ruleobj.rolerequest=="on" && !(query.jobrule in ["特殊规则.黑暗火锅","特殊规则.手调黑暗火锅","特殊规则.量子人狼","特殊规则.Endless黑暗火锅"])
                 # 希望役職制あり
-                console.log "=== 希望制开始 ==="
-                console.log "房间玩家:", room.players
-                console.log "game.players:", game.players
-                console.log "game.participants:", game.participants
                 # とりあえず入れなくする
                 M.rooms.update {id:roomid},{$set:{mode:"playing"}}
                 # 役職選択中
