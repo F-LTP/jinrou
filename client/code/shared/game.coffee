@@ -519,6 +519,69 @@ super1=(number)->
         ret.Poisoner=1 #猫
     ret
 
+fanni1=(number)->
+    ret={}
+    #狼
+    ret.CautiousWolf=1
+    if number>=8
+        ret.CautiousWolf++
+        if number>=14
+            ret.CautiousWolf++
+            if number>=17
+                ret.CautiousWolf++
+                if number>=20
+                    ret.CautiousWolf++
+                    if number>=23
+                        ret.CautiousWolf++
+                        if number>=27
+                            ret.CautiousWolf++
+                            if number>=29
+                                ret.CautiousWolf++
+    ret.Diviner=1 #占い
+    if number>=23
+        ret.Diviner++
+    if number>=8
+        ret.Psychic=1 #灵能
+        if number>=23
+            ret.Psychic++
+    if number>=6
+        ret.Madman=1 #狂人
+        ret.Guard=1 #猎人
+        if number==13
+            ret.Madman--
+            ret.HearMadman=1  #13人是听狂配置
+            ret.Baker=1
+        if 15<=number<=16
+            ret.Madman--
+            ret.Fanatic=1 #狂信者
+            if number==16
+                ret.Immoral=1
+        if number==18
+            ret.Immoral=1
+        if 19<=number<=22
+            ret.Immoral=1 
+            if number==19
+                ret.Madman--
+                ret.Fanatic=1 #狂信者
+            if number==22
+                ret.Madman--
+                ret.Fanatic=1 #狂信者
+        if number>=23
+            ret.Madman++
+    if number>=14
+        ret.Couple=2 #共有
+        if number>=25
+            ret.Couple++
+    if number>=12
+        ret.Fox=1 #狐
+        if number>=23
+            ret.Fox++
+            if number>=24
+                ret.Fox++
+    if number>=17
+        ret.Poisoner=1 #猫
+    ret
+
 exports.jobrules=[
   {
     name:"普通配置"
@@ -566,11 +629,9 @@ exports.jobrules=[
             
       }
       {
-        name:"猫又"
+        name:"魔女反逆者"
         rule:(number)->
-          ret=normal1 number
-          ret.Poisoner=1
-          ret.Werewolf++
+          ret=fanni1 number
           ret
       }
       {

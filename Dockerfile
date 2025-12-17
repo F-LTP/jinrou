@@ -4,8 +4,10 @@ MAINTAINER uhyo
 # define work directory
 WORKDIR /jinrou
 # First, install dependencies.
+# COPY ./package.json ./package-lock.json ./
+# RUN npm install --production
+COPY ./node_modules ./node_modules/
 COPY ./package.json ./package-lock.json ./
-RUN npm install --production
 # copy source files.
 COPY ./prizedata ./prizedata/
 COPY ./public ./public/

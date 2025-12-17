@@ -120,7 +120,7 @@ speak:
   size:
     # description of size selection.
     description: '发言字体样式'
-    small: '下划线'
+    small: '特殊强调'
     normal: '普通'
     big: '粗体'
   # kind of speech.
