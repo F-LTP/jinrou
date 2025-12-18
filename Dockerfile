@@ -5,9 +5,11 @@ MAINTAINER uhyo
 WORKDIR /jinrou
 # First, install dependencies.
 # COPY ./package.json ./package-lock.json ./
-# RUN npm install --production
-COPY ./node_modules ./node_modules/
+# COPY ./node_modules ./node_modules/
 COPY ./package.json ./package-lock.json ./
+RUN npm config set registry https://registry.npmjs.org/ \
+ && npm config set strict-ssl false \
+ && npm install --production --no-audit --no-fund --verbose
 # copy source files.
 COPY ./prizedata ./prizedata/
 COPY ./public ./public/
