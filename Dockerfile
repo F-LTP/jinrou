@@ -7,9 +7,9 @@ WORKDIR /jinrou
 # COPY ./package.json ./package-lock.json ./
 # COPY ./node_modules ./node_modules/
 COPY ./package.json ./package-lock.json ./
-RUN npm config set registry https://registry.npmjs.org/ \
+RUN npm config set registry https://registry.npmmirror.com/ \
  && npm config set strict-ssl false \
- && npm install --production --no-audit --no-fund --verbose
+ && npm install --production --no-audit --no-fund
 # copy source files.
 COPY ./prizedata ./prizedata/
 COPY ./public ./public/

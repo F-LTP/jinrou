@@ -245,7 +245,7 @@ normal2=(number)->
     ret.Werewolf=1
     if number>=8
         ret.Werewolf++
-        if number>=14
+        if number>=12
             ret.Werewolf++
             if number>=16
                 ret.Werewolf++
@@ -267,16 +267,12 @@ normal2=(number)->
     if number>=6
         ret.Madman=1 #狂人
         ret.Guard=1 #猎人
-        if 12<=number<=13
-            ret.Madman--
-            ret.HearMadman=1  #1213人是听狂配置
-            ret.Baker=1
         if 14<=number<=15
             ret.Madman--
             ret.Fanatic=1 #狂信者
             ret.Immoral=1
         if number==16
-            ret.HearMadman=1
+            ret.Immoral=1
             ret.Madman--
         if 18<=number<=22
             ret.Immoral=1 
@@ -288,9 +284,9 @@ normal2=(number)->
                 ret.Fanatic=1 #狂信者
         if number>=23
             ret.Madman++
-    if number>=14
-        ret.Poisoner=1 #猫
     if number>=12
+        ret.Poisoner=1 #猫
+    if number>=14
         ret.Fox=1 #狐
         if number>=23
             ret.Fox++
@@ -419,7 +415,7 @@ normal3=(number)->
         ret.Werewolf++
         if number>=14
             ret.Werewolf++
-            if number>=18
+            if number>=17
                 ret.Werewolf++
                 if number>=20
                     ret.Werewolf++
@@ -429,31 +425,48 @@ normal3=(number)->
                             ret.Werewolf++
                             if number>=29
                                 ret.Werewolf++
-    if number<=12
-        ret.Diviner=1 #占い
-        ret.Guard=1 #狩人
-        ret.Baker=1
-        ret.HearMadman=1
-    if number>=13
-        ret.SuperDiviner=1 #超占い
-        ret.SuperGuard=1 #超猎人
-        ret.HearMadman=1
-        if number>=14
-            ret.Couple=2 #共有
-        if number>=16
-            ret.Immoral=1
-            if number>=18
-                ret.Poisoner=1
+    ret.Diviner=1 #占い
     if number>=23
-        ret.SuperDiviner++
+        ret.Diviner++
     if number>=8
         ret.Psychic=1 #灵能
         if number>=23
             ret.Psychic++
+    if number>=6
+        ret.Madman=1 #狂人
+        ret.Guard=1 #猎人
+        if 12<=number<=13
+            ret.Madman--
+            ret.HearMadman=1  #1213人是听狂配置
+            ret.Baker=1
+        if number==15
+            ret.Madman--
+            ret.Fanatic=1 #狂信者
+        if number==16
+            ret.Madman--
+            ret.HearMadman=1
+        if 19<=number<=22
+            ret.Immoral=1 
+            if number==19
+                ret.Madman--
+                ret.Fanatic=1 #狂信者
+            if number==22
+                ret.Madman--
+                ret.Fanatic=1 #狂信者
+        if number>=23
+            ret.Madman++
+    if number>=17
+        ret.Couple=2 #共有
+        if number>=25
+            ret.Couple++
     if number>=12
         ret.Fox=1 #狐
         if number>=23
             ret.Fox++
+            if number>=24
+                ret.Fox++
+    if number>=14
+        ret.Poisoner=1 #猫
     ret
 
 super1=(number)->
