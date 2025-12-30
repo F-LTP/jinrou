@@ -284,7 +284,7 @@ normal2=(number)->
                 ret.Fanatic=1 #狂信者
         if number>=23
             ret.Madman++
-    if number>=12
+    if number==12 || number>=14
         ret.Poisoner=1 #猫
     if number>=14
         ret.Fox=1 #狐
@@ -292,7 +292,7 @@ normal2=(number)->
             ret.Fox++
             if number>=24
                 ret.Fox++
-    if number>=14
+    if number>=13
         ret.Couple=2
         if number>=25
             ret.Couple++
@@ -455,7 +455,7 @@ normal3=(number)->
                 ret.Fanatic=1 #狂信者
         if number>=23
             ret.Madman++
-    if number>=17
+    if number>=16
         ret.Couple=2 #共有
         if number>=25
             ret.Couple++
@@ -465,7 +465,7 @@ normal3=(number)->
             ret.Fox++
             if number>=24
                 ret.Fox++
-    if number>=14
+    if number>=14 && number!=16
         ret.Poisoner=1 #猫
     ret
 
