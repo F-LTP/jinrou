@@ -21,7 +21,7 @@ module.exports=
         return true
     skins:
         nikaido_hiro:
-            avatar: ["https://s2.loli.net/2025/07/20/c1X9eZhknWau64s.jpg","https://s2.loli.net/2025/10/24/4Z57jGkRnYbJWTc.png","https://s2.loli.net/2025/11/28/yVn7CIdMfc6xKq9.png"]
+            avatar: ["https://s2.loli.net/2025/07/20/c1X9eZhknWau64s.jpg","https://s2.loli.net/2025/10/24/4Z57jGkRnYbJWTc.png","https://s41.ax1x.com/2026/01/04/pZUvTyV.png"]
             name: "二阶堂希罗"
             prize: []
 
@@ -136,7 +136,7 @@ module.exports=
              prize: []
             
         shojo:
-             avatar: "https://s2.loli.net/2025/10/24/dU8JEP3Xo2hS1Yp.jpg"
+             avatar: "https://s41.ax1x.com/2026/01/04/pZUv6L8.png"
              name: "绵贯咲耶"
              prize: []
             
@@ -170,30 +170,30 @@ module.exports=
              name: "水无月美迦"
              prize: []
              
-        # shii:
-        #      avatar: "https://s2.loli.net/2025/10/24/H3EvStBNefIY9uh.jpg"
-        #      name: "药师堂诗衣"
-        #      prize: []
+        shii:
+             avatar: "https://s41.ax1x.com/2026/01/03/pZUTgZn.png"
+             name: "药师堂诗衣"
+             prize: []
              
-        # amane:
-        #      avatar: "https://s2.loli.net/2025/10/24/wcILKrESJgZpqFD.jpg"
-        #      name: "药师堂天音"
-        #      prize: []
+        amane:
+             avatar: "https://s2.loli.net/2025/10/24/wcILKrESJgZpqFD.jpg"
+             name: "药师堂天音"
+             prize: []
              
-        # kira:
-        #      avatar: "https://s2.loli.net/2025/10/24/98bwE7F5PxgSaDy.jpg"
-        #      name: "碧羽星罗"
-        #      prize: []
+        kira:
+             avatar: "https://s2.loli.net/2025/10/24/98bwE7F5PxgSaDy.jpg"
+             name: "碧羽星罗"
+             prize: []
              
-        # itori:
-        #      avatar: "https://s2.loli.net/2025/10/24/f2CJiGvr5kBROjK.jpg"
-        #      name: "墨垣丝鸟"
-        #      prize: []
+        itori:
+             avatar: "https://s41.ax1x.com/2026/01/03/pZUTyrj.png"
+             name: "墨垣丝鸟"
+             prize: []
              
-        # mai:
-        #      avatar: "https://s2.loli.net/2025/10/24/fNk31DTKavy2VIH.jpg"
-        #      name: "相原舞"
-        #      prize: []
+        mai:
+             avatar: "https://s2.loli.net/2025/10/24/fNk31DTKavy2VIH.jpg"
+             name: "志波千羽"
+             prize: []
             
         # jocho:
         #     avatar: "https://s2.loli.net/2025/08/06/Tqg17wFJfD2pQ98.png"
