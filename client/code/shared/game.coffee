@@ -105,7 +105,7 @@ exports.jobs=["Human","Werewolf","Diviner","Psychic","Madman","Guard","Couple","
 ]
 # 隠されていて自分で入れることができない役職
 exports.hiddenJobs = [
-    "Light", "Neet", "MinionSelector", "QuantumPlayer", "HolyMarked", "Lorelei",
+    "Light", "Neet", "MinionSelector", "QuantumPlayer",
     # 宇宙人狼
     "SpaceWerewolfCrew", "SpaceWerewolfImposter", "SpaceWerewolfObserver","SpaceWerewolfGuard","SpaceWerewolfSabotage"
 ]
@@ -383,9 +383,13 @@ queen=(number)->
         ret.Madman=1 #狂人
         ret.Guard=1 #猎人
         ret.QueenSpectator=1 #女王
-        if 13<=number<=15
+        if 13<=number<=14
             ret.Madman--
             ret.Fanatic=1 #狂信者
+            ret.Couple=2
+        if number==15
+            ret.Madman--
+            ret.HearMadman=1
             ret.Couple=2
         if number>=16
             ret.Cosplayer=1
