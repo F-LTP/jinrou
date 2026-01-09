@@ -13,7 +13,7 @@ exports.jobs=["Human","Werewolf","Diviner","Psychic","Madman","Guard","Couple","
 # るる鯖で見つけた职业
 "Fanatic","HearMadman","Immoral","SuperDiviner","SuperGuard","SuperFox"
 # 特殊役職2
-"Devil","Stalker","WhisperingMad","Dog","Perfidious","Heretic"
+"Devil","Stalker","WhisperingMad","Dog","Perfidious","Heretic","HolyMarked",
 # 桃栗基本特殊役職
 "Bat","Noble","Slave","Magician","Spy","WolfDiviner",
 # 桃栗期間限定役職
@@ -97,7 +97,7 @@ exports.jobs=["Human","Werewolf","Diviner","Psychic","Madman","Guard","Couple","
 # 人狼ゲームオンライン
 "RainyBoy",
 # オリジナル
-"SantaClaus","Reindeer",
+"SantaClaus","Reindeer","Lorelei",
 "Pyrotechnist","Patissiere","Shishimai","Idol","LurkingMad",
 "DecoyWolf","Hooligan","HomeComer","DragonKnight","Poet","Sacrifice",
 "Synesthete","Streamer","RemoteWorker","Disguised","Acrobat","Hanami",
@@ -120,7 +120,7 @@ exports.blacks=["Werewolf","WolfDiviner","MadWolf","Lycan","LoneWolf","WolfCub",
 exports.teams=teams=
     Human:["Human","Diviner","SuperDiviner","Psychic","Guard","SuperGuard","Couple","Poisoner","ToughGuy","Noble","Slave","Magician","Fugitive","Merchant","QueenSpectator","MadWolf","Liar","Light","Cursed","ApprenticeSeer","Diseased","Spellcaster","Lycan","Priest","Prince","PI","Cat","Witch","Oldman","OccultMania","Dog","Dictator","SeersMama","Trapper","RedHood","Counselor","Miko","HolyMarked","WanderingGuard","TroubleMaker","FrankensteinsMonster","BloodyMary","King","SantaClaus","Phantom","DrawGirl","Pyrotechnist","Baker","SpiritPossessed","GotChocolate","Forensic","Cosplayer","TinyGhost","Ninja","Twin","Hunter","Emma","Idol","HomeComer","Illusionist","DragonKnight","Samurai","Elementaler","Poet","Sacrifice","Oracle","GachaAddicted","Fate","Synesthete","Reindeer","Streamer","Tarzan","Hitokotonushinokami","RemoteWorker","Gambler","Sleepwalker","Disguised","Saint","SpaceWerewolfCrew","SpaceWerewolfObserver","SpaceWerewolfGuard","Hanami","Reincarnator","MementoDisposer","Interpreter","Dreamer","Assassin","StraySheep","Secretary","HouseKeeper","DarkPsychic","Itako"]
     Werewolf:["Werewolf","Madman","BigWolf","Fanatic","HearMadman","Spy","WolfDiviner","Spy2","Sorcerer","LoneWolf","MinionSelector","WolfCub","WhisperingMad","WolfBoy","GreedyWolf","SuperWerewolf","FascinatingWolf","SolitudeWolf","ToughWolf","ThreateningWolf","ObstructiveMad","PsychoKiller","CautiousWolf","Bomber","Ushinotokimairi","MadDog","Hypnotist","CraftyWolf","Pumpkin","MadScientist","MadHunter","MadCouple","EyesWolf","TongueWolf","BlackCat","LurkingMad","DecoyWolf","Satori","AbsoluteWolf","QueenOfNight","CurseWolf","IntuitionWolf","Faker","SealWolf","CynthiaWolf","NetherWolf","DarkWolf","SpaceWerewolfImposter","Acrobat","BloodWolf","Shadow","AttractiveWoman","DestroyCraziest","RainyBoy"]
-    Fox:["Fox","SuperFox","TinyFox","Immoral","Perfidious","Heretic","Blasphemy","XianFox","NightRabbit","Trickster","VariationFox","Actress","Perfidious","Heretic"]
+    Fox:["Fox","SuperFox","TinyFox","Immoral","Perfidious","Heretic","Blasphemy","XianFox","NightRabbit","Trickster","VariationFox","Actress"]
     Devil:["Devil"]
     Friend:["Cupid","Lover","BadLady","Patissiere","SnowLover","LunaticLover"]
     Vampire:["Vampire","Dracula","VampireClan"]
@@ -403,7 +403,7 @@ queen=(number)->
                 ret.Madman=1
         if number>=22
             ret.Madman++
-    if number>=14
+    if number>=16
         ret.Fox=1 #狐
         if number>=22
             ret.Fox++
