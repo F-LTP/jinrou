@@ -15222,6 +15222,8 @@ module.exports.actions=(req,res,ss)->
                     # 狐が誰も居ないときは背徳は出ない
                     if Shared.game.categories.Fox.every((j)-> joblist[j]==0)
                         exceptions.push "Immoral"
+                        exceptions.push "Perfidious"
+                        exceptions.push "Heretic"
                     # 吸血鬼の眷属も
                     if joblist.Vampire == 0 && joblist.Dracula == 0
                         exceptions.push "VampireClan"
@@ -15321,16 +15323,24 @@ module.exports.actions=(req,res,ss)->
                                     frees--
                                 if playersnumber <= 17
                                     exceptions.push "Immoral"
+                                    exceptions.push "Heretic"
+                                    exceptions.push "Prefidious"
                             else
                                 # サプライズ的に…
                                 if Math.random()<0.06 && !nonavs.Immoral
                                     joblist.Immoral++
                                     frees--
                                 exceptions.push "Immoral"
+                                exceptions.push "Heretic"
+                                exceptions.push "Prefidious"
                         else if playersnumber <= 17
                             exceptions.push "Immoral"
+                            exceptions.push "Heretic"
+                            exceptions.push "Prefidious"
                     else
                         exceptions.push "Immoral"
+                        exceptions.push "Heretic"
+                        exceptions.push "Prefidious"
                     # 恋人陣営
                     if frees>0
                         if 17>=playersnumber>=12

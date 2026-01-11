@@ -228,11 +228,6 @@ module.exports=
         #     avatar: "https://s2.loli.net/2025/08/06/R3FT5x2ZwWeJ4sK.png"
         #     name: "简易长矛"
         #     prize: []
-        
-        # daimajo:
-        #     avatar: "https://s2.loli.net/2025/07/25/Hf1aUDOXhQTuKlZ.jpg"
-        #     name: "大魔女"
-        #     prize: []
           
             
             

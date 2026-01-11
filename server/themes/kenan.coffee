@@ -399,3 +399,8 @@ module.exports=
             avatar:"https://pic1.imgdb.cn/item/6960bd273278aeeee21d6ba9.jpg"
             name:"榎本梓"
             prize: ""
+
+        okita:
+            avatar:"https://pic1.imgdb.cn/item/69632914a2662d5114e1be21.png"
+            name:"冲田总司"
+            prize: ""
