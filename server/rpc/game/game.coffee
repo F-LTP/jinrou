@@ -16200,7 +16200,7 @@ module.exports.actions=(req,res,ss)->
                         res null
                         return
                     log.mode=query.mode
-                    if game.silentexpires && game.silentexpires>=Date.now()
+                    if game.silentexpires && game.silentexpires>=Date.now() && !player?.isJobType "GameMaster"
                         # まだ発言できない（15秒ルール）
                         res null
                         return

@@ -209,6 +209,7 @@ export class Game extends React.Component<IPropGame, {}> {
                 onRuleOpen={this.handleRuleOpen}
                 onWillChange={onWillChange}
                 onFocus={this.handleSpeakFocus}
+                timer={timer}
                 {...speakState}
               />
             </SpeakFormPart>

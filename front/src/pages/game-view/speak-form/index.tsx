@@ -86,6 +86,11 @@ export interface IPropSpeakForm extends SpeakState {
    * Whether use wide page.
    */
   widePage: boolean;
+  timer?: {
+    enabled: boolean;
+    name: string; // 阶段名称
+    target: number; // 结束时间戳
+  };
 }
 /**
  * Speaking controls.
@@ -124,11 +129,32 @@ export class SpeakForm extends React.PureComponent<
       logVisibility,
       rule,
       widePage,
+      timer,
     } = this.props;
     const { additionalControlsShown } = this.state;
-
     // whether speech is allowed.
     const speakAllowed = !(roleInfo == null && !gameInfo.watchspeak);
+    const nsecondSilent = (() => {
+      if (roleInfo == null) {
+        // not init
+        return true;
+      }
+      const jobname = (roleInfo as any).jobname;
+      const dead = (roleInfo as any).dead;
+      const phase = (timer as any).name;
+
+      // rule1 gamemaster
+      if (jobname === '游戏管理员') {
+        return true;
+      }
+
+      // rule2 silentphase
+      if (dead == false && phase == '禁止发言') {
+        return false;
+      }
+
+      return true;
+    })();
     // list of speech kind.
     const speaks = roleInfo != null ? roleInfo.speak : ['day'];
     const playersMap = makeMapByKey(players, 'id');
@@ -187,7 +213,7 @@ export class SpeakForm extends React.PureComponent<
                       <input
                         type="submit"
                         value={t('game_client:speak.say')}
-                        disabled={!speakAllowed}
+                        disabled={!speakAllowed || !nsecondSilent}
                       />
                     </SpeakButtonArea>
                     {/* Speech-related controls. */}
