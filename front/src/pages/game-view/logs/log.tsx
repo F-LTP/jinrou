@@ -189,12 +189,12 @@ class OneLogInner extends React.PureComponent<IPropOneLog, {}> {
         log.mode === 'nextturn' || !log.name
           ? null
           : log.mode === 'monologue' || log.mode === 'heavenmonologue'
-            ? t('log.monologue', { name: log.name }) + ':'
-            : log.mode === 'will'
-              ? t('log.will', { name: log.name }) + ':'
-              : log.mode === 'streaming'
-                ? t('log.streaming', { name: log.name }) + ':'
-                : log.name + ':';
+          ? t('log.monologue', { name: log.name }) + ':'
+          : log.mode === 'will'
+          ? t('log.will', { name: log.name }) + ':'
+          : log.mode === 'streaming'
+          ? t('log.streaming', { name: log.name }) + ':'
+          : log.name + ':';
       // Auto-link URLs and room numbers in it.
       const noName = icon == null && !nameText;
       const props = {
@@ -549,7 +549,7 @@ const Name = styled(LogPart)<IPropLogPart>`
   grid-column: 2;
   max-width: 10em;
   overflow: hidden;
-
+  line-height: 1.3;
   font-weight: bold;
   white-space: nowrap;
   word-wrap: break-word;
@@ -568,6 +568,7 @@ const Name = styled(LogPart)<IPropLogPart>`
  */
 const Main = styled(LogPart)<IPropLogPart>`
   grid-column: 3;
+  line-height: 1.3;
   ${phone<IPropLogPart>`
     grid-column: ${({ noName }) => (noName ? '2 / 3' : '2 / 4')};
     ${({ noName }) => (noName ? '' : 'border-top: none;')}
@@ -586,8 +587,8 @@ const getFontSize = (size: 'big' | 'small' | undefined) =>
   size === 'big'
     ? 'calc(1.1 * var(--base-font-size))'
     : size === 'small'
-      ? 'calc(1.3 * var(--base-font-size))'
-      : 'var(--base-font-size)';
+    ? 'calc(1.3 * var(--base-font-size))'
+    : 'var(--base-font-size)';
 const getLineHeight = (size: 'big' | 'small' | undefined) =>
   size === 'big' ? '1.1' : size === 'small' ? '1.1' : '1.1';
 /**
@@ -598,12 +599,13 @@ const Comment = styled(Main)<IPropComment>`
   font-size: ${({ size }) => getFontSize(size)};
   line-height: ${({ size }) => getLineHeight(size)};
   letter-spacing: 0.05em;
+  line-height: 1.3;
   ${({ size }) =>
     size === 'big'
       ? 'font-weight: bold;'
       : size === 'small'
-        ? 'text-decoration: underline; font-weight: bold;'
-        : ''};
+      ? 'text-decoration: underline; font-weight: bold;'
+      : ''};
 `;
 
 /**
