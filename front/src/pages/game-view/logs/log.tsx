@@ -552,7 +552,6 @@ const Name = styled(LogPart)<IPropLogPart>`
   white-space: nowrap;
   word-wrap: break-word;
   text-align: right;
-  padding-right: 3px;
   ${phone<IPropLogPart>`
     ${({ noName }) => (noName ? 'display: none;' : '')}
     max-width: none;
@@ -595,6 +594,7 @@ const getFontSize = (size: 'big' | 'small' | undefined) =>
 const Comment = styled(Main)<IPropComment>`
   white-space: pre-wrap;
   font-size: ${({ size }) => getFontSize(size)};
+  letter-spacing: 0.03em;
   ${({ size }) =>
     size === 'big'
       ? 'font-weight: bold;'

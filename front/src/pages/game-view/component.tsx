@@ -451,7 +451,7 @@ const AppWrapper = styled(AppStyling)`
         case 'large':
           return '1rem';
         case 'normal':
-          return '1rem';
+          return '0.91rem';
         case 'small':
           return '0.7rem';
         case 'very-small':
