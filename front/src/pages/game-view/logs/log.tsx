@@ -514,11 +514,9 @@ const LogPart = styled.div<{
       : 'none'};
   font-weight: ${props => (props.logStyle.bold ? 'bold' : 'normal')};
   overflow: hidden;
-  line-height: 1;
   word-break: break-all;
   overflow-wrap: break-word;
   word-break: break-word;
-  padding: 1px 0;
   font-size: var(--base-font-size);
 `;
 
@@ -549,7 +547,7 @@ const Name = styled(LogPart)<IPropLogPart>`
   grid-column: 2;
   max-width: 10em;
   overflow: hidden;
-  line-height: 1.3;
+
   font-weight: bold;
   white-space: nowrap;
   word-wrap: break-word;
@@ -568,7 +566,7 @@ const Name = styled(LogPart)<IPropLogPart>`
  */
 const Main = styled(LogPart)<IPropLogPart>`
   grid-column: 3;
-  line-height: 1.3;
+
   ${phone<IPropLogPart>`
     grid-column: ${({ noName }) => (noName ? '2 / 3' : '2 / 4')};
     ${({ noName }) => (noName ? '' : 'border-top: none;')}
@@ -589,17 +587,15 @@ const getFontSize = (size: 'big' | 'small' | undefined) =>
     : size === 'small'
     ? 'calc(1.3 * var(--base-font-size))'
     : 'var(--base-font-size)';
-const getLineHeight = (size: 'big' | 'small' | undefined) =>
-  size === 'big' ? '1.1' : size === 'small' ? '1.1' : '1.1';
+
 /**
  * Log comment box.
  */
 const Comment = styled(Main)<IPropComment>`
   white-space: pre-wrap;
   font-size: ${({ size }) => getFontSize(size)};
-  line-height: ${({ size }) => getLineHeight(size)};
   letter-spacing: 0.05em;
-  line-height: 1.3;
+
   ${({ size }) =>
     size === 'big'
       ? 'font-weight: bold;'

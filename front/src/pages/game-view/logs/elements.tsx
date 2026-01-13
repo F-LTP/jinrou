@@ -49,10 +49,6 @@ export const LogWrapper = styled.div<{
   `};
 `;
 
-/* contain: layout style;
-  这句修改部分浏览器下卡顿问题
-  */
-
 /**
  * Wrapper of chunk, used in fixed-size mode.
  */
@@ -73,6 +69,7 @@ export const FixedSizeLogRow = styled.div`
     grid-template-columns: ${fixedSizeGridColumnsPhone};
     grid-auto-flow: row dense;
   `};
+  will-change: transform;
 `;
 
 /**
