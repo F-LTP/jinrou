@@ -443,7 +443,7 @@ export class Game extends React.Component<IPropGame, {}> {
 const AppWrapper = styled(AppStyling)`
   display: flex;
   flex-flow: column nowrap;
-  --base-font-size: 1.05rem;
+  --base-font-size: 1rem;
   ${phone`
     --base-font-size: ${({ theme }): string => {
       const fontSize = theme.user.phoneFontSize;
@@ -451,7 +451,7 @@ const AppWrapper = styled(AppStyling)`
         case 'large':
           return '1rem';
         case 'normal':
-          return '0.86rem';
+          return '1rem';
         case 'small':
           return '0.7rem';
         case 'very-small':

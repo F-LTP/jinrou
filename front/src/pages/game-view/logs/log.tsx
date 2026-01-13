@@ -552,6 +552,7 @@ const Name = styled(LogPart)<IPropLogPart>`
   white-space: nowrap;
   word-wrap: break-word;
   text-align: right;
+  padding-right: 3px;
   ${phone<IPropLogPart>`
     ${({ noName }) => (noName ? 'display: none;' : '')}
     max-width: none;
@@ -583,9 +584,9 @@ interface IPropComment {
 
 const getFontSize = (size: 'big' | 'small' | undefined) =>
   size === 'big'
-    ? 'calc(1.1 * var(--base-font-size))'
+    ? 'calc(1.07 * var(--base-font-size))'
     : size === 'small'
-    ? 'calc(1.3 * var(--base-font-size))'
+    ? 'calc(1.25 * var(--base-font-size))'
     : 'var(--base-font-size)';
 
 /**
@@ -594,8 +595,6 @@ const getFontSize = (size: 'big' | 'small' | undefined) =>
 const Comment = styled(Main)<IPropComment>`
   white-space: pre-wrap;
   font-size: ${({ size }) => getFontSize(size)};
-  letter-spacing: 0.05em;
-
   ${({ size }) =>
     size === 'big'
       ? 'font-weight: bold;'
