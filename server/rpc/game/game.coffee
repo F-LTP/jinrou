@@ -12420,11 +12420,6 @@ class GameMaster extends Player
     chooseJobDay:(game)->true   # 昼でも対象選択
     makeJobSelection:(game)->
         # 常に全員
-        console.log "=== GM检测 ==="
-        console.log game.players.map((pl)-> {
-            name: pl.name
-            value: pl.id
-        })
         return game.players.map((pl)-> {
             name: pl.name
             value: pl.id
