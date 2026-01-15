@@ -330,7 +330,7 @@ export class Game extends React.Component<IPropGame, {}> {
   @bind
   protected handleShortIdClick(shortId: string): void {
     if (this.speakFormRef.current != null) {
-      this.speakFormRef.current.appendToComment(`>>${shortId}`);
+      this.speakFormRef.current.appendToComment(`>>${shortId} `);
     }
   }
   /**

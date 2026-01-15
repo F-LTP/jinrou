@@ -583,7 +583,7 @@ class Game
     generateShortId:->
         # TODO: テスト用 - 衝突テストのために固定範囲に制限
         # テスト後は削除して元のロジックに戻す
-        TEST_MODE = true
+        TEST_MODE = false
         TEST_RANGE = 5  # 0-4 の5通りのみ生成（衝突しやすくするため）
 
         generate = (digits) =>
