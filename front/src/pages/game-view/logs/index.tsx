@@ -71,6 +71,16 @@ export class Logs extends React.Component<IPropLogs, IStateLogs> {
   public componentWillUnmount() {
     this.state.renderingState.dispose();
   }
+
+  /**
+   * Resolve log by shortId for reply reference.
+   * This is a performance-optimized lookup using the shortId index.
+   */
+  private resolveLogById = (shortId: string): string | null => {
+    const log = this.props.logs.findByShortId(shortId);
+    return log ? JSON.stringify(log) : null;
+  };
+
   public render() {
     const {
       logs,
@@ -125,6 +135,7 @@ export class Logs extends React.Component<IPropLogs, IStateLogs> {
               fixedSize={fixedSize}
               icons={icons}
               rule={rule}
+              resolveLogById={this.resolveLogById}
             />
           );
         })}
@@ -169,6 +180,10 @@ class LogChunk extends React.Component<
      * Current rule.
      */
     rule: Rule | undefined;
+    /**
+     * Function to resolve log by shortId for reply reference.
+     */
+    resolveLogById?: (shortId: string) => string | null;
   },
   {}
 > {
@@ -181,6 +196,7 @@ class LogChunk extends React.Component<
       renderedNumber,
       rule,
       icons,
+      resolveLogById,
     } = this.props;
     if (!visible && !fixedSize) {
       return null;
@@ -189,8 +205,8 @@ class LogChunk extends React.Component<
       renderedNumber >= logs.length
         ? logs
         : renderedNumber > 0
-          ? logs.slice(-renderedNumber)
-          : [];
+        ? logs.slice(-renderedNumber)
+        : [];
 
     const chunkContent = (
       <I18n namespace="game_client">
@@ -207,6 +223,7 @@ class LogChunk extends React.Component<
                     log={log}
                     rule={rule}
                     icons={icons}
+                    resolveLogById={resolveLogById}
                   />
                 );
               })

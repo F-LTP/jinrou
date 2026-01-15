@@ -520,6 +520,9 @@ class Game
         # 夜能力の対象選択に対するフック
         @skillTargetHook = new SkillTargetHook this
 
+        # 発言短IDカウンター（当局の発言ごとにユニークな短IDを生成）
+        @shortIdCounter = 0
+
         @initTimeBasedEvent()
 
     initTimeBasedEvent:->
@@ -16413,6 +16416,12 @@ module.exports.actions=(req,res,ss)->
 
 splashlog=(roomid,game,log)->
     log.time=Date.now() # 時間を付加
+
+    # 短IDを生成（当局の発言ごとにユニーク）
+    # 4桁の短ID：0001〜9999、それ以上は桁数を増やす
+    game.shortIdCounter++
+    log.shortId = game.shortIdCounter.toString().padStart(4, '0')
+
     #DBに追加
     game.logsaver.saveLog log
     #みんなに送信

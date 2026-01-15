@@ -35,6 +35,10 @@ export interface IPropOneLog {
    * Current rule setting.
    */
   rule: Rule | undefined;
+  /**
+   * Function to resolve log by shortId for reply reference.
+   */
+  resolveLogById?: (shortId: string) => string | null;
 }
 
 /**
@@ -50,7 +54,16 @@ function sanitizeLog(log: string): string {
  */
 class OneLogInner extends React.PureComponent<IPropOneLog, {}> {
   public render() {
-    const { t, theme, logClass, fixedSize, log, rule, icons } = this.props;
+    const {
+      t,
+      theme,
+      logClass,
+      fixedSize,
+      log,
+      rule,
+      icons,
+      resolveLogById,
+    } = this.props;
 
     const LogLineWrapper = fixedSize ? FixedSizeLogRow : React.Fragment;
 
@@ -213,6 +226,7 @@ class OneLogInner extends React.PureComponent<IPropOneLog, {}> {
           <CommentContent
             comment={log.comment || ''}
             supplement={log.mode === 'nextturn' ? undefined : log.supplement}
+            resolveLogById={resolveLogById}
           />
         </Comment>
       ) : (
@@ -233,6 +247,7 @@ class OneLogInner extends React.PureComponent<IPropOneLog, {}> {
             time={new Date(log.time)}
             logStyle={logStyle}
             className={logClass}
+            shortId={log.shortId}
           />
         </LogLineWrapper>
       );
@@ -614,8 +629,15 @@ interface IPropTime extends IPropLogPart {
   time: Date;
   className?: string;
   logStyle: LogStyle;
+  shortId?: string;
 }
-const TimeInner = ({ time, noName, className, logStyle }: IPropTime) => {
+const TimeInner = ({
+  time,
+  noName,
+  className,
+  logStyle,
+  shortId,
+}: IPropTime) => {
   const year = time.getFullYear();
   const month = ('0' + (time.getMonth() + 1)).slice(-2);
   const day = ('0' + time.getDate()).slice(-2);
@@ -625,7 +647,12 @@ const TimeInner = ({ time, noName, className, logStyle }: IPropTime) => {
   const str = `${year}-${month}-${day} ${hour}:${minute}:${second}`;
   return (
     <LogPart logStyle={logStyle} className={className}>
-      <time>{str}</time>
+      <time>
+        {shortId && (
+          <span style={{ marginLeft: 6, opacity: 0.6 }}>#{shortId}</span>
+        )}{' '}
+        {str}
+      </time>
     </LogPart>
   );
 };

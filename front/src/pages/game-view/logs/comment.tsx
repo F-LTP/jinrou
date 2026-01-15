@@ -1,12 +1,160 @@
 import { LogSupplement } from '../defs';
-import { memo, Fragment } from 'react';
+import { memo, Fragment, useState, useRef, useLayoutEffect } from 'react';
+import { createPortal } from 'react-dom';
 import autolink, { compile } from 'my-autolink';
 import React from 'react';
 
 export interface IPropCommentContent {
   comment: string;
   supplement?: LogSupplement[];
+  resolveLogById?: (shortId: string) => string | null;
 }
+
+const GAP = 12;
+const MAX_WIDTH = 360;
+
+/**
+ * Tooltip component for log reference.
+ */
+export const LogReferenceTooltip = React.memo<{
+  shortId: string;
+  msg: string | null;
+}>(({ shortId, msg }) => {
+  const [visible, setVisible] = useState(false);
+  const [pos, setPos] = useState({ x: 0, y: 0 });
+  const tooltipRef = useRef<HTMLDivElement>(null);
+
+  /** 用真实高度修正 Y */
+  useLayoutEffect(() => {
+    if (!visible || !tooltipRef.current) return;
+
+    const el = tooltipRef.current;
+    const rect = el.getBoundingClientRect();
+
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const gap = 12;
+    const safe = 8; // 安全边距
+
+    let top = 0;
+    let left = 0;
+
+    // =========================
+    // ① 先决定上下
+    // =========================
+    const spaceAbove = pos.y;
+    const spaceBelow = vh - pos.y;
+
+    if (spaceAbove >= rect.height + gap) {
+      // 优先上
+      top = pos.y - rect.height - gap;
+    } else if (spaceBelow >= rect.height + gap) {
+      // 不够就下
+      top = pos.y + gap;
+    } else {
+      // 两边都不够 → 选空间大的那边
+      top = spaceAbove > spaceBelow ? safe : vh - rect.height - safe;
+    }
+
+    // =========================
+    // ② 决定左右展开方向
+    // =========================
+    const spaceLeft = pos.x;
+    const spaceRight = vw - pos.x;
+
+    if (spaceRight >= rect.width / 2 && spaceLeft >= rect.width / 2) {
+      // 居中
+      left = pos.x - rect.width / 2;
+    } else if (spaceRight >= rect.width) {
+      // 向右展开
+      left = pos.x + gap;
+    } else if (spaceLeft >= rect.width) {
+      // 向左展开
+      left = pos.x - rect.width - gap;
+    } else {
+      // 哪边空间大靠哪边
+      left = spaceRight > spaceLeft ? safe : vw - rect.width - safe;
+    }
+
+    // =========================
+    // ③ 最终兜底防出屏
+    // =========================
+    left = Math.min(Math.max(left, safe), vw - rect.width - safe);
+    top = Math.min(Math.max(top, safe), vh - rect.height - safe);
+
+    el.style.left = `${left}px`;
+    el.style.top = `${top}px`;
+  }, [visible, pos.x, pos.y]);
+
+  /** 桌面端 */
+  const onMouseEnter = (e: React.MouseEvent) => {
+    setPos({ x: e.clientX, y: e.clientY });
+    setVisible(true);
+  };
+
+  const onMouseMove = (e: React.MouseEvent) => {
+    setPos({ x: e.clientX, y: e.clientY });
+  };
+
+  const onMouseLeave = () => {
+    setVisible(false);
+  };
+
+  /** 移动端 */
+  const onTouchStart = (e: React.TouchEvent) => {
+    const t = e.touches[0];
+    if (!t) return;
+    setPos({ x: t.clientX, y: t.clientY });
+    setVisible(v => !v);
+  };
+
+  return (
+    <>
+      <b
+        onMouseEnter={onMouseEnter}
+        onMouseMove={onMouseMove}
+        onMouseLeave={onMouseLeave}
+        onTouchStart={onTouchStart}
+        style={{ cursor: 'pointer' }}
+      >
+        {'>>'}
+        {shortId}
+      </b>
+
+      {visible &&
+        createPortal(
+          <div
+            ref={tooltipRef}
+            style={{
+              position: 'fixed',
+              left: pos.x,
+              top: pos.y,
+              transform: 'none',
+              backgroundColor: 'rgba(0,0,0,0.95)',
+              color: '#fff',
+              padding: '12px 16px',
+              borderRadius: '8px',
+              fontSize: '14px',
+              lineHeight: 1.4,
+              maxWidth: `${MAX_WIDTH}px`,
+              whiteSpace: 'pre-wrap',
+              wordBreak: 'break-word',
+              zIndex: 9999999,
+              boxShadow: '0 6px 24px rgba(0,0,0,0.5)',
+              pointerEvents: 'auto',
+            }}
+          >
+            <div style={{ fontWeight: 'bold', marginBottom: '6px' }}>
+              {'>>'}
+              {shortId}
+            </div>
+            <div style={{ fontSize: '13px' }}>{msg || '未找到对应发言'}</div>
+          </div>,
+          document.body,
+        )}
+    </>
+  );
+});
 
 const autolinkSetting = compile(
   [
@@ -42,72 +190,113 @@ const autolinkSetting = compile(
   },
 );
 
-export const CommentContent: React.FunctionComponent<
-  IPropCommentContent
-> = memo(({ comment, supplement }) => {
-  console.log(comment, supplement);
-  if (supplement == null || supplement.length === 0) {
-    return (
-      <span
-        dangerouslySetInnerHTML={{
-          __html: autolink(comment, autolinkSetting),
-        }}
-      />
-    );
-  }
-  // perform calculation of special commands.
-  const commandr = /!(\d+)[dD](\d+)/g;
-  const nodes: React.ReactNode[] = [];
-  let currentIndex = 0;
-  let supplementIndex = 0;
-  let res;
-  while ((res = commandr.exec(comment))) {
-    if (res.index > currentIndex) {
-      nodes.push(comment.slice(currentIndex, res.index));
+export const CommentContent: React.FunctionComponent<IPropCommentContent> = memo(
+  ({ comment, supplement, resolveLogById }) => {
+    // 检查是否包含特殊命令（骰子或引用）
+    const hasSpecialCommand = /!(\d+)[dD](\d+)|>>\s*\d+/.test(comment);
+
+    if (!hasSpecialCommand) {
+      return (
+        <span
+          dangerouslySetInnerHTML={{
+            __html: autolink(comment, autolinkSetting),
+          }}
+        />
+      );
     }
-    currentIndex = commandr.lastIndex;
-    const sup = supplement[supplementIndex++];
-    if (sup == null) {
-      // ?????????
-      nodes.push(res[0]);
-      continue;
-    }
-    switch (sup.type) {
-      case 'dice': {
-        const { result } = sup;
-        if (result == null || result.length === 0) {
-          // unprocessable
-          nodes.push(<>{res[0]}</>);
-          break;
+
+    // perform calculation of special commands.
+    const commandr = /!(\d+)[dD](\d+)|>>\s*(\d+)/g;
+    const nodes: React.ReactNode[] = [];
+    let currentIndex = 0;
+    let supplementIndex = 0;
+    let res;
+    while ((res = commandr.exec(comment))) {
+      // 1. 把普通文本补进去
+      if (res.index > currentIndex) {
+        nodes.push(comment.slice(currentIndex, res.index));
+      }
+      currentIndex = commandr.lastIndex;
+
+      // ======================
+      // 2. 处理骰子 !XdY
+      // ======================
+      if (res[1] != null) {
+        if (!supplement) {
+          nodes.push(res[0]);
+          continue;
         }
+        const sup = supplement[supplementIndex++];
+
+        if (sup == null || sup.type !== 'dice') {
+          nodes.push(res[0]);
+          continue;
+        }
+
+        const { result } = sup;
+        if (!result || result.length === 0) {
+          nodes.push(res[0]);
+          continue;
+        }
+
         // dice result
         if (result.length === 1) {
           nodes.push(
-            <b>
+            <b key={`dice-${res.index}`}>
               【{res[1]}D{res[2]}={result[0]}】
             </b>,
           );
         } else {
           const sum = result.reduce((a, b) => a + b, 0);
           nodes.push(
-            <b>
-              【{res[1]}D{res[2]}={sum}({result.join('+')}
-              )】
+            <b key={`dice-${res.index}`}>
+              【{res[1]}D{res[2]}={sum}({result.join('+')})】
             </b>,
           );
         }
-        break;
+        continue;
+      }
+
+      // ======================
+      // 3. 处理 >>y 引用
+      // ======================
+      if (res[3] != null) {
+        const shortId = res[3].padStart(4, '0'); // 补齐到4位
+        let msg = null;
+
+        if (resolveLogById) {
+          const original = resolveLogById(shortId);
+          if (original != null) {
+            const logobj = JSON.parse(original);
+            if (logobj != null) {
+              msg =
+                logobj.name != null && logobj.comment != null
+                  ? `${logobj.name}：${logobj.comment}`
+                  : logobj.comment != null
+                  ? logobj.comment
+                  : null;
+            }
+          }
+        }
+
+        nodes.push(
+          <LogReferenceTooltip
+            key={`ref-${res.index}`}
+            shortId={shortId}
+            msg={msg}
+          />,
+        );
+        continue;
       }
     }
-  }
-  if (currentIndex < comment.length) {
-    nodes.push(comment.slice(currentIndex));
-  }
-  console.log(nodes);
-  return (
-    <>
-      {nodes.map(
-        (node, i) =>
+
+    if (currentIndex < comment.length) {
+      nodes.push(comment.slice(currentIndex));
+    }
+
+    return (
+      <>
+        {nodes.map((node, i) =>
           typeof node === 'string' ? (
             <Fragment key={i}>
               <span
@@ -119,7 +308,8 @@ export const CommentContent: React.FunctionComponent<
           ) : (
             <Fragment key={i}>{node}</Fragment>
           ),
-      )}
-    </>
-  );
-});
+        )}
+      </>
+    );
+  },
+);
