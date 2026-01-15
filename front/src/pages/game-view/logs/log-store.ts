@@ -148,6 +148,7 @@ export class LogStore {
    * Returns null if not found.
    */
   public findByShortId(shortId: string): StoredLog | null {
-    return this.shortIdIndex.get(shortId) ?? null;
+    const result = this.shortIdIndex.get(shortId);
+    return result !== undefined ? result : null;
   }
 }
