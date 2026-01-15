@@ -1,5 +1,12 @@
 import { LogSupplement } from '../defs';
-import { memo, Fragment, useState, useRef, useLayoutEffect } from 'react';
+import {
+  memo,
+  Fragment,
+  useState,
+  useRef,
+  useLayoutEffect,
+  useEffect,
+} from 'react';
 import { createPortal } from 'react-dom';
 import autolink, { compile } from 'my-autolink';
 import React from 'react';
@@ -86,6 +93,33 @@ export const LogReferenceTooltip = React.memo<{
     el.style.top = `${top}px`;
   }, [visible, pos.x, pos.y]);
 
+  /** 移动端：全局点击关闭tooltip */
+  useEffect(() => {
+    if (!visible) return;
+
+    const handleClick = (e: Event) => {
+      // 检查点击目标是否是 tooltip 或其内部元素
+      if (tooltipRef.current && tooltipRef.current.contains(e.target as Node)) {
+        return;
+      }
+      // 检查点击目标是否是触发元素（>>xxx）或其内部
+      const target = e.target as HTMLElement;
+      if (target && target.closest('[data-tooltip-trigger]')) {
+        return;
+      }
+      setVisible(false);
+    };
+
+    // 不使用 capture 阶段，让 onTouchStart 先处理
+    document.addEventListener('click', handleClick);
+    document.addEventListener('touchstart', handleClick);
+
+    return () => {
+      document.removeEventListener('click', handleClick);
+      document.removeEventListener('touchstart', handleClick);
+    };
+  }, [visible]);
+
   /** 桌面端 */
   const onMouseEnter = (e: React.MouseEvent) => {
     setPos({ x: e.clientX, y: e.clientY });
@@ -111,6 +145,7 @@ export const LogReferenceTooltip = React.memo<{
   return (
     <>
       <b
+        data-tooltip-trigger="true"
         onMouseEnter={onMouseEnter}
         onMouseMove={onMouseMove}
         onMouseLeave={onMouseLeave}
@@ -261,7 +296,7 @@ export const CommentContent: React.FunctionComponent<IPropCommentContent> = memo
       // 3. 处理 >>y 引用
       // ======================
       if (res[3] != null) {
-        const shortId = res[3].padStart(4, '0'); // 补齐到4位
+        const shortId = res[3]; // 不再需要补齐，直接使用原始数字
         let msg = null;
 
         if (resolveLogById) {

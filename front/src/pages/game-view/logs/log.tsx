@@ -528,6 +528,7 @@ const LogPart = styled.div<{
       ? `1px dashed ${props.logStyle.borderColor}`
       : 'none'};
   font-weight: ${props => (props.logStyle.bold ? 'bold' : 'normal')};
+  line-height: ${props => (props.logStyle.bold ? '1' : 'inherit')};
   overflow: hidden;
   word-break: break-all;
   overflow-wrap: break-word;
@@ -609,12 +610,12 @@ const getFontSize = (size: 'big' | 'small' | undefined) =>
 const Comment = styled(Main)<IPropComment>`
   white-space: pre-wrap;
   font-size: ${({ size }) => getFontSize(size)};
-  letter-spacing: 0.03em;
+  letter-spacing: 0.02em;
   ${({ size }) =>
     size === 'big'
-      ? 'font-weight: bold;'
+      ? 'font-weight: bold; line-height: 1.2;'
       : size === 'small'
-      ? 'text-decoration: underline; font-weight: bold;'
+      ? 'text-decoration: underline; font-weight: bold; line-height: 1.2;'
       : ''};
 `;
 
