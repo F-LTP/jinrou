@@ -115,8 +115,7 @@ const makeConfig = (isProduction, isLegacyBuild) => ({
     }),
     new BundleAnalyzerPlugin({
       analyzerMode: isProduction ? 'static' : 'server',
-      openAnalyzer: !isProduction,
-      analyzerPort: 8889,
+      openAnalyzer: !isProduction
     }),
     new CopyWebpackPlugin([
       {
