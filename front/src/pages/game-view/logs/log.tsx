@@ -39,6 +39,10 @@ export interface IPropOneLog {
    * Function to resolve log by shortId for reply reference.
    */
   resolveLogById?: (shortId: string) => string | null;
+  /**
+   * Callback for shortId click.
+   */
+  onShortIdClick?: (shortId: string) => void;
 }
 
 /**
@@ -63,6 +67,7 @@ class OneLogInner extends React.PureComponent<IPropOneLog, {}> {
       rule,
       icons,
       resolveLogById,
+      onShortIdClick,
     } = this.props;
 
     const LogLineWrapper = fixedSize ? FixedSizeLogRow : React.Fragment;
@@ -248,6 +253,7 @@ class OneLogInner extends React.PureComponent<IPropOneLog, {}> {
             logStyle={logStyle}
             className={logClass}
             shortId={log.shortId}
+            onShortIdClick={onShortIdClick}
           />
         </LogLineWrapper>
       );
@@ -631,6 +637,7 @@ interface IPropTime extends IPropLogPart {
   className?: string;
   logStyle: LogStyle;
   shortId?: string;
+  onShortIdClick?: (shortId: string) => void;
 }
 const TimeInner = ({
   time,
@@ -638,6 +645,7 @@ const TimeInner = ({
   className,
   logStyle,
   shortId,
+  onShortIdClick,
 }: IPropTime) => {
   const year = time.getFullYear();
   const month = ('0' + (time.getMonth() + 1)).slice(-2);
@@ -650,7 +658,13 @@ const TimeInner = ({
     <LogPart logStyle={logStyle} className={className}>
       <time>
         {shortId && (
-          <span style={{ marginLeft: 6, opacity: 0.6 }}>#{shortId}</span>
+          <span
+            style={{ marginLeft: 6, opacity: 0.6, cursor: 'pointer' }}
+            onClick={() => onShortIdClick && onShortIdClick(shortId)}
+          >
+            {'>'}
+            {shortId}
+          </span>
         )}{' '}
         {str}
       </time>

@@ -251,6 +251,7 @@ export class Game extends React.Component<IPropGame, {}> {
                           rule={store.rule}
                           logPickup={logPickup}
                           onResetLogPickup={this.handleResetLogPickup}
+                          onShortIdClick={this.handleShortIdClick}
                         />
                       </LogsWrapper>
                     </>
@@ -322,6 +323,15 @@ export class Game extends React.Component<IPropGame, {}> {
   protected handleRefuseRevival(): void {
     const { onRefuseRevival } = this.props;
     onRefuseRevival();
+  }
+  /**
+   * Handle a click on shortId in log.
+   */
+  @bind
+  protected handleShortIdClick(shortId: string): void {
+    if (this.speakFormRef.current != null) {
+      this.speakFormRef.current.appendToComment(`>>${shortId}`);
+    }
   }
   /**
    * handle the rule open button event.

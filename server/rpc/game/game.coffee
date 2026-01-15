@@ -590,10 +590,8 @@ class Game
             # テストモードの場合は範囲を制限
             if TEST_MODE and digits is 1
                 max = TEST_RANGE
-                console.log "TEST MODE: max=#{max}"
             else
                 max = Math.pow(10, digits)
-                console.log "NORMAL MODE: digits=#{digits}, max=#{max}"
 
             # 使用率を計算（digitsCountからO(1)で取得）
             usedCount = @digitsCount[digits] ? 0

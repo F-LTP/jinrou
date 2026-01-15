@@ -358,6 +358,16 @@ export class SpeakForm extends React.PureComponent<
     }
   }
   /**
+   * Append text to the comment input.
+   */
+  public appendToComment(text: string) {
+    this.commentString += text;
+    if (this.comment != null) {
+      this.comment.value = this.commentString;
+      this.comment.focus();
+    }
+  }
+  /**
    * Handle submission of the speak form.
    */
   @bind

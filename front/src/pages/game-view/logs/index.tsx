@@ -40,6 +40,10 @@ export interface IPropLogs {
    * Callback for resetting log pickup filter.
    */
   onResetLogPickup(): void;
+  /**
+   * Callback for shortId click.
+   */
+  onShortIdClick?: (shortId: string) => void;
 }
 
 export interface IStateLogs {
@@ -89,6 +93,7 @@ export class Logs extends React.Component<IPropLogs, IStateLogs> {
       visibility,
       logPickup,
       onResetLogPickup,
+      onShortIdClick,
     } = this.props;
     const { renderingState } = this.state;
 
@@ -136,6 +141,7 @@ export class Logs extends React.Component<IPropLogs, IStateLogs> {
               icons={icons}
               rule={rule}
               resolveLogById={this.resolveLogById}
+              onShortIdClick={onShortIdClick}
             />
           );
         })}
@@ -184,6 +190,10 @@ class LogChunk extends React.Component<
      * Function to resolve log by shortId for reply reference.
      */
     resolveLogById?: (shortId: string) => string | null;
+    /**
+     * Callback for shortId click.
+     */
+    onShortIdClick?: (shortId: string) => void;
   },
   {}
 > {
@@ -197,6 +207,7 @@ class LogChunk extends React.Component<
       rule,
       icons,
       resolveLogById,
+      onShortIdClick,
     } = this.props;
     if (!visible && !fixedSize) {
       return null;
@@ -224,6 +235,7 @@ class LogChunk extends React.Component<
                     rule={rule}
                     icons={icons}
                     resolveLogById={resolveLogById}
+                    onShortIdClick={onShortIdClick}
                   />
                 );
               })
