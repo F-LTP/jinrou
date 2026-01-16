@@ -32,7 +32,8 @@ let currentTooltipClose: (() => void) | null = null;
 export const LogReferenceTooltip = React.memo<{
   shortId: string;
   msg: string | null;
-}>(({ shortId, msg }) => {
+  playerName?: string;
+}>(({ shortId, msg, playerName }) => {
   const [visible, setVisible] = useState(false);
   const [pos, setPos] = useState({ x: 0, y: 0 });
   const tooltipRef = useRef<HTMLDivElement>(null);
@@ -176,8 +177,14 @@ export const LogReferenceTooltip = React.memo<{
         onClick={onClick}
         style={{ cursor: 'pointer' }}
       >
-        {'>>'}
-        {shortId}
+        {playerName ? (
+          `>>${playerName}:${shortId}`
+        ) : (
+          <>
+            {'>>'}
+            {shortId}
+          </>
+        )}
       </b>
 
       {visible &&
@@ -203,10 +210,6 @@ export const LogReferenceTooltip = React.memo<{
               pointerEvents: 'auto',
             }}
           >
-            <div style={{ fontWeight: 'bold', marginBottom: '6px' }}>
-              {'>>'}
-              {shortId}
-            </div>
             <div style={{ fontSize: '13px' }}>{msg || '未找到对应发言'}</div>
           </div>,
           document.body,
@@ -322,15 +325,17 @@ export const CommentContent: React.FunctionComponent<IPropCommentContent> = memo
       if (res[3] != null) {
         const shortId = res[3]; // 不再需要补齐，直接使用原始数字
         let msg = null;
+        let playerName = undefined;
 
         if (resolveLogById) {
           const original = resolveLogById(shortId);
           if (original != null) {
             const logobj = JSON.parse(original);
             if (logobj != null) {
+              playerName = logobj.name;
               msg =
                 logobj.name != null && logobj.comment != null
-                  ? `${logobj.name}：${logobj.comment}`
+                  ? `${logobj.name}：\n${logobj.comment}`
                   : logobj.comment != null
                   ? logobj.comment
                   : null;
@@ -343,6 +348,7 @@ export const CommentContent: React.FunctionComponent<IPropCommentContent> = memo
             key={`ref-${res.index}`}
             shortId={shortId}
             msg={msg}
+            playerName={playerName}
           />,
         );
         continue;
