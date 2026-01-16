@@ -660,17 +660,17 @@ const TimeInner = ({
   const str = `${year}-${month}-${day} ${hour}:${minute}:${second}`;
   return (
     <LogPart logStyle={logStyle} className={className}>
-      <time>
-        {shortId && (
-          <span
-            style={{ marginLeft: 6, opacity: 0.6, cursor: 'pointer' }}
-            onClick={() => onShortIdClick && onShortIdClick(shortId)}
-          >
-            {'>'}
-            {shortId}
-          </span>
-        )}{' '}
-        {str}
+      <time
+        style={{
+          cursor: shortId && onShortIdClick ? 'pointer' : 'default',
+          display: 'block',
+          width: '100%',
+        }}
+        onDoubleClick={() =>
+          shortId && onShortIdClick && onShortIdClick(shortId)
+        }
+      >
+        {shortId && <span style={{ opacity: 0.6 }}>>{shortId}</span>} {str}
       </time>
     </LogPart>
   );

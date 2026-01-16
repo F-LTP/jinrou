@@ -21,6 +21,12 @@ const GAP = 12;
 const MAX_WIDTH = 360;
 
 /**
+ * 全局 tooltip 状态管理
+ * 确保同一时间只有一个 tooltip 显示
+ */
+let currentTooltipClose: (() => void) | null = null;
+
+/**
  * Tooltip component for log reference.
  */
 export const LogReferenceTooltip = React.memo<{
@@ -30,6 +36,9 @@ export const LogReferenceTooltip = React.memo<{
   const [visible, setVisible] = useState(false);
   const [pos, setPos] = useState({ x: 0, y: 0 });
   const tooltipRef = useRef<HTMLDivElement>(null);
+
+  /** 关闭当前 tooltip 的函数 */
+  const closeThisTooltip = () => setVisible(false);
 
   /** 用真实高度修正 Y */
   useLayoutEffect(() => {
@@ -93,7 +102,7 @@ export const LogReferenceTooltip = React.memo<{
     el.style.top = `${top}px`;
   }, [visible, pos.x, pos.y]);
 
-  /** 移动端：全局点击关闭tooltip */
+  /** 全局点击关闭tooltip */
   useEffect(() => {
     if (!visible) return;
 
@@ -110,35 +119,53 @@ export const LogReferenceTooltip = React.memo<{
       setVisible(false);
     };
 
-    // 不使用 capture 阶段，让 onTouchStart 先处理
     document.addEventListener('click', handleClick);
-    document.addEventListener('touchstart', handleClick);
 
     return () => {
       document.removeEventListener('click', handleClick);
-      document.removeEventListener('touchstart', handleClick);
     };
   }, [visible]);
 
-  /** 桌面端 */
-  const onMouseEnter = (e: React.MouseEvent) => {
-    setPos({ x: e.clientX, y: e.clientY });
-    setVisible(true);
-  };
+  /** 管理 tooltip 互斥显示 */
+  useEffect(() => {
+    if (!visible) {
+      // 当隐藏时，如果这是当前注册的 tooltip，清除注册
+      if (currentTooltipClose && currentTooltipClose === closeThisTooltip) {
+        currentTooltipClose = null;
+      }
+      return;
+    }
 
-  const onMouseMove = (e: React.MouseEvent) => {
-    setPos({ x: e.clientX, y: e.clientY });
-  };
+    // 显示时，先关闭其他 tooltip，然后注册自己
+    if (currentTooltipClose && currentTooltipClose !== closeThisTooltip) {
+      currentTooltipClose();
+    }
+    currentTooltipClose = closeThisTooltip;
 
-  const onMouseLeave = () => {
-    setVisible(false);
-  };
+    return () => {
+      // 清理时移除注册
+      if (currentTooltipClose === closeThisTooltip) {
+        currentTooltipClose = null;
+      }
+    };
+  }, [visible]);
 
-  /** 移动端 */
-  const onTouchStart = (e: React.TouchEvent) => {
-    const t = e.touches[0];
-    if (!t) return;
-    setPos({ x: t.clientX, y: t.clientY });
+  /** 点击切换显示 */
+  const onClick = (e: React.MouseEvent | React.TouchEvent) => {
+    let clientX: number;
+    let clientY: number;
+
+    if ('touches' in e) {
+      const t = e.touches[0];
+      if (!t) return;
+      clientX = t.clientX;
+      clientY = t.clientY;
+    } else {
+      clientX = e.clientX;
+      clientY = e.clientY;
+    }
+
+    setPos({ x: clientX, y: clientY });
     setVisible(v => !v);
   };
 
@@ -146,10 +173,7 @@ export const LogReferenceTooltip = React.memo<{
     <>
       <b
         data-tooltip-trigger="true"
-        onMouseEnter={onMouseEnter}
-        onMouseMove={onMouseMove}
-        onMouseLeave={onMouseLeave}
-        onTouchStart={onTouchStart}
+        onClick={onClick}
         style={{ cursor: 'pointer' }}
       >
         {'>>'}
