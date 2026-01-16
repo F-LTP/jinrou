@@ -243,7 +243,7 @@ class OneLogInner extends React.PureComponent<IPropOneLog, {}> {
           <Icon noName={noName} {...props}>
             {icon != null ? <img src={icon} alt="" /> : null}
           </Icon>
-          <Name noName={noName} {...props}>
+          <Name noName={noName} size={size} {...props}>
             {nameText ? sanitizeLog(nameText) : null}
           </Name>
           {comment}
@@ -534,7 +534,7 @@ const LogPart = styled.div<{
       ? `1px dashed ${props.logStyle.borderColor}`
       : 'none'};
   font-weight: ${props => (props.logStyle.bold ? 'bold' : 'normal')};
-  line-height: ${props => (props.logStyle.bold ? '1' : 'inherit')};
+  line-height: inherit;
   overflow: hidden;
   word-break: break-all;
   overflow-wrap: break-word;
@@ -565,7 +565,7 @@ const Icon = styled(LogPart)<IPropLogPart>`
 /**
  * Username box.
  */
-const Name = styled(LogPart)<IPropLogPart>`
+const Name = styled(LogPart)<IPropLogPart & { size?: 'big' | 'small' }>`
   grid-column: 2;
   max-width: 10em;
   overflow: hidden;
@@ -574,6 +574,10 @@ const Name = styled(LogPart)<IPropLogPart>`
   white-space: nowrap;
   word-wrap: break-word;
   text-align: right;
+  ${({ size }) =>
+    size === 'big' || size === 'small'
+      ? 'line-height: 1.2;'
+      : 'line-height: 1.27;'}
   ${phone<IPropLogPart>`
     ${({ noName }) => (noName ? 'display: none;' : '')}
     max-width: none;
@@ -622,7 +626,7 @@ const Comment = styled(Main)<IPropComment>`
       ? 'font-weight: bold; line-height: 1.2;'
       : size === 'small'
       ? 'text-decoration: underline; font-weight: bold; line-height: 1.2;'
-      : ''};
+      : 'line-height: 1.27'};
 `;
 
 /**
