@@ -65,7 +65,7 @@ export const FixedSizeChunkWrapper = styled.div<{
 export const FixedSizeLogRow = styled.div`
   display: grid;
   grid-template-columns: ${fixedSizeGridColumnsPC};
-  margin-bottom: -0.2px;
+  margin-bottom: -0.35px;
   ${phone`
     grid-template-columns: ${fixedSizeGridColumnsPhone};
     grid-auto-flow: row dense;
