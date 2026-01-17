@@ -7,6 +7,38 @@ import { phone, notPhone } from '../../../common/media';
 import { Theme } from '../../../theme';
 import { FixedSizeLogRow } from './elements';
 import { CommentContent } from './comment';
+import { useState, useRef, useCallback } from 'react';
+
+/**
+ * 兼容移动端和桌面端的双击检测 Hook
+ */
+function useDoubleClick(callback: () => void, delay = 300) {
+  const [lastClickTime, setLastClickTime] = useState(0);
+  const clickTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  return useCallback(() => {
+    const now = Date.now();
+    const timeDiff = now - lastClickTime;
+
+    if (timeDiff < delay && timeDiff > 0) {
+      callback();
+      setLastClickTime(0);
+      if (clickTimeoutRef.current) {
+        clearTimeout(clickTimeoutRef.current);
+        clickTimeoutRef.current = null;
+      }
+    } else {
+      setLastClickTime(now);
+      if (clickTimeoutRef.current) {
+        clearTimeout(clickTimeoutRef.current);
+      }
+      clickTimeoutRef.current = setTimeout(() => {
+        setLastClickTime(0);
+        clickTimeoutRef.current = null;
+      }, delay);
+    }
+  }, [callback, delay, lastClickTime]);
+}
 
 export interface IPropOneLog {
   /**
@@ -243,7 +275,13 @@ class OneLogInner extends React.PureComponent<IPropOneLog, {}> {
           <Icon noName={noName} {...props}>
             {icon != null ? <img src={icon} alt="" /> : null}
           </Icon>
-          <Name noName={noName} size={size} {...props}>
+          <Name
+            noName={noName}
+            size={size}
+            shortId={log.shortId}
+            onShortIdClick={onShortIdClick}
+            {...props}
+          >
             {nameText ? sanitizeLog(nameText) : null}
           </Name>
           {comment}
@@ -565,7 +603,42 @@ const Icon = styled(LogPart)<IPropLogPart>`
 /**
  * Username box.
  */
-const Name = styled(LogPart)<IPropLogPart & { size?: 'big' | 'small' }>`
+interface IPropName extends IPropLogPart {
+  size?: 'big' | 'small';
+  shortId?: string;
+  onShortIdClick?: (shortId: string) => void;
+}
+
+const NameInner = ({
+  children,
+  shortId,
+  onShortIdClick,
+  logStyle,
+  className,
+}: IPropName & {
+  logStyle: LogStyle;
+  className?: string;
+  children?: React.ReactNode;
+}) => {
+  const handleDoubleClick = useDoubleClick(() => {
+    if (shortId && onShortIdClick) {
+      onShortIdClick(shortId);
+    }
+  });
+
+  return (
+    <LogPart
+      logStyle={logStyle}
+      className={className}
+      onClick={handleDoubleClick}
+      style={{ cursor: shortId && onShortIdClick ? 'pointer' : 'default' }}
+    >
+      {children}
+    </LogPart>
+  );
+};
+
+const Name = styled(NameInner)<IPropName>`
   grid-column: 2;
   max-width: 10em;
   overflow: hidden;
@@ -658,6 +731,13 @@ const TimeInner = ({
   const minute = ('0' + time.getMinutes()).slice(-2);
   const second = ('0' + time.getSeconds()).slice(-2);
   const str = `${year}-${month}-${day} ${hour}:${minute}:${second}`;
+
+  const handleDoubleClick = useDoubleClick(() => {
+    if (shortId && onShortIdClick) {
+      onShortIdClick(shortId);
+    }
+  });
+
   return (
     <LogPart logStyle={logStyle} className={className}>
       <time
@@ -666,9 +746,7 @@ const TimeInner = ({
           display: 'block',
           width: '100%',
         }}
-        onDoubleClick={() =>
-          shortId && onShortIdClick && onShortIdClick(shortId)
-        }
+        onClick={handleDoubleClick}
       >
         {shortId && <span style={{ opacity: 0.6 }}>>{shortId}</span>} {str}
       </time>
