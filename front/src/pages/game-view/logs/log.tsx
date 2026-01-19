@@ -288,8 +288,7 @@ class OneLogInner extends React.PureComponent<IPropOneLog, {}> {
           <Time
             noName={noName}
             time={new Date(log.time)}
-            logStyle={logStyle}
-            className={logClass}
+            {...props}
             shortId={log.shortId}
             onShortIdClick={onShortIdClick}
           />
@@ -615,10 +614,12 @@ const NameInner = ({
   onShortIdClick,
   logStyle,
   className,
+  'data-userid': dataUserid,
 }: IPropName & {
   logStyle: LogStyle;
   className?: string;
   children?: React.ReactNode;
+  'data-userid'?: string;
 }) => {
   const handleDoubleClick = useDoubleClick(() => {
     if (shortId && onShortIdClick) {
@@ -630,6 +631,7 @@ const NameInner = ({
     <LogPart
       logStyle={logStyle}
       className={className}
+      data-userid={dataUserid}
       onClick={handleDoubleClick}
       style={{ cursor: shortId && onShortIdClick ? 'pointer' : 'default' }}
     >
@@ -715,6 +717,7 @@ interface IPropTime extends IPropLogPart {
   logStyle: LogStyle;
   shortId?: string;
   onShortIdClick?: (shortId: string) => void;
+  'data-userid'?: string;
 }
 const TimeInner = ({
   time,
@@ -723,6 +726,7 @@ const TimeInner = ({
   logStyle,
   shortId,
   onShortIdClick,
+  'data-userid': dataUserid,
 }: IPropTime) => {
   const year = time.getFullYear();
   const month = ('0' + (time.getMonth() + 1)).slice(-2);
@@ -739,7 +743,7 @@ const TimeInner = ({
   });
 
   return (
-    <LogPart logStyle={logStyle} className={className}>
+    <LogPart logStyle={logStyle} className={className} data-userid={dataUserid}>
       <time
         style={{
           cursor: shortId && onShortIdClick ? 'pointer' : 'default',
