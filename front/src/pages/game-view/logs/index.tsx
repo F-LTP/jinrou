@@ -54,16 +54,11 @@ export interface IStateLogs {
  * Shows all logs.
  */
 @observer
-class LogsInner extends React.Component<IPropLogs, IStateLogs> {
+export class Logs extends React.Component<IPropLogs, IStateLogs> {
   /**
    * Classname attached to each log.
    */
   private readonly logClass = 'jf-log';
-  /**
-   * Cached resolveLogById function to maintain stable reference.
-   * This prevents unnecessary re-renders of child components.
-   */
-  private readonly resolveLogById: (shortId: string) => string | null;
   constructor(props: IPropLogs) {
     super(props);
     this.state = {
@@ -71,8 +66,6 @@ class LogsInner extends React.Component<IPropLogs, IStateLogs> {
       // (getDerivedStateFromProps)
       renderingState: new LogsRenderingState(this.props.logs),
     };
-    // Bind resolveLogById to maintain stable reference
-    this.resolveLogById = this._resolveLogById.bind(this);
   }
   public componentDidUpdate(prevProps: IPropLogs) {
     if (!prevProps.logs.loaded && this.props.logs.loaded) {
@@ -87,10 +80,10 @@ class LogsInner extends React.Component<IPropLogs, IStateLogs> {
    * Resolve log by shortId for reply reference.
    * This is a performance-optimized lookup using the shortId index.
    */
-  private _resolveLogById(shortId: string): string | null {
+  private resolveLogById = (shortId: string): string | null => {
     const log = this.props.logs.findByShortId(shortId);
     return log ? JSON.stringify(log) : null;
-  }
+  };
 
   public render() {
     const {
@@ -262,16 +255,3 @@ class LogChunk extends React.Component<
     }
   }
 }
-
-/**
- * Memoized export of Logs component.
- * Custom comparison to ensure Logs only re-renders when log data actually changes.
- */
-export const Logs = React.memo(LogsInner, (prevProps, nextProps) => {
-  // Only re-render if the actual log data or critical props change
-  return (
-    prevProps.logs === nextProps.logs &&
-    prevProps.visibility === nextProps.visibility &&
-    prevProps.logPickup === nextProps.logPickup
-  );
-});

@@ -66,15 +66,6 @@ export const FixedSizeLogRow = styled.div`
   display: grid;
   grid-template-columns: ${fixedSizeGridColumnsPC};
 
-  /* Containment: isolate each log row's layout from others */
-  contain: layout style paint;
-
-  /* content-visibility: skip rendering when not visible (major performance boost) */
-  content-visibility: auto;
-
-  /* Tell browser the typical size of each row (helps content-visibility) */
-  contain-intrinsic-size: auto 20px;
-
   ${phone`
     grid-template-columns: ${fixedSizeGridColumnsPhone};
     grid-auto-flow: row dense;
