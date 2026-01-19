@@ -546,6 +546,8 @@ const JobInfoPart = styled(RoomHeaderPart)`
 const MainWrapper = styled.div`
   display: flex;
   flex-flow: row nowrap;
+  /* Containment: limit layout recalculation scope when children change */
+  contain: layout;
 `;
 
 /**
@@ -559,6 +561,8 @@ const LogsWrapper = styled.div<{
 }>`
   flex: auto 1 1;
   order: 1;
+  /* Containment: tell browser this element's layout won't be affected by external changes */
+  contain: layout style;
   ${phone`
     transition: margin-left 250ms ease-out;
     margin-left: ${({ ruleOpen }) => (ruleOpen ? '-20em' : '0)')};
@@ -583,14 +587,17 @@ interface IPropsRuleWrapper {
  * Wrapper of rule.
  */
 const RuleWrapper = styled.div<IPropsRuleWrapper>`
-  transition: width 250ms ease-out;
-  flex: auto 0 0;
-  width: ${({ closed }) => (closed ? '0' : '20em')};
+  flex: 0 0 ${({ closed }) => (closed ? '0' : '20em')};
+  width: 20em;
   order: 2;
+  overflow: hidden;
 
   z-index: ${ruleZIndex};
   background-color: #ffd1f2;
   color: black;
+
+  /* Containment to limit layout recalculation scope */
+  contain: layout style;
 
   a {
     ${lightA};
@@ -598,11 +605,9 @@ const RuleWrapper = styled.div<IPropsRuleWrapper>`
 `;
 
 const RuleStickyWrapper = styled.div<IPropsRuleWrapper>`
-  transition: width 250ms ease-out;
-  width: ${({ closed }) => (closed ? '0' : '20em')};
+  width: 20em;
   position: sticky;
   top: 0;
-  overflow-x: hidden;
 `;
 
 const RuleInnerWrapper = styled.div`
