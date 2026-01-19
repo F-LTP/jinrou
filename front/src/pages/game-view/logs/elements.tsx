@@ -68,7 +68,7 @@ export const FixedSizeLogRow = styled.div`
   contain: layout style paint;
   content-visibility: auto;
   contain-intrinsic-size: auto 20px;
-
+  margin-bottom: -0.35px;
   ${phone`
     grid-template-columns: ${fixedSizeGridColumnsPhone};
     grid-auto-flow: row dense;
