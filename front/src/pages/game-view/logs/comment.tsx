@@ -178,7 +178,7 @@ export const LogReferenceTooltip = React.memo<{
         style={{ cursor: 'pointer' }}
       >
         {playerName ? (
-          `>>${playerName}:${shortId}`
+          `>>${shortId}:${playerName}`
         ) : (
           <>
             {'>>'}
