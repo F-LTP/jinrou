@@ -66,7 +66,6 @@ export const FixedSizeLogRow = styled.div`
   display: grid;
   grid-template-columns: ${fixedSizeGridColumnsPC};
   contain: layout style paint;
-  content-visibility: auto;
   margin-bottom: -0.35px;
   ${phone`
     grid-template-columns: ${fixedSizeGridColumnsPhone};
