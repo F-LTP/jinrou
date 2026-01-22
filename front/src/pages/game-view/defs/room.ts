@@ -23,6 +23,10 @@ export interface RoomPrelude {
    * Whether this room has a theme.
    */
   theme: boolean;
+  /**
+   * Theme name if exists (for detecting OpenAvatar mode).
+   */
+  themeName?: string;
 }
 /**
  * State of room during endless yaminabe.

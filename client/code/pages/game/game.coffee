@@ -356,6 +356,7 @@ exports.start=(roomid)->
                             old: room.old
                             blind: !!room.blind
                             theme: room.theme? && !!room.theme
+                            themeName: room.theme
                         }
                     else if obj.game?.finished
                         {

@@ -200,3 +200,60 @@ export interface ISuddenDeathPunishDialog {
     label: string;
   }>;
 }
+
+/**
+ * OpenAvatar role selection dialog.
+ */
+export interface IOpenAvatarDialog {
+  modal?: boolean;
+  /**
+   * Title of dialog.
+   */
+  title: string;
+  /**
+   * Message shown to user.
+   */
+  message: string;
+  /**
+   * Random from all themes button text.
+   */
+  randomAll: string;
+  /**
+   * Random from current theme button text.
+   */
+  randomTheme: string;
+  /**
+   * Select button text.
+   */
+  select: string;
+  /**
+   * Cancel button text.
+   */
+  cancel: string;
+  /**
+   * Promise which resolves to list of available roles.
+   */
+  roles: Promise<
+    Array<{
+      theme: string;
+      themeName: string;
+      skinKey: string;
+      name: string;
+      avatar: string | string[];
+      prize: string | string[];
+    }>
+  >;
+  /**
+   * Currently selected role names in the room.
+   */
+  selectedNames: string[];
+}
+
+/**
+ * Result of OpenAvatar role selection.
+ * null = cancelled
+ */
+export type OpenAvatarResult = null | {
+  theme: string;
+  skinKey: string;
+};

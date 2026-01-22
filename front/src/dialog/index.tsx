@@ -14,6 +14,8 @@ import {
   ILoginDialog,
   IRoleDescDialog,
   ISuddenDeathPunishDialog,
+  IOpenAvatarDialog,
+  OpenAvatarResult,
 } from './defs';
 
 import { MessageDialog } from './components/message';
@@ -28,6 +30,7 @@ import { BoundFunc } from '../util/cached-binder';
 import { PromptDialog } from './components/prompt';
 import { LoginDialog } from './components/login';
 import { RoleDescDialog } from './components/role-desc';
+import { OpenAvatarDialog } from './components/openavatar';
 
 /**
  * ID of area to place dialogs.
@@ -201,13 +204,26 @@ export async function showRoleDescDialog(d: IRoleDescDialog): Promise<void> {
 }
 
 /**
+ * Show an OpenAvatar role selection dialog.
+ * Returns null if cancelled, undefined if random selected, or { theme, skinKey } if role selected.
+ */
+export function showOpenAvatarDialog(
+  d: IOpenAvatarDialog,
+): Promise<OpenAvatarResult> {
+  return showDialog(dialogArea, null, (open, close) => {
+    const dialog = <OpenAvatarDialog {...d} onSelect={close} />;
+    open(dialog);
+  });
+}
+
+/**
  * Inner function to show a dialog.
  */
 function showDialog<T>(
   areaId: string,
   i18n: i18n | null,
   callback: (
-    open: ((dialog: React.ReactElement<any>) => void),
+    open: (dialog: React.ReactElement<any>) => void,
     close: BoundFunc<T, void>,
   ) => void,
 ): Promise<T> {

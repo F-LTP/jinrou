@@ -278,13 +278,15 @@ module.exports.actions=(req,res,ss)->
                     res {error: i18n.t "error.theme.notBlind"}
                     return
 
-                skins = Object.keys theme.skins
-                if room.number > skins.length
-                    res {error: i18n.t "error.theme.playerTooMuch", {
-                        name: theme.name
-                        length: skins.length
-                    }}
-                    return
+                # OpenAvatar 模式不检查人数限制（角色来自所有主题）
+                unless theme.openAvatar
+                    skins = Object.keys theme.skins
+                    if room.number > skins.length
+                        res {error: i18n.t "error.theme.playerTooMuch", {
+                            name: theme.name
+                            length: skins.length
+                        }}
+                        return
             room.comment=query.comment ? ""
             #unless room.blind
             #   room.players.push req.session.user
@@ -431,15 +433,59 @@ module.exports.actions=(req,res,ss)->
                     return
                 # 分配皮肤
                 if room.theme && theme != null
-                    skins = Object.keys theme.skins
-                    skins = skins.filter((x)->!room.players.some((pl)->theme.skins[x].name==pl.name))
-                    skin = skins[Math.floor(Math.random() * skins.length)]
+                    # OpenAvatar 跨主题选择模式
+                    if theme.openAvatar
+                        # opt.selectedSkin 格式: { theme: "themeName", skinKey: "skinKey" }
+                        if opt.selectedSkin?.theme && opt.selectedSkin?.skinKey
+                            # 用户主动选择角色（包括手动选择和随机后选择）
+                            selectedTheme = Server.game.themes.getTheme opt.selectedSkin.theme
+                            if selectedTheme && selectedTheme.skins && selectedTheme.skins[opt.selectedSkin.skinKey]
+                                selectedSkin = selectedTheme.skins[opt.selectedSkin.skinKey]
+                                # 检查角色名是否已被使用
+                                if room.players.some((pl)->pl.name==selectedSkin.name)
+                                    res error:"该角色已被选择，请选择其他角色。"
+                                    return
+                                user.name = selectedSkin.name.trim()
+                                avatar = selectedSkin.avatar
+                                if Array.isArray avatar
+                                    avatar = avatar[Math.floor(Math.random() * avatar.length)]
+                                user.icon = avatar ? null
+                                # 保存称号用于后续
+                                theme._selectedPrize = selectedSkin.prize
+                                theme._selectedSkinName = opt.selectedSkin.skinKey
+                                theme._selectedThemeName = opt.selectedSkin.theme
+                            else
+                                res error:"选择的角色不存在，请重试。"
+                                return
+                        else
+                            # 没有选择角色，返回错误
+                            res error:"请先选择一个角色。"
+                            return
+                    else
+                        # 原有的单一主题角色分配逻辑
+                        skins = Object.keys theme.skins
+                        skins = skins.filter((x)->!room.players.some((pl)->theme.skins[x].name==pl.name))
+                        skin = skins[Math.floor(Math.random() * skins.length)]
 
-                    unless skin
-                        res error:"由于未知错误加入游戏失败，请重试。"
-                        return
-                        
-                    user.name=theme.skins[skin].name.trim()
+                        unless skin
+                            res error:"由于未知错误加入游戏失败，请重试。"
+                            return
+
+                        user.name=theme.skins[skin].name.trim()
+                        loop
+                            user.userid=crypto.randomBytes(10).toString('hex')
+                            if user.userid? && room.players.every((pl)->user.userid!=pl.userid)
+                                break
+                        unless user.name? && user.name && user.userid? && user.userid
+                            res error:"由于未知错误加入游戏失败，请重试。"
+                            return
+                        avatar = theme.skins[skin].avatar
+                        # 也可能是 Array
+                        if Array.isArray avatar
+                            avatar = avatar[Math.floor(Math.random() * avatar.length)]
+                        user.icon= avatar ? null
+
+                    # 生成随机用户ID（OpenAvatar和普通主题都需要）
                     loop
                         user.userid=crypto.randomBytes(10).toString('hex')
                         if user.userid? && room.players.every((pl)->user.userid!=pl.userid)
@@ -447,11 +493,6 @@ module.exports.actions=(req,res,ss)->
                     unless user.name? && user.name && user.userid? && user.userid
                         res error:"由于未知错误加入游戏失败，请重试。"
                         return
-                    avatar = theme.skins[skin].avatar
-                    # 也可能是 Array
-                    if Array.isArray avatar
-                        avatar = avatar[Math.floor(Math.random() * avatar.length)]
-                    user.icon= avatar ? null
                 # 匿名模式
                 else
                     makeid=->   # ID生成
@@ -489,7 +530,13 @@ module.exports.actions=(req,res,ss)->
                     # 啊啦，为什么身上有一张身份证，这就是我吗？
                     if room.theme && theme != null
                         # 指明玩家的皮肤
-                        pr = theme.skins[skin].prize
+                        if theme.openAvatar
+                            # OpenAvatar 模式：使用保存的称号
+                            pr = theme._selectedPrize
+                        else
+                            # 普通主题模式
+                            pr = theme.skins[skin].prize
+
                         # 也可能是 Array
                         if Array.isArray pr
                             pr = pr[Math.floor(Math.random() * pr.length)]
@@ -499,6 +546,12 @@ module.exports.actions=(req,res,ss)->
                             name = "「#{user.tpr}」#{user.name}"
                         else
                             name = "#{user.name}"
+                        # 清除临时保存的数据
+                        if theme.openAvatar
+                            delete theme._selectedPrize
+                            delete theme._selectedSkinName
+                            delete theme._selectedThemeName
+
                         res
                             tip: "#{name}"
                             title:"#{theme.skin_tip}"
