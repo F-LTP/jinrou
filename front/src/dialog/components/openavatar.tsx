@@ -23,6 +23,8 @@ interface ThemeGroup {
   roles: Role[];
 }
 
+type TabType = 'role' | 'custom';
+
 export class OpenAvatarDialog extends React.PureComponent<
   IPropOpenAvatarDialog,
   {
@@ -30,6 +32,9 @@ export class OpenAvatarDialog extends React.PureComponent<
     themeGroups: ThemeGroup[] | null;
     selectedThemeName: string;
     selectedSkinKey: string;
+    activeTab: TabType;
+    customName: string;
+    customIcon: string;
   }
 > {
   constructor(props: IPropOpenAvatarDialog) {
@@ -39,6 +44,9 @@ export class OpenAvatarDialog extends React.PureComponent<
       themeGroups: null,
       selectedThemeName: '',
       selectedSkinKey: '',
+      activeTab: 'role',
+      customName: '',
+      customIcon: '',
     };
   }
 
@@ -82,6 +90,9 @@ export class OpenAvatarDialog extends React.PureComponent<
       themeGroups,
       selectedThemeName,
       selectedSkinKey,
+      activeTab,
+      customName,
+      customIcon,
     } = this.state;
 
     const selectedTheme = themeGroups
@@ -94,6 +105,12 @@ export class OpenAvatarDialog extends React.PureComponent<
       ? this.props.selectedNames.includes(selectedRole.name)
       : false;
 
+    // Check if can confirm selection
+    const canConfirm =
+      activeTab === 'role'
+        ? selectedRole && !isTaken
+        : customName.trim().length > 0 && customIcon.trim().length > 0;
+
     return (
       <Dialog
         modal={modal}
@@ -103,19 +120,20 @@ export class OpenAvatarDialog extends React.PureComponent<
         buttons={() => (
           <>
             <NoButton onClick={this.handleCancel}>{cancel}</NoButton>
-            <YesButton onClick={this.handleRandomAllClick}>
-              {randomAll}
-            </YesButton>
-            <YesButton
-              onClick={this.handleRandomThemeClick}
-              disabled={!selectedTheme}
-            >
-              {randomTheme}
-            </YesButton>
-            <YesButton
-              onClick={this.handleSelectClick}
-              disabled={!selectedRole || isTaken}
-            >
+            {activeTab === 'role' && (
+              <>
+                <YesButton onClick={this.handleRandomAllClick}>
+                  {randomAll}
+                </YesButton>
+                <YesButton
+                  onClick={this.handleRandomThemeClick}
+                  disabled={!selectedTheme}
+                >
+                  {randomTheme}
+                </YesButton>
+              </>
+            )}
+            <YesButton onClick={this.handleSelectClick} disabled={!canConfirm}>
               {select}
             </YesButton>
           </>
@@ -126,70 +144,149 @@ export class OpenAvatarDialog extends React.PureComponent<
               <div style={styles.loading}>加载中...</div>
             ) : (
               <>
-                <div style={styles.selectGroup}>
-                  <label style={styles.label}>选择主题</label>
-                  <select
-                    value={selectedThemeName}
-                    onChange={this.handleThemeChange}
-                    style={styles.select}
+                {/* Tabs */}
+                <div style={styles.tabs}>
+                  <div
+                    style={{
+                      ...styles.tab,
+                      ...(activeTab === 'role' ? styles.tabActive : {}),
+                    }}
+                    onClick={this.handleTabRole}
                   >
-                    <option value="">-- 请选择主题 --</option>
-                    {themeGroups!.map(group => (
-                      <option key={group.themeName} value={group.themeName}>
-                        {group.themeName} ({group.roles.length}个角色)
-                      </option>
-                    ))}
-                  </select>
+                    角色选择
+                  </div>
+                  <div
+                    style={{
+                      ...styles.tab,
+                      ...(activeTab === 'custom' ? styles.tabActive : {}),
+                    }}
+                    onClick={this.handleTabCustom}
+                  >
+                    自定义
+                  </div>
                 </div>
 
-                {selectedTheme && (
-                  <div style={styles.selectGroup}>
-                    <label style={styles.label}>选择角色</label>
-                    <select
-                      value={selectedSkinKey}
-                      onChange={this.handleRoleChange}
-                      style={styles.select}
-                    >
-                      <option value="">-- 请选择角色 --</option>
-                      {selectedTheme.roles.map(role => {
-                        const taken = this.props.selectedNames.includes(
-                          role.name,
-                        );
-                        return (
-                          <option
-                            key={role.skinKey}
-                            value={role.skinKey}
-                            disabled={taken}
-                          >
-                            {taken ? `${role.name} (已选)` : role.name}
+                {/* Role Selection Tab */}
+                {activeTab === 'role' && (
+                  <>
+                    <div style={styles.selectGroup}>
+                      <label style={styles.label}>选择主题</label>
+                      <select
+                        value={selectedThemeName}
+                        onChange={this.handleThemeChange}
+                        style={styles.select}
+                      >
+                        <option value="">-- 请选择主题 --</option>
+                        {themeGroups!.map(group => (
+                          <option key={group.themeName} value={group.themeName}>
+                            {group.themeName} ({group.roles.length}个角色)
                           </option>
-                        );
-                      })}
-                    </select>
-                  </div>
+                        ))}
+                      </select>
+                    </div>
+
+                    {selectedTheme && (
+                      <div style={styles.selectGroup}>
+                        <label style={styles.label}>选择角色</label>
+                        <select
+                          value={selectedSkinKey}
+                          onChange={this.handleRoleChange}
+                          style={styles.select}
+                        >
+                          <option value="">-- 请选择角色 --</option>
+                          {selectedTheme.roles.map(role => {
+                            const taken = this.props.selectedNames.includes(
+                              role.name,
+                            );
+                            return (
+                              <option
+                                key={role.skinKey}
+                                value={role.skinKey}
+                                disabled={taken}
+                              >
+                                {taken ? `${role.name} (已选)` : role.name}
+                              </option>
+                            );
+                          })}
+                        </select>
+                      </div>
+                    )}
+
+                    {selectedRole && (
+                      <div style={styles.preview}>
+                        <img
+                          src={
+                            Array.isArray(selectedRole.avatar)
+                              ? selectedRole.avatar[0]
+                              : selectedRole.avatar
+                          }
+                          alt={selectedRole.name}
+                          style={styles.previewAvatar}
+                        />
+                        <div style={styles.previewInfo}>
+                          <div style={styles.previewName}>
+                            {selectedRole.name}
+                          </div>
+                          <div style={styles.previewTheme}>
+                            {selectedRole.themeName}
+                          </div>
+                          {isTaken && (
+                            <div style={styles.takenWarning}>
+                              该角色已被选择
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </>
                 )}
 
-                {selectedRole && (
-                  <div style={styles.preview}>
-                    <img
-                      src={
-                        Array.isArray(selectedRole.avatar)
-                          ? selectedRole.avatar[0]
-                          : selectedRole.avatar
-                      }
-                      alt={selectedRole.name}
-                      style={styles.previewAvatar}
-                    />
-                    <div style={styles.previewInfo}>
-                      <div style={styles.previewName}>{selectedRole.name}</div>
-                      <div style={styles.previewTheme}>
-                        {selectedRole.themeName}
-                      </div>
-                      {isTaken && (
-                        <div style={styles.takenWarning}>该角色已被选择</div>
-                      )}
+                {/* Custom Tab */}
+                {activeTab === 'custom' && (
+                  <>
+                    <div style={styles.selectGroup}>
+                      <label style={styles.label}>自定义名字</label>
+                      <input
+                        type="text"
+                        value={customName}
+                        onChange={this.handleCustomNameChange}
+                        placeholder="请输入你的名字"
+                        style={styles.input}
+                        maxLength={50}
+                      />
                     </div>
-                  </div>
+
+                    <div style={styles.selectGroup}>
+                      <label style={styles.label}>自定义头像URL</label>
+                      <input
+                        type="text"
+                        value={customIcon}
+                        onChange={this.handleCustomIconChange}
+                        placeholder="请输入图片URL (如: https://example.com/avatar.png)"
+                        style={styles.input}
+                      />
+                    </div>
+
+                    {customIcon && (
+                      <div style={styles.preview}>
+                        <img
+                          src={customIcon}
+                          alt="预览"
+                          style={styles.previewAvatar}
+                          onError={e => {
+                            (e.target as HTMLImageElement).style.display =
+                              'none';
+                          }}
+                        />
+                        <div style={styles.previewInfo}>
+                          <div style={styles.previewName}>
+                            {customName || '未命名'}
+                          </div>
+                          <div style={styles.previewTheme}>自定义头像</div>
+                        </div>
+                      </div>
+                    )}
+                  </>
                 )}
               </>
             )}
@@ -197,6 +294,16 @@ export class OpenAvatarDialog extends React.PureComponent<
         )}
       />
     );
+  }
+
+  @bind
+  private handleTabRole(): void {
+    this.setState({ activeTab: 'role' });
+  }
+
+  @bind
+  private handleTabCustom(): void {
+    this.setState({ activeTab: 'custom' });
   }
 
   @bind
@@ -210,6 +317,16 @@ export class OpenAvatarDialog extends React.PureComponent<
   @bind
   private handleRoleChange(e: React.ChangeEvent<HTMLSelectElement>): void {
     this.setState({ selectedSkinKey: e.target.value });
+  }
+
+  @bind
+  private handleCustomNameChange(e: React.ChangeEvent<HTMLInputElement>): void {
+    this.setState({ customName: e.target.value });
+  }
+
+  @bind
+  private handleCustomIconChange(e: React.ChangeEvent<HTMLInputElement>): void {
+    this.setState({ customIcon: e.target.value });
   }
 
   @bind
@@ -264,32 +381,71 @@ export class OpenAvatarDialog extends React.PureComponent<
 
   @bind
   private handleSelectClick(): void {
-    const { selectedSkinKey, selectedThemeName, themeGroups } = this.state;
-    if (!selectedSkinKey) return;
+    const {
+      activeTab,
+      selectedSkinKey,
+      selectedThemeName,
+      themeGroups,
+      customName,
+      customIcon,
+    } = this.state;
 
-    const theme = themeGroups
-      ? themeGroups.find(t => t.themeName === selectedThemeName)
-      : null;
-    if (!theme) return;
+    if (activeTab === 'role') {
+      // Role selection mode
+      if (!selectedSkinKey) return;
 
-    const role = theme.roles.find(r => r.skinKey === selectedSkinKey);
-    if (!role || this.props.selectedNames.includes(role.name)) return;
+      const theme = themeGroups
+        ? themeGroups.find(t => t.themeName === selectedThemeName)
+        : null;
+      if (!theme) return;
 
-    this.props.onSelect({
-      theme: role.theme,
-      skinKey: role.skinKey,
-    });
+      const role = theme.roles.find(r => r.skinKey === selectedSkinKey);
+      if (!role || this.props.selectedNames.includes(role.name)) return;
+
+      this.props.onSelect({
+        type: 'role',
+        theme: role.theme,
+        skinKey: role.skinKey,
+      });
+    } else {
+      // Custom mode
+      if (!customName.trim() || !customIcon.trim()) return;
+
+      this.props.onSelect({
+        type: 'custom',
+        customName: customName.trim(),
+        customIcon: customIcon.trim(),
+      });
+    }
   }
 }
 
 const styles: { [key: string]: React.CSSProperties } = {
   container: {
-    minWidth: '300px',
+    minWidth: '320px',
     padding: '10px 0',
   },
   loading: {
     textAlign: 'center',
     padding: '20px',
+  },
+  tabs: {
+    display: 'flex',
+    marginBottom: '15px',
+    borderBottom: '1px solid #ddd',
+  },
+  tab: {
+    flex: 1,
+    padding: '10px',
+    textAlign: 'center',
+    cursor: 'pointer',
+    borderBottom: '2px solid transparent',
+    color: '#666',
+  },
+  tabActive: {
+    borderBottom: '2px solid #2196F3',
+    color: '#2196F3',
+    fontWeight: 'bold',
   },
   selectGroup: {
     marginBottom: '15px',
@@ -301,6 +457,14 @@ const styles: { [key: string]: React.CSSProperties } = {
     color: '#333',
   },
   select: {
+    width: '100%',
+    padding: '8px',
+    fontSize: '14px',
+    border: '1px solid #ccc',
+    borderRadius: '4px',
+    boxSizing: 'border-box' as const,
+  },
+  input: {
     width: '100%',
     padding: '8px',
     fontSize: '14px',

@@ -252,8 +252,18 @@ export interface IOpenAvatarDialog {
 /**
  * Result of OpenAvatar role selection.
  * null = cancelled
+ * { type: 'role' } = selected from existing roles
+ * { type: 'custom' } = custom name and avatar
  */
-export type OpenAvatarResult = null | {
-  theme: string;
-  skinKey: string;
-};
+export type OpenAvatarResult =
+  | null
+  | {
+      type: 'role';
+      theme: string;
+      skinKey: string;
+    }
+  | {
+      type: 'custom';
+      customName: string;
+      customIcon: string;
+    };

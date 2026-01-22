@@ -435,11 +435,33 @@ module.exports.actions=(req,res,ss)->
                 if room.theme && theme != null
                     # OpenAvatar 跨主题选择模式
                     if theme.openAvatar
+                        # 自定义模式：使用自定义名字和头像
+                        if opt.customName? and opt.customIcon?
+                            customName = opt.customName.trim()
+                            customIcon = opt.customIcon.trim()
+                            # 检查名字是否已被使用
+                            if room.players.some((pl)->pl.name==customName)
+                                res error:"该名字已被使用，请选择其他名字。"
+                                return
+                            # 检查名字长度
+                            if customName.length > Config.maxlength.user.name
+                                res error:"名字太长了。"
+                                return
+                            user.name = customName
+                            user.icon = customIcon
+                            # 生成随机用户ID
+                            loop
+                                user.userid=crypto.randomBytes(10).toString('hex')
+                                if user.userid? and room.players.every((pl)->user.userid!=pl.userid)
+                                    break
+                            unless user.name? and user.name and user.userid? and user.userid
+                                res error:"由于未知错误加入游戏失败，请重试。"
+                                return
                         # opt.selectedSkin 格式: { theme: "themeName", skinKey: "skinKey" }
-                        if opt.selectedSkin?.theme && opt.selectedSkin?.skinKey
+                        else if opt.selectedSkin?.theme and opt.selectedSkin?.skinKey
                             # 用户主动选择角色（包括手动选择和随机后选择）
                             selectedTheme = Server.game.themes.getTheme opt.selectedSkin.theme
-                            if selectedTheme && selectedTheme.skins && selectedTheme.skins[opt.selectedSkin.skinKey]
+                            if selectedTheme and selectedTheme.skins and selectedTheme.skins[opt.selectedSkin.skinKey]
                                 selectedSkin = selectedTheme.skins[opt.selectedSkin.skinKey]
                                 # 检查角色名是否已被使用
                                 if room.players.some((pl)->pl.name==selectedSkin.name)
@@ -454,12 +476,20 @@ module.exports.actions=(req,res,ss)->
                                 theme._selectedPrize = selectedSkin.prize
                                 theme._selectedSkinName = opt.selectedSkin.skinKey
                                 theme._selectedThemeName = opt.selectedSkin.theme
+                                # 生成随机用户ID
+                                loop
+                                    user.userid=crypto.randomBytes(10).toString('hex')
+                                    if user.userid? and room.players.every((pl)->user.userid!=pl.userid)
+                                        break
+                                unless user.name? and user.name and user.userid? and user.userid
+                                    res error:"由于未知错误加入游戏失败，请重试。"
+                                    return
                             else
                                 res error:"选择的角色不存在，请重试。"
                                 return
                         else
                             # 没有选择角色，返回错误
-                            res error:"请先选择一个角色。"
+                            res error:"请先选择一个角色或自定义。"
                             return
                     else
                         # 原有的单一主题角色分配逻辑
@@ -531,7 +561,7 @@ module.exports.actions=(req,res,ss)->
                     if room.theme && theme != null
                         # 指明玩家的皮肤
                         if theme.openAvatar
-                            # OpenAvatar 模式：使用保存的称号
+                            # OpenAvatar 模式：使用保存的称号（自定义模式没有称号）
                             pr = theme._selectedPrize
                         else
                             # 普通主题模式

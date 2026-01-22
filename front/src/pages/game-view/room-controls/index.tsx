@@ -160,14 +160,23 @@ export class RoomControls extends React.Component<IPropRoomControls, {}> {
           return;
         }
 
-        handlers.join({
-          name: '',
-          icon: null,
-          selectedSkin: {
-            theme: result.theme,
-            skinKey: result.skinKey,
-          },
-        });
+        if (result.type === 'role') {
+          handlers.join({
+            name: '',
+            icon: null,
+            selectedSkin: {
+              theme: result.theme,
+              skinKey: result.skinKey,
+            },
+          });
+        } else if (result.type === 'custom') {
+          handlers.join({
+            name: '',
+            icon: null,
+            customName: result.customName,
+            customIcon: result.customIcon,
+          });
+        }
       } catch (err) {
         console.error(err);
       }
