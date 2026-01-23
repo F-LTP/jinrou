@@ -4807,34 +4807,15 @@ class WolfDiviner extends Werewolf
                 @die game, "curse", p.id
         p=game.getPlayer target
         # 狂人変化（死亡時は変化しない）
-        # if p?.getTeam() == "Werewolf" && p.jobname() && !p.dead
-        #     jobnames=Object.keys jobs
-        #     # inspect all target roles.
-        #     for targetpl in p.accessMainLevel()
-        #         [_, mainpl] = constructMainChain targetpl
-        #         # check whether this target should change.
-        #         unless mainpl.getTeam()=="Werewolf" && mainpl.isHuman()
-        #             continue
-        #         newjob=jobnames[Math.floor Math.random()*jobnames.length]
-        #         # convert this to new pl.
-        #         newpl = Player.factory newjob, game
-        #         targetpl.transProfile newpl
-        #         targetpl.transferData newpl, true
-
-        #         targetpl.transform game,newpl,false
-        #         log=
-        #             mode:"skill"
-        #             to:p.id
-        #             comment: game.i18n.t "system.changeRole", {name: p.name, result: newpl.getJobDisp()}
-        #         splashlog game.id,game,log
-        if p?.getTeam() == "Werewolf" && (p?.isJobType("Madman") || p?.isJobType("Fanatic")) && p.jobname && !p.dead
+        if p?.getTeam() == "Werewolf" && p.jobname() && !p.dead
+            jobnames=Object.keys jobs
             # inspect all target roles.
             for targetpl in p.accessMainLevel()
                 [_, mainpl] = constructMainChain targetpl
                 # check whether this target should change.
-                unless mainpl.getTeam() == "Werewolf" && (mainpl.isJobType("Madman") || mainpl.isJobType("Fanatic"))  && mainpl.jobname
+                unless mainpl.getTeam()=="Werewolf" && mainpl.isHuman()
                     continue
-                newjob="HearMadman"
+                newjob=jobnames[Math.floor Math.random()*jobnames.length]
                 # convert this to new pl.
                 newpl = Player.factory newjob, game
                 targetpl.transProfile newpl
@@ -4846,6 +4827,25 @@ class WolfDiviner extends Werewolf
                     to:p.id
                     comment: game.i18n.t "system.changeRole", {name: p.name, result: newpl.getJobDisp()}
                 splashlog game.id,game,log
+        # if p?.getTeam() == "Werewolf" && (p?.isJobType("Madman") || p?.isJobType("Fanatic")) && p.jobname && !p.dead
+        #     # inspect all target roles.
+        #     for targetpl in p.accessMainLevel()
+        #         [_, mainpl] = constructMainChain targetpl
+        #         # check whether this target should change.
+        #         unless mainpl.getTeam() == "Werewolf" && (mainpl.isJobType("Madman") || mainpl.isJobType("Fanatic"))  && mainpl.jobname
+        #             continue
+        #         newjob="HearMadman"
+        #         # convert this to new pl.
+        #         newpl = Player.factory newjob, game
+        #         targetpl.transProfile newpl
+        #         targetpl.transferData newpl, true
+
+        #         targetpl.transform game,newpl,false
+        #         log=
+        #             mode:"skill"
+        #             to:p.id
+        #             comment: game.i18n.t "system.changeRole", {name: p.name, result: newpl.getJobDisp()}
+        #         splashlog game.id,game,log
                         
 
     showdivineresult:(game)->
