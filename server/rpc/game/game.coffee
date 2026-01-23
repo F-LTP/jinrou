@@ -4028,8 +4028,8 @@ class Diviner extends Player
 class SuperDiviner extends Diviner
     type:"SuperDiviner"
     midnightSort:80
-    sleeping:->@target? || @scapegoat
-    jobdone:->@target? && @flag[0].SuperDivinerUsed
+    sleeping:->@flag[0].NormalDivinerTarget? || @scapegoat
+    jobdone:->@flag[0].NormalDivinerTarget? && @flag[0].SuperDivinerUsed
     constructor:->
         super
         @setFlag [{
@@ -4037,31 +4037,33 @@ class SuperDiviner extends Diviner
             type: null
             # day on which this action is taken.
             day: 0
-            # whether kill is already used.
+            # whether extra divination is already used.
             SuperDivinerUsed: false
+            # normal divination target
+            NormalDivinerTarget: null
+            # extra divination target
             SuperDivinerTarget: null
         }]
     job:(game,playerid,query)->
         pl=game.getPlayer playerid
         unless pl?
             return game.i18n.t "error.common.nonexistentPlayer"
-        
+
         type = query.commandname
         unless type in ["SuperDiviner", "NormalDiviner"]
             return game.i18n.t "error.common.invalidQuery"
 
-        # cannot use kill more than once
+        # cannot use extra divination more than once
         if @flag[0].SuperDivinerUsed && type == "SuperDiviner"
             return game.i18n.t "error.common.alreadyUsed"
 
-        if(type == "SuperDiviner")
+        # Set target based on type
+        if type == "NormalDiviner"
+            @flag[0].NormalDivinerTarget = playerid
+        else if type == "SuperDiviner"
             @flag[0].SuperDivinerUsed = true
             @flag[0].SuperDivinerTarget = playerid
 
-        temptarget = null
-        if type == "SuperDiviner" && @target != null
-            temptarget = @target
-        @setTarget playerid
         pl.touched game,@id
         log=
             mode:"skill"
@@ -4072,16 +4074,20 @@ class SuperDiviner extends Diviner
                 game.i18n.t "roles:SuperDiviner.SuperSelect", {name: @name, target: pl.name}
         splashlog game.id,game,log
         if game.rule.divineresult=="immediate"
-            @dodivine game
-            @showdivineresult game, @target
-        # 如果使用的是超占，不影响target判断行动
-        if type == "SuperDiviner"
-            @target = temptarget
+            if type == "NormalDiviner"
+                @dodivine game
+                @showdivineresult game, @flag[0].NormalDivinerTarget
+            else
+                savedTarget = @target
+                @setTarget @flag[0].SuperDivinerTarget
+                @dodivine game
+                @showdivineresult game, @flag[0].SuperDivinerTarget
+                @setTarget savedTarget
         null
     getOpenForms:(game)->
         if !@dead && Phase.isNight(game.phase)
             res = []
-            if(!@target)
+            if(!@flag[0].NormalDivinerTarget)
                 # manually generate form.
                 res.push {
                     type: "NormalDiviner"
@@ -4095,7 +4101,6 @@ class SuperDiviner extends Diviner
                     options: @makeJobSelection game, false
                     formType: FormType.optionalOnce
                     objid: @objid
-                    # give data of whether kill is already used.
                     data:
                         SuperDivinerUsed: @flag[0].SuperDivinerUsed
                 }
@@ -4104,16 +4109,39 @@ class SuperDiviner extends Diviner
             return super
     isFormTarget:(jobtype)->
         (jobtype in ["NormalDiviner", "SuperDiviner"]) || super
-    sunrise:(game)->
-        super
+    midnight:(game,midnightSort)->
         unless game.rule.divineresult=="immediate"
-            @showdivineresult game, @target
-            if @flag[0].SuperDivinerTarget != null
-                @showdivineresult game, @flag[0].SuperDivinerTarget
-                @flag[0].SuperDivinerTarget == null
+            # 执行普通占卜
+            if @flag[0].NormalDivinerTarget?
+                @setTarget @flag[0].NormalDivinerTarget
+                @dodivine game
+            # 执行额外占卜
+            if @flag[0].SuperDivinerTarget?
+                @setTarget @flag[0].SuperDivinerTarget
+                @dodivine game
+        @divineeffect game
+
+    sunrise:(game)->
+        # Call parent sunrise for base class behavior, but skip the showdivineresult part
+        Player.prototype.sunrise.call @, game
+        unless game.rule.divineresult=="immediate"
+            resday = game.day - 1
+            # 分别显示普通占卜和额外占卜的结果
+            for r in @flag
+                continue if r.day != resday
+                log =
+                    mode:"skill"
+                    to:@id
+                    comment:r.result
+                splashlog game.id,game,log
+            # 重置目标
+            @flag[0].NormalDivinerTarget = null
+            @flag[0].SuperDivinerTarget = null
     sunset:(game)->
         super
-        @setTarget null
+        # 重置目标
+        @flag[0].NormalDivinerTarget = null
+        @flag[0].SuperDivinerTarget = null
         # 占い対象
         targets = game.players.filter (x)->!x.dead
 
@@ -4135,7 +4163,13 @@ class SuperDiviner extends Diviner
                 return
     divineeffect:(game)->
         super
-        if @flag[0].SuperDivinerTarget
+        # 对普通占卜目标执行效果
+        if @flag[0].NormalDivinerTarget?
+            p=game.getPlayer game.skillTargetHook.get @flag[0].NormalDivinerTarget
+            if p?
+                p.divined game,this
+        # 对额外占卜目标执行效果
+        if @flag[0].SuperDivinerTarget?
             p2=game.getPlayer game.skillTargetHook.get @flag[0].SuperDivinerTarget
             if p2?
                 p2.divined game,this
