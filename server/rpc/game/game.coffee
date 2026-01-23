@@ -4807,15 +4807,34 @@ class WolfDiviner extends Werewolf
                 @die game, "curse", p.id
         p=game.getPlayer target
         # 狂人変化（死亡時は変化しない）
-        if p?.getTeam() == "Werewolf" && p.isHuman() && !p.dead
-            jobnames=Object.keys jobs
+        # if p?.getTeam() == "Werewolf" && p.jobname() && !p.dead
+        #     jobnames=Object.keys jobs
+        #     # inspect all target roles.
+        #     for targetpl in p.accessMainLevel()
+        #         [_, mainpl] = constructMainChain targetpl
+        #         # check whether this target should change.
+        #         unless mainpl.getTeam()=="Werewolf" && mainpl.isHuman()
+        #             continue
+        #         newjob=jobnames[Math.floor Math.random()*jobnames.length]
+        #         # convert this to new pl.
+        #         newpl = Player.factory newjob, game
+        #         targetpl.transProfile newpl
+        #         targetpl.transferData newpl, true
+
+        #         targetpl.transform game,newpl,false
+        #         log=
+        #             mode:"skill"
+        #             to:p.id
+        #             comment: game.i18n.t "system.changeRole", {name: p.name, result: newpl.getJobDisp()}
+        #         splashlog game.id,game,log
+        if p?.getTeam() == "Werewolf" && (p?.isJobType("Madman") || p?.isJobType("Fanatic")) && p.jobname && !p.dead
             # inspect all target roles.
             for targetpl in p.accessMainLevel()
                 [_, mainpl] = constructMainChain targetpl
                 # check whether this target should change.
-                unless mainpl.getTeam()=="Werewolf" && mainpl.isHuman()
+                unless mainpl.getTeam() == "Werewolf" && (mainpl.isJobType("Madman") || mainpl.isJobType("Fanatic"))  && mainpl.jobname
                     continue
-                newjob=jobnames[Math.floor Math.random()*jobnames.length]
+                newjob="HearMadman"
                 # convert this to new pl.
                 newpl = Player.factory newjob, game
                 targetpl.transProfile newpl
@@ -4827,6 +4846,7 @@ class WolfDiviner extends Werewolf
                     to:p.id
                     comment: game.i18n.t "system.changeRole", {name: p.name, result: newpl.getJobDisp()}
                 splashlog game.id,game,log
+                        
 
     showdivineresult:(game)->
         r=@flag.results[@flag.results.length-1]
@@ -9004,30 +9024,30 @@ class TongueWolf extends Werewolf
                 continue unless pl?
                 continue unless pl.dead
 
-                if obj.isHuman
-                    # Attacked a Human. Skill is lost.
-                    log=
-                        mode: "skill"
-                        to: @id
-                        comment: game.i18n.t "roles:TongueWolf.resultLost", {
-                            name: @name
-                            target: obj.player.name
-                            job: obj.jobname
-                        }
-                    splashlog game.id, game, log
-                    @addGamelog game,"tongueresult", pl.type, pl.id
-                    @setFlag "lost"
-                else
-                    log=
-                        mode: "skill"
-                        to: @id
-                        comment: game.i18n.t "roles:TongueWolf.result", {
-                            name: @name
-                            target: obj.player.name
-                            job: obj.jobname
-                        }
-                    splashlog game.id, game, log
-                    @addGamelog game,"tongueresult", pl.type, pl.id
+                # if obj.isHuman
+                #     # Attacked a Human. Skill is lost.
+                #     log=
+                #         mode: "skill"
+                #         to: @id
+                #         comment: game.i18n.t "roles:TongueWolf.resultLost", {
+                #             name: @name
+                #             target: obj.player.name
+                #             job: obj.jobname
+                #         }
+                #     splashlog game.id, game, log
+                #     @addGamelog game,"tongueresult", pl.type, pl.id
+                #     @setFlag "lost"
+                # else
+                log=
+                    mode: "skill"
+                    to: @id
+                    comment: game.i18n.t "roles:TongueWolf.result", {
+                        name: @name
+                        target: obj.player.name
+                        job: obj.jobname
+                    }
+                splashlog game.id, game, log
+                @addGamelog game,"tongueresult", pl.type, pl.id
 
 class BlackCat extends Madman
     type:"BlackCat"
