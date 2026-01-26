@@ -13769,7 +13769,7 @@ class ShadowBlacked extends Complex
     cmplType:"ShadowBlacked"
     getFortuneResult:(game)->
         shadow=game.getPlayer @cmplFlag
-        unless shadow.dead
+        unless shadow? && shadow.dead
             FortuneResult.werewolf
         else
             super
@@ -13782,7 +13782,7 @@ class ShadowWhited extends Complex
     cmplType:"ShadowWhited"
     getFortuneResult:(game)->
         shadow=game.getPlayer @cmplFlag
-        unless shadow.dead
+        unless shadow? && shadow.dead
             FortuneResult.human
         else
             super
