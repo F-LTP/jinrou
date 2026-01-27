@@ -718,7 +718,7 @@ exports.jobrules=[
           ret
       }
       {
-        name:"人狼占卜师"
+        name:"人狼幻术师"
         rule:(number)->
           ret=normal1 number
           ret.Werewolf--

@@ -203,11 +203,11 @@ SuperGuard:
   
 SuperDiviner:
   description: '请选择占卜的使用对象'
-  Superdescription: '请选择超级占卜的使用对象'
+  Superdescription: '请选择SP占卜的使用对象'
   # normal guard button.
   DivinerButton: '占卜'
-  SuperDivinerUsedButton: '超级占卜（只限一次）'
-  SuperDivinerUsedButtonUsed: '超级占卜（已经使用）'
+  SuperDivinerUsedButton: 'SP占卜（只限一次）'
+  SuperDivinerUsedButtonUsed: 'SP占卜（已经使用）'
 
 # Texts for Poet form.
 Poet:

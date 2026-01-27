@@ -4043,6 +4043,8 @@ class SuperDiviner extends Diviner
             NormalDivinerTarget: null
             # extra divination target
             SuperDivinerTarget: null
+            # divination results array
+            results: []
         }]
     job:(game,playerid,query)->
         pl=game.getPlayer playerid
@@ -4075,6 +4077,7 @@ class SuperDiviner extends Diviner
         splashlog game.id,game,log
         if game.rule.divineresult=="immediate"
             if type == "NormalDiviner"
+                @setTarget @flag[0].NormalDivinerTarget
                 @dodivine game
                 @showdivineresult game, @flag[0].NormalDivinerTarget
             else
@@ -4084,6 +4087,19 @@ class SuperDiviner extends Diviner
                 @showdivineresult game, @flag[0].SuperDivinerTarget
                 @setTarget savedTarget
         null
+    #占い実行 - Override to use results array in flag[0]
+    dodivine:(game)->
+        target = game.skillTargetHook.get @target
+        origp = game.getPlayer @target
+        p=game.getPlayer target
+        if p? && origp?
+            # show original target's name even if target is forced to another player.
+            @flag[0].results.push {
+                player: origp.publicinfo()
+                result: game.i18n.t "roles:Diviner.resultlog", {name: @name, target: origp.name, result: game.i18n.t "roles:fortune.#{p.getFortuneResult(game)}"}
+                day: game.day
+            }
+            @addGamelog game,"divine",p.type,@target    # 占った
     getOpenForms:(game)->
         if !@dead && Phase.isNight(game.phase)
             res = []
@@ -4109,6 +4125,25 @@ class SuperDiviner extends Diviner
             return super
     isFormTarget:(jobtype)->
         (jobtype in ["NormalDiviner", "SuperDiviner"]) || super
+    # Override to use results array in flag[0]
+    showdivineresult:(game, target)->
+        results = @flag[0].results
+        return unless results?.length > 0
+        r = results[results.length-1]
+        return unless r?
+        # result of which day to show?
+        resday = (
+            if game.rule.divineresult == "immediate"
+                game.day
+            else
+                game.day - 1)
+        return if r.day != resday
+
+        log=
+            mode:"skill"
+            to:@id
+            comment:r.result
+        splashlog game.id,game,log
     midnight:(game,midnightSort)->
         unless game.rule.divineresult=="immediate"
             # 执行普通占卜
@@ -4126,8 +4161,8 @@ class SuperDiviner extends Diviner
         Player.prototype.sunrise.call @, game
         unless game.rule.divineresult=="immediate"
             resday = game.day - 1
-            # 分别显示普通占卜和额外占卜的结果
-            for r in @flag
+            # 分别显示普通占卜和额外占卜的结果（从 results 数组中读取）
+            for r in @flag[0].results
                 continue if r.day != resday
                 log =
                     mode:"skill"
@@ -4741,6 +4776,7 @@ class Spy extends Player
         unless isvote
             []
         else super
+
 class WolfDiviner extends Werewolf
     type:"WolfDiviner"
     midnightSort:120
@@ -4807,7 +4843,7 @@ class WolfDiviner extends Werewolf
                 @die game, "curse", p.id
         p=game.getPlayer target
         # 狂人変化（死亡時は変化しない）
-        if p?.getTeam() == "Werewolf" && p.jobname() && !p.dead
+        if p?.getTeam() == "Werewolf" && p.isHuman() && !p.dead
             jobnames=Object.keys jobs
             # inspect all target roles.
             for targetpl in p.accessMainLevel()
@@ -4827,6 +4863,7 @@ class WolfDiviner extends Werewolf
                     to:p.id
                     comment: game.i18n.t "system.changeRole", {name: p.name, result: newpl.getJobDisp()}
                 splashlog game.id,game,log
+
     showdivineresult:(game)->
         r=@flag.results[@flag.results.length-1]
         return unless r?
@@ -4870,7 +4907,6 @@ class WolfDiviner extends Werewolf
                     objid: @objid
                 }
         return res
-
 
 class NormalWolfDiviner extends Werewolf
     type:"NormalWolfDiviner"
@@ -4938,12 +4974,12 @@ class NormalWolfDiviner extends Werewolf
                 @die game, "curse", p.id
         p=game.getPlayer target
         # 狂人変化（死亡時は変化しない）
-        if p?.getTeam() == "Werewolf" && (p?.isJobType("Madman") || p?.isJobType("Fanatic")) && p.jobname && !p.dead
+        if p?.getTeam() == "Werewolf" && (p?.isJobType("Madman") || p?.isJobType("Fanatic")) && p.isHuman() && !p.dead
             # inspect all target roles.
             for targetpl in p.accessMainLevel()
                 [_, mainpl] = constructMainChain targetpl
                 # check whether this target should change.
-                unless mainpl.getTeam() == "Werewolf" && (mainpl.isJobType("Madman") || mainpl.isJobType("Fanatic"))  && mainpl.jobname
+                unless mainpl.getTeam() == "Werewolf" && (mainpl.isJobType("Madman") || mainpl.isJobType("Fanatic")) && mainpl.isHuman()
                     continue
                 newjob="HearMadman"
                 # convert this to new pl.
