@@ -151,7 +151,7 @@ module.exports=
              prize: []
              
         nagi:
-             avatar: "https://s2.loli.net/2025/10/24/DdKY7fveu1pCnh3.png"
+             avatar: "https://s41.ax1x.com/2026/01/30/pZfaJZd.png"
              name: "狭间那岐"
              prize: []
              
@@ -193,6 +193,11 @@ module.exports=
         mai:
              avatar: "https://s2.loli.net/2025/10/24/fNk31DTKavy2VIH.jpg"
              name: "志波千羽"
+             prize: []
+             
+        onigi:
+             avatar: "https://s41.ax1x.com/2026/01/30/pZfaMRK.png"
+             name: "鬼崎弥弥"
              prize: []
             
         # jocho:
