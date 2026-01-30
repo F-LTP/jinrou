@@ -151,7 +151,7 @@ module.exports=
              prize: []
              
         nagi:
-             avatar: "https://s41.ax1x.com/2026/01/30/pZfaJZd.png"
+             avatar: "https://s41.ax1x.com/2026/01/30/pZfaHoR.png"
              name: "狭间那岐"
              prize: []
              
