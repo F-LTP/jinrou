@@ -175,7 +175,7 @@ export const LogReferenceTooltip = React.memo<{
       <b
         data-tooltip-trigger="true"
         onClick={onClick}
-        style={{ cursor: 'pointer' }}
+        style={{ cursor: 'pointer', fontStyle: 'italic' }}
       >
         {playerName ? (
           `>>${shortId}:${playerName}`
