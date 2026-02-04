@@ -27,6 +27,8 @@ specialName:
   GachaAddicted_Normal: '课金者的能力'
   GachaAddicted_Premium: '课金者的能力'
   GachaAddicted_Commit: '课金者的能力'
+  HimeFox: '姬狐的能力'
+  NekikillTarget: '姬狐的能力'
   _Quantum_Diviner: '占卜师的能力'
   _Quantum_Werewolf: '人狼的袭击'
 
@@ -44,6 +46,7 @@ messages:
   SuperFox: '请选择要占卜的对象'
   Guard: '请选择要护卫的对象'
   SuperGuard: '请选择要SP护卫的对象'
+  MindPsychic: '请选择要施加念杀护卫的对象'
   Magician: '请选择要复活的对象'
   Spy: '准备今晚离开村子的时候请选择'
   Fugitive: '请选择要逃亡到谁家里'
@@ -143,6 +146,8 @@ messages:
   HouseKeeper: '请选择打理家务的客户'
   RainyBoy: '请在准备下雨的时候选择'
   Itako: '请在准备倾听死者声音的时候选择'
+  HimeFox: '请选择准备献祭的背信者'
+  NekikillTarget: '请选择念杀目标'
 
   # Message for normal selection form of special subjobs.  normalMessage:
   SpaceWerewolfObserver: '请选择要观察的对象'
@@ -208,6 +213,15 @@ SuperDiviner:
   DivinerButton: '占卜'
   SuperDivinerUsedButton: 'SP占卜（只限一次）'
   SuperDivinerUsedButtonUsed: 'SP占卜（已经使用）'
+
+# Texts for HimeFox form.
+HimeFox:
+  sacrifice:
+    description: '请选择准备献祭的背信者或异端者'
+    button: '献祭'
+  nekikill:
+    description: '请选择念杀的目标'
+    button: '念杀'
 
 # Texts for Poet form.
 Poet:

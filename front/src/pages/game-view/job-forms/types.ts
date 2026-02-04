@@ -21,6 +21,9 @@ export const specialNamedTypes = [
   'NormalGuard',
   'GachaAddicted_Premium',
   'GachaAddicted_Commit',
+  // HimeFox forms
+  'HimeFox',
+  'NekikillTarget',
   // forms for quantum players.
   '_Quantum_Diviner',
   '_Quantum_Werewolf',
@@ -45,4 +48,7 @@ export const specialContentTypes = [
   'GachaAddicted_Normal',
   'GachaAddicted_Premium',
   'GachaAddicted_Commit',
+  // HimeFox forms
+  'HimeFox',
+  'NekikillTarget',
 ];

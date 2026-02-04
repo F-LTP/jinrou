@@ -2031,6 +2031,10 @@ class Game
                     @i18n.t "found.goneDay", {name: x.name}
                 when "gone-night"
                     @i18n.t "found.goneNight", {name: x.name}
+                when "sacrificed"
+                    @i18n.t "found.sacrificed", {name: x.name}
+                when "nekikill"
+                    @i18n.t "found.nekikill", {name: x.name}
                 else
                     @i18n.t "found.fallback", {name: x.name}
             log=
@@ -2043,7 +2047,7 @@ class Game
             unless (obj.found in ["punish", "infirm", "bonds", "hunter", "gm", "gone-day", "gone-night"]) || (obj.found == "curse" && @rule.deadfox == "obvious")
                 if ["werewolf","werewolf2","trickedWerewolf","poison","hinamizawa",
                     "vampire","vampire2","witch","dog","trap","bomb",
-                    "marycurse","psycho","curse","punish","spygone","deathnote",
+                    "marycurse","psycho","curse","punish","spygone","deathnote","sacrificed","nekikill"
                     "foxsuicide","friendsuicide","twinsuicide","dragonknightsuicide","vampiresuicide","santasuicide","fascinatesuicide","loreleisuicide"
                     "infirm","hunter",
                     "gmpunish","gone-day","gone-night","crafty","greedy","tough","lunaticlover",
@@ -2120,6 +2124,10 @@ class Game
                         "assassinate"
                     when "ghostrevenge"
                         "ghostrevenge"
+                    when "sacrificed"
+                        "sacrificed"
+                    when "nekikill"
+                        "nekikill"
                     else
                         null
                 if emma_log?
@@ -4253,6 +4261,69 @@ class Psychic extends Player
                 result: PsychicResult.renderToString x.getPsychicResult(), game.i18n
             }) + "\n"
         return false
+
+# 真·灵能者 - 拥有念杀护卫能力的灵能者
+class MindPsychic extends Psychic
+    type:"MindPsychic"
+    formType: FormType.optional
+    constructor:->
+        super
+        @guarded = null  # 念杀护卫目标ID
+    # 真·灵能者抵抗念杀
+    hasDeadResistance:->true
+    checkDeathResistance:(game, found, from)->
+        # 只有念杀会被抵抗
+        return super unless found == "nekikill"
+        # 念杀被抵抗
+        true
+    sleeping:-> true
+    jobdone:(game)-> @guarded
+    sunset:(game)->
+        super
+        @guarded = null
+
+    job:(game,playerid)->
+        guardpl = game.getPlayer playerid
+        unless guardpl?
+            return game.i18n.t "error.common.nonexistentPlayer"
+
+        @guarded = playerid
+        @setTarget playerid
+
+        log=
+            mode:"skill"
+            to:@id
+            comment: game.i18n.t "roles:MindPsychic.curseGuardSelect", {name: @name, target: guardpl.name}
+        splashlog game.id,game,log
+        null
+
+    midnight:(game,midnightSort)->
+        super
+
+        # 对自己施加念杀护卫
+        newpl = Player.factory null, game, @, null, GuardedByPsychic
+        @transProfile newpl
+        newpl.cmplFlag = @id
+        @transform game, newpl, true
+
+        # 对护卫目标施加念杀护卫
+        guardTarget = game.getPlayer game.skillTargetHook.get @guarded
+        unless guardTarget?
+            return
+
+        currentGuardTarget = game.getPlayer @guarded
+        unless currentGuardTarget? && !currentGuardTarget.dead
+            return
+
+        newpl2 = Player.factory null, game, guardTarget, null, GuardedByPsychic
+        guardTarget.transProfile newpl2
+        newpl2.cmplFlag = @id
+        guardTarget.transform game, newpl2, true
+        newpl2.touched game, @id
+        null
+    sunrise:(game)->
+        # 重置目标
+        @guarded = null
 
 class Madman extends Player
     type:"Madman"
@@ -12221,6 +12292,180 @@ class Actress extends Fox
             comment: game.i18n.t "roles:Actress.existence", {name: @name}
         splashlog game.id,game,log
 
+class HimeFox extends Fox
+    type:"HimeFox"
+    team:"Fox"
+    midnightSort: 106  # after werewolf kill
+    formType: FormType.optional
+    isFox:->true
+    constructor:->
+        super
+        @setFlag null  # sacrifice id
+        @setTarget null  # nekikill id
+        @nekikillBlockedLog = false  # 念杀被阻挡的标记，sunrise时播报
+        @nekikillFailedLog = false  # 念杀失败（猫又/九命妖猫）的标记，sunrise时播报
+
+    isFormTarget:(jobtype)-> jobtype in ["HimeFox", "NekikillTarget"]
+
+    checkJobValidity:(game,query)->
+        pl = game.getPlayer query.target
+        return false unless pl?
+
+        if query?.jobtype == "NekikillTarget"
+            # isalive
+            return !pl.dead
+        else
+            # is Perfidious or Heretic
+            return !pl.dead && (pl.type == "Perfidious" || pl.type == "Heretic")
+
+    getOpenForms:(game)->
+        return [] if @dead
+        unless Phase.isNight(game.phase)
+            return []
+
+        # get alive perfidious or heretic
+        perfidiousOrHeretic = game.players.filter (x)=>
+            !x.dead && (x.type == "Perfidious" || x.type == "Heretic")
+        if perfidiousOrHeretic.length == 0
+            return []
+
+        # Returns different forms based on the selection stage
+        unless @flag?
+            # 1.select sacrifice
+            return [{
+                type: @type
+                options: perfidiousOrHeretic.map (pl) -> {name: pl.name, value: pl.id}
+                formType: FormType.optional
+                objid: @objid
+            }]
+        else if @flag? && !@target?
+            # 2.select nekikill target
+            alivePlayers = game.players.filter (pl)-> !pl.dead
+            return [{
+                type: "NekikillTarget"
+                options: alivePlayers.map (pl) -> {name: pl.name, value: pl.id}
+                formType: FormType.required
+                objid: @objid
+            }]
+        []
+
+    sleeping:-> !@flag? || !!@target
+    jobdone:(game)-> @flag? && @target?
+
+    job:(game, playerId, query)->
+        pl = game.getPlayer playerId
+        unless pl?
+            return game.i18n.t "error.common.nonexistentPlayer"
+        if pl.id==@id
+            return game.i18n.t "error.common.noSelectSelf"
+
+        if !@flag?
+            # 1.select sacrifice
+            unless pl.type == "Perfidious" || pl.type == "Heretic"
+                return game.i18n.t "error.HimeFox.invalidSacrificeTarget"
+            @setFlag playerId
+            splashlog game.id, game, {
+                mode:"skill"
+                to:@id
+                comment: game.i18n.t "roles:HimeFox.selectSacrifice", {name: @name, target: pl.name}
+            }
+        else if !@target?
+            # 2.select nekikill target
+            @setTarget playerId
+            sacrificepl = game.getPlayer @flag
+            splashlog game.id, game, {
+                mode:"skill"
+                to:@id
+                comment: game.i18n.t "roles:HimeFox.select", {name: @name, target: pl.name, sacrifice: sacrificepl.name}
+            }
+        else
+            return game.i18n.t "error.common.alreadyUsed"
+        null
+
+    midnight:(game,midnightSort)->
+        super
+        return unless @flag? && @target?
+
+        sacrifice = game.getPlayer game.skillTargetHook.get @flag
+        target = game.getPlayer game.skillTargetHook.get @target
+        return unless sacrifice? && target?
+
+        # still effect when sacrifice is dead in tonight
+        currentSacrifice = game.getPlayer @flag
+        unless currentSacrifice? && (currentSacrifice.type == "Perfidious" || currentSacrifice.type == "Heretic")
+            return
+
+        # check nekikill target is alive
+        currentTarget = game.getPlayer @target
+        unless currentTarget? && !currentTarget.dead
+            return
+
+        # check guardbyMindPsychic
+        if currentTarget?.isCmplType "GuardedByPsychic"
+            guard = game.getPlayer currentTarget.cmplFlag
+            if guard? && !guard.dead
+                # blocked when guarded
+                guard.addGamelog game, "nekikill", null, @id
+                @nekikillBlockedLog = true
+                return
+
+        # curse himefox when nekikill to poisoner or cat
+        if target.type == "Poisoner" || target.type == "Cat"
+            @die game, "curse", currentTarget.id
+            currentTarget.addGamelog game, "nekikill", null, @id
+            @nekikillFailedLog = true
+            return
+
+        # nekikill
+        target.die game, "nekikill", @id
+        @addGamelog game, "nekikill", null, target.id
+
+        # do sacrifice when only nekikill success 
+        if currentTarget.dead && currentTarget.found == "nekikill" && !sacrifice.dead
+            sacrifice.die game, "sacrificed", @id
+        null
+
+    sunrise:(game)->
+        super
+        # 如果念杀被阻挡，播报log
+        if @nekikillBlockedLog
+            splashlog game.id, game, {
+                mode:"system"
+                comment: game.i18n.t "roles:HimeFox.nekikillBlocked", {}
+            }
+            @nekikillBlockedLog = false
+        # 如果念杀失败（猫又/九命妖猫），播报log
+        if @nekikillFailedLog
+            splashlog game.id, game, {
+                mode:"system"
+                comment: game.i18n.t "roles:HimeFox.nekikillFailed", {}
+            }
+            @nekikillFailedLog = false
+        @setFlag null
+        @setTarget null
+
+    deadsunrise:(game)->
+        # 死后也要播报log
+        if @nekikillBlockedLog
+            splashlog game.id, game, {
+                mode:"system"
+                comment: game.i18n.t "roles:HimeFox.nekikillBlocked", {}
+            }
+            @nekikillBlockedLog = false
+        if @nekikillFailedLog
+            splashlog game.id, game, {
+                mode:"system"
+                comment: game.i18n.t "roles:HimeFox.nekikillFailed", {}
+            }
+            @nekikillFailedLog = false
+        @setFlag null
+        @setTarget null
+
+    divined:(game,player)->
+        super
+        @die game,"curse", player.id
+        player.addGamelog game,"cursekill",null,@id
+
 class StraySheep extends Player
     type:"StraySheep"
     midnightSort:79
@@ -13120,6 +13365,28 @@ class Complex
             for key, value of res2
                 res[key] ||= value
         res
+
+# 灵能者念杀护卫的复合类 - 只能护卫念杀攻击
+class GuardedByPsychic extends Complex
+    cmplType: "GuardedByPsychic"
+    # cmplFlag: 灵能者ID
+    checkDeathResistance:(game, found, from)->
+        guard = game.getPlayer @cmplFlag
+
+        # 只能护卫念杀攻击（nekikill）
+        unless found == "nekikill"
+            return super
+        # 念杀护卫成功
+        # 灵能者需要等待姬狐进行献祭
+        # 这里只是标记护卫成功，献祭由姬狐的midnight处理
+        guard.addGamelog game, "curseGuard", null, @id
+
+        return true  # 被护卫者暂时不死（等待姬狐献祭）
+    sunrise:(game)->
+        # 一日只能护卫一次
+        @mcall game, @main.sunrise, game
+        @sub?.sunrise? game
+        @uncomplex game
 
 #superがつかえないので注意
 class Friend extends Complex    # 恋人
@@ -14599,6 +14866,7 @@ jobs=
     Diviner:Diviner
     SuperDiviner:SuperDiviner
     Psychic:Psychic
+    MindPsychic:MindPsychic
     Madman:Madman
     SuperGuard:SuperGuard
     Guard:Guard
@@ -14608,6 +14876,7 @@ jobs=
     BigWolf:BigWolf
     TinyFox:TinyFox
     SuperFox:SuperFox
+    HimeFox:HimeFox
     Bat:Bat
     Noble:Noble
     Slave:Slave
@@ -14787,6 +15056,7 @@ jobs=
     ResidualHaunting:ResidualHaunting
     HouseKeeper: HouseKeeper
     RainyBoy:RainyBoy
+    MindPsychic:MindPsychic
     DarkPsychic:DarkPsychic
     Itako:Itako
     SpaceWerewolfCrew:SpaceWerewolfCrew
@@ -14865,6 +15135,7 @@ jobStrength=
     Werewolf:40
     Diviner:25
     Psychic:15
+    MindPsychic:15
     Madman:10
     Guard:23
     Couple:10
@@ -14873,6 +15144,7 @@ jobStrength=
     BigWolf:80
     TinyFox:10
     SuperFox:10
+    HimeFox:20
     Bat:10
     Noble:12
     Slave:5
@@ -16070,6 +16342,10 @@ module.exports.actions=(req,res,ss)->
                                     # 鴉がいないと出ない（実質鴉が2配役以上で出現条件を満たす）
                                     if joblist.Raven==0
                                         continue
+                                when "HimeFox"
+                                    # 姫狐が出るときは必ず念缚灵能者を出す
+                                    unless init "MindPsychic","Human"
+                                        continue
 
                         # 絶対狼はセーフティに関わらず処理を実施する
                         if job == "AbsoluteWolf"
@@ -16572,17 +16848,18 @@ module.exports.actions=(req,res,ss)->
 
         try
             plobj = player.accessByObjid query.objid
-            console.log "plobj", plobj
             unless plobj?
                 res {error: game.i18n.t "common:error.invalidInput"}
                 return
             # check whether this query is valid.
             if game.phase == Phase.rolerequesting || Phase.isNight(game.phase) || game.phase == Phase.hunter || query.jobtype!="_day"  # 昼の投票
                 # 夜
-                unless plobj.isFormTarget query.jobtype
+                isTarget = plobj.isFormTarget query.jobtype
+                unless isTarget
                     res {error: game.i18n.t "error.job.invalid"}
                     return
-                unless plobj.checkJobValidity game,query
+                isValid = plobj.checkJobValidity game,query
+                unless isValid
                     res {error: game.i18n.t "error.job.invalid"}
                     return
                 # Error-check whether his job is already done.

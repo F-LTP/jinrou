@@ -7,6 +7,7 @@ jobname:
   Diviner: '占卜师'
   SuperDiviner: 'SP占卜师'
   Psychic: '灵能者'
+  MindPsychic: '念缚灵能者'
   Madman: '狂人'
   Guard: '猎人'
   SuperGuard: 'SP猎人'
@@ -188,6 +189,7 @@ jobname:
   AttractiveWoman: '美女'
   DestroyCraziest: '破坏的狂人'
   Actress: '女狐'
+  HimeFox: '姬狐'
   StraySheep: '迷途羔羊'
   SpaceWerewolfCrew: '宇航员'
   SpaceWerewolfImposter: '诈欺师'
@@ -289,8 +291,17 @@ SuperDiviner:
 Psychic:
   result:
     human: '村人'
-  # Psychi result.
+  # Psychic result.
   resultlog: '根据 {{name}} 的灵能结论，被处刑的 {{target}} 是 {{result}}。'
+
+# MindPsychic - 念缚灵能者，拥有念杀护卫能力
+MindPsychic:
+  # 继承 Psychic 的所有能力
+  result:
+    human: '村人'
+  resultlog: '根据 {{name}} 的灵能结论，被处刑的 {{target}} 是 {{result}}。'
+  # 念杀护卫选择
+  curseGuardSelect: '{{name}} 决定对 {{target}} 施加念杀护卫。'
 
 # Werewolf
 Werewolf:
@@ -839,6 +850,8 @@ Emma:
     assassinate: '{{name}} 被暗杀了。'
     # Killed by DarkPsychic
     ghostrevenge: '{{name}} 被亡灵的怨念杀死了。'
+    nekikill: '{{name}} 被念杀了。'
+    sacrificed: '{{name}} 被献祭了。'
 
 EyesWolf:
   # EyesWolf result strings
@@ -1133,6 +1146,13 @@ DestroyCraziest:
 
 Actress:
   existence: '{{name}} 从舞台谢幕了。'
+
+HimeFox:
+  selectSacrifice: '{{name}} 选择献祭 {{target}}。'
+  select: '{{name}} 献祭 {{sacrifice}}，念杀 {{target}}。'
+  sacrificed: '{{name}} 被献祭了。'
+  nekikillBlocked: '昨晚念杀失败...'
+  nekikillFailed: '猫又的力量反噬了念杀。'
 
 StraySheep:
   select: '{{name}} 决意替他人死去了。'

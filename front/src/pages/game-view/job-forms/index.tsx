@@ -23,6 +23,7 @@ import { makeDragonKnightForm } from './dragonKnight';
 import { makePoet1Form, makePoet2Form } from './poet';
 import { makeNormalDivinerForm, makeSuperDivinerForm } from './superdiviner';
 import { makeNormalGuardForm, makeSuperGuardForm } from './superguard';
+import { makeHimeFoxSacrificeForm, makeNekikillTargetForm } from './himefox';
 import {
   makeGachaAddictedNormalForm,
   makeGachaAddictedPremiumForm,
@@ -271,6 +272,18 @@ function makeSpecialContent(props: FormContentProps): Partial<FormContent> {
     case 'GachaAddicted_Commit': {
       ({ content: otherContents, buttons } = makeGachaAddictedCommitForm(
         props as FormContentProps<'GachaAddicted_Commit'>,
+      ));
+      break;
+    }
+    case 'HimeFox': {
+      ({ content: otherContents, buttons } = makeHimeFoxSacrificeForm(
+        props as FormContentProps<'HimeFox'>,
+      ));
+      break;
+    }
+    case 'NekikillTarget': {
+      ({ content: otherContents, buttons } = makeNekikillTargetForm(
+        props as FormContentProps<'NekikillTarget'>,
       ));
       break;
     }
