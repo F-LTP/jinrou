@@ -125,6 +125,11 @@ module.exports=
             name: "月代雪"
             prize: []
             
+        ruru:
+            avatar: "https://s41.ax1x.com/2026/01/31/pZhwBTJ.png"
+            name: "鬼崎露露"
+            prize: []
+            
         azami:
              avatar: "https://s2.loli.net/2025/08/06/tzu1YCy5HfQkhxP.jpg"
              name: "薊（Azami）"
