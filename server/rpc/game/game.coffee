@@ -12308,15 +12308,19 @@ class HimeFox extends Fox
     isFormTarget:(jobtype)-> jobtype in ["HimeFox", "NekikillTarget"]
 
     checkJobValidity:(game,query)->
-        pl = game.getPlayer query.target
-        return false unless pl?
-
-        if query?.jobtype == "NekikillTarget"
+        # 只有技能选择时才进行特殊验证，其他（投票等）使用默认逻辑
+        if query?.jobtype == "HimeFox"
+            pl = game.getPlayer query.target
+            return false unless pl?
+            # is Perfidious or Heretic
+            return !pl.dead && (pl.type == "Perfidious" || pl.type == "Heretic")
+        else if query?.jobtype == "NekikillTarget"
+            pl = game.getPlayer query.target
+            return false unless pl?
             # isalive
             return !pl.dead
         else
-            # is Perfidious or Heretic
-            return !pl.dead && (pl.type == "Perfidious" || pl.type == "Heretic")
+            return super
 
     getOpenForms:(game)->
         return [] if @dead
@@ -15128,6 +15132,7 @@ complexes=
     RaidProtected:RaidProtected
     OnedayAuthority:OnedayAuthority
     HouseKeeped: HouseKeeped
+    GuardedByPsychic:GuardedByPsychic
 
     # 役職ごとの強さ
 jobStrength=

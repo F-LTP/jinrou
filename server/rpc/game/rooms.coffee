@@ -403,9 +403,9 @@ module.exports.actions=(req,res,ss)->
                 nowprize:su.nowprize
             # 同IP制限
                 
-            if room.players.some((x)->x.ip==su.ip) && su.ip?.match("127.0.0.1")==null
-                res error:"禁止多开 #{su.ip}"
-                return
+            # if room.players.some((x)->x.ip==su.ip) && su.ip?.match("127.0.0.1")==null
+            #     res error:"禁止多开 #{su.ip}"
+            #     return
                 
             # please no, link of data:image/jpeg;base64 would be a disaster
             if user.icon?.length > Config.maxlength.user.icon
