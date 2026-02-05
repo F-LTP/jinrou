@@ -4268,7 +4268,6 @@ class MindPsychic extends Psychic
     formType: FormType.optional
     constructor:->
         super
-        @guarded = null  # 念杀护卫目标ID
     # 真·灵能者抵抗念杀
     hasDeadResistance:->true
     checkDeathResistance:(game, found, from)->
@@ -4277,17 +4276,17 @@ class MindPsychic extends Psychic
         # 念杀被抵抗
         true
     sleeping:-> true
-    jobdone:(game)-> @guarded
+    # 使用@target来检查是否已选择护卫目标
+    jobdone:(game)-> @target?
     sunset:(game)->
         super
-        @guarded = null
+        @setTarget null
 
     job:(game,playerid)->
         guardpl = game.getPlayer playerid
         unless guardpl?
             return game.i18n.t "error.common.nonexistentPlayer"
 
-        @guarded = playerid
         @setTarget playerid
 
         log=
@@ -4307,11 +4306,11 @@ class MindPsychic extends Psychic
         @transform game, newpl, true
 
         # 对护卫目标施加念杀护卫
-        guardTarget = game.getPlayer game.skillTargetHook.get @guarded
+        guardTarget = game.getPlayer game.skillTargetHook.get @target
         unless guardTarget?
             return
 
-        currentGuardTarget = game.getPlayer @guarded
+        currentGuardTarget = game.getPlayer @target
         unless currentGuardTarget? && !currentGuardTarget.dead
             return
 
@@ -4321,9 +4320,10 @@ class MindPsychic extends Psychic
         guardTarget.transform game, newpl2, true
         newpl2.touched game, @id
         null
+
     sunrise:(game)->
-        # 重置目标
-        @guarded = null
+        super
+        @setTarget null
 
 class Madman extends Player
     type:"Madman"
@@ -12312,8 +12312,7 @@ class HimeFox extends Fox
         if query?.jobtype == "HimeFox"
             pl = game.getPlayer query.target
             return false unless pl?
-            # is Perfidious or Heretic
-            return !pl.dead && (pl.type == "Perfidious" || pl.type == "Heretic")
+            return !pl.dead && (pl.isJobType("Perfidious") || pl.isJobType("Heretic"))
         else if query?.jobtype == "NekikillTarget"
             pl = game.getPlayer query.target
             return false unless pl?
@@ -12327,9 +12326,8 @@ class HimeFox extends Fox
         unless Phase.isNight(game.phase)
             return []
 
-        # get alive perfidious or heretic
         perfidiousOrHeretic = game.players.filter (x)=>
-            !x.dead && (x.type == "Perfidious" || x.type == "Heretic")
+            !x.dead && (x.isJobType("Perfidious") || x.isJobType("Heretic"))
         if perfidiousOrHeretic.length == 0
             return []
 
@@ -12364,8 +12362,7 @@ class HimeFox extends Fox
             return game.i18n.t "error.common.noSelectSelf"
 
         if !@flag?
-            # 1.select sacrifice
-            unless pl.type == "Perfidious" || pl.type == "Heretic"
+            unless pl.isJobType("Perfidious") || pl.isJobType("Heretic")
                 return game.i18n.t "error.HimeFox.invalidSacrificeTarget"
             @setFlag playerId
             splashlog game.id, game, {
@@ -12394,13 +12391,12 @@ class HimeFox extends Fox
         target = game.getPlayer game.skillTargetHook.get @target
         return unless sacrifice? && target?
 
-        # still effect when sacrifice is dead in tonight
         currentSacrifice = game.getPlayer @flag
-        unless currentSacrifice? && (currentSacrifice.type == "Perfidious" || currentSacrifice.type == "Heretic")
+        unless currentSacrifice? && (currentSacrifice.isJobType("Perfidious") || currentSacrifice.isJobType("Heretic"))
             return
 
         # check nekikill target is alive
-        currentTarget = game.getPlayer @target
+        currentTarget = game.getPlayer game.skillTargetHook.get @target
         unless currentTarget? && !currentTarget.dead
             return
 
