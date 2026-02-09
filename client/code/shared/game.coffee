@@ -292,7 +292,7 @@ normal2=(number)->
             ret.Fox++
             if number>=24
                 ret.Fox++
-    if number>=13
+    if number>=14
         ret.Couple=2
         if number>=25
             ret.Couple++
@@ -419,7 +419,7 @@ normal3=(number)->
         ret.Werewolf++
         if number>=14
             ret.Werewolf++
-            if number>=17
+            if number>=18
                 ret.Werewolf++
                 if number>=20
                     ret.Werewolf++
@@ -446,7 +446,7 @@ normal3=(number)->
         if number==15
             ret.Madman--
             ret.Fanatic=1 #狂信者
-        if number==16
+        if number==16 || number==17 || number==18
             ret.Madman--
             ret.HearMadman=1
         if 19<=number<=22
@@ -469,7 +469,7 @@ normal3=(number)->
             ret.Fox++
             if number>=24
                 ret.Fox++
-    if number>=14 && number!=16
+    if number>=14 && (number!=16 || number!=17)
         ret.Poisoner=1 #猫
     ret
 
@@ -511,9 +511,9 @@ super1=(number)->
             ret.Madman--
             ret.Fanatic=1 #狂信者
             if number==16
-                ret.Immoral=1
+                ret.Heretic=1
         if 19<=number<=22
-            ret.Immoral=1 
+            ret.Heretic=1 
             if number==19
                 ret.Madman--
                 ret.Fanatic=1 #狂信者
@@ -573,9 +573,7 @@ fanni1=(number)->
             ret.Fanatic=1 #狂信者
             if number==16
                 ret.Immoral=1
-        if number==18
-            ret.Immoral=1
-        if 19<=number<=22
+        if 18<=number<=22
             ret.Immoral=1 
             if number==19
                 ret.Madman--
