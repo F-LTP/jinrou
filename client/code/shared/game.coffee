@@ -597,6 +597,57 @@ fanni1=(number)->
         ret.Poisoner=1 #猫
     ret
 
+cosplayer=(number)->
+    ret={}
+    #狼
+    ret.Werewolf=1
+    if number>=8
+        ret.Werewolf++
+        if number>=13
+            ret.Werewolf++
+            if number>=17
+                ret.Werewolf++
+                if number>=20
+                    ret.Werewolf++
+                    if number>=21
+                        ret.Werewolf++
+                        if number>=25
+                            ret.Werewolf++
+                            if number>=27
+                                ret.Werewolf++
+    ret.Diviner=1 #占い
+    if number>=21
+        ret.Diviner++
+    if number>=8
+        ret.Psychic=1 #灵能
+        if number>=23
+            ret.Psychic++
+    if number>=6
+        ret.Madman=1 #狂人
+        ret.Cosplayer=1 #猎人
+        if number==12 || number==16 || number>=21
+            ret.Madman--
+            ret.Fanatic=1
+        if number>=23
+            ret.Madman++
+    if number>=12
+        ret.Couple=2 #共有
+        if number>=25
+            ret.Couple++
+    if number>=15
+        ret.Fox=1 #狐
+        if number>=18 && number<=20
+            ret.Immoral=1
+        if number>=21
+            ret.Fox++
+            if number>=24
+                ret.Fox++
+    if number>=17
+        ret.Guard=1 #猎人
+    if number>=21
+        ret.Poisoner=1
+    ret
+
 exports.jobrules=[
   {
     name:"普通配置"
@@ -644,17 +695,15 @@ exports.jobrules=[
             
       }
       {
-        name:"魔女反逆者"
+        name:"黑骑士"
         rule:(number)->
-          ret=fanni1 number
+          ret=cosplayer number
           ret
       }
       {
-        name:"九命妖猫"
+        name:"魔女反逆者"
         rule:(number)->
-          ret=normal1 number
-          ret.Cat=1
-          ret.Werewolf++
+          ret=fanni1 number
           ret
       }
       {
