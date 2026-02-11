@@ -609,7 +609,7 @@ cosplayer=(number)->
                 ret.Werewolf++
                 if number>=20
                     ret.Werewolf++
-                    if number>=20
+                    if number>=21
                         ret.Werewolf++
                         if number>=26
                             ret.Werewolf++
