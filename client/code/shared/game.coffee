@@ -609,11 +609,11 @@ cosplayer=(number)->
                 ret.Werewolf++
                 if number>=20
                     ret.Werewolf++
-                    if number>=21
+                    if number>=20
                         ret.Werewolf++
-                        if number>=25
+                        if number>=26
                             ret.Werewolf++
-                            if number>=27
+                            if number>=28
                                 ret.Werewolf++
     ret.Diviner=1 #占い
     if number>=21
@@ -625,14 +625,14 @@ cosplayer=(number)->
     if number>=6
         ret.Madman=1 #狂人
         ret.Cosplayer=1 #猎人
-        if number==12 || number==16 || number>=21
+        if number==12 || number==16
             ret.Madman--
             ret.Fanatic=1
         if number>=23
-            ret.Madman++
+            ret.Fanatic=1
     if number>=12
         ret.Couple=2 #共有
-        if number>=25
+        if number>=27
             ret.Couple++
     if number>=15
         ret.Fox=1 #狐
