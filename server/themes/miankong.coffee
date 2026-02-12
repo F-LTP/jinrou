@@ -453,3 +453,8 @@ module.exports =
             avatar: "https://i.imgs.ovh/2025/07/21/PFNZ6.th.png"
             name: "枫树叶"
             prize: []
+
+        Seronda:
+            avatar: "https://s3.bmp.ovh/2026/02/11/MzQf8yCq.jpg"
+            name: "Seronda"
+            prize: []

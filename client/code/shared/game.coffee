@@ -603,7 +603,7 @@ cosplayer=(number)->
     ret.Werewolf=1
     if number>=8
         ret.Werewolf++
-        if number>=13
+        if number>=15
             ret.Werewolf++
             if number>=17
                 ret.Werewolf++
@@ -625,7 +625,7 @@ cosplayer=(number)->
     if number>=6
         ret.Madman=1 #狂人
         ret.Cosplayer=1 #猎人
-        if number==12 || number==16
+        if number==12 || number==16 || number==13 || number==14
             ret.Madman--
             ret.Fanatic=1
         if number>=23
