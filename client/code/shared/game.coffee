@@ -439,10 +439,14 @@ normal3=(number)->
     if number>=6
         ret.Madman=1 #狂人
         ret.Guard=1 #猎人
-        if 12<=number<=13
+        if number==12
             ret.Madman--
-            ret.HearMadman=1  #1213人是听狂配置
+            ret.HearMadman=1
             ret.Baker=1
+        if number==13
+            ret.Madman--
+            ret.WhisperingMad=1
+            ret.Couple=2
         if number==15
             ret.Madman--
             ret.Fanatic=1 #狂信者
