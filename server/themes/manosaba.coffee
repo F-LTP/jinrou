@@ -238,6 +238,11 @@ module.exports=
         #     avatar: "https://s2.loli.net/2025/08/06/R3FT5x2ZwWeJ4sK.png"
         #     name: "简易长矛"
         #     prize: []
+        # damn:
+        #     avatar: "https://s41.ax1x.com/2026/01/27/pZRj9Gn.jpg"
+        #     name: "大魔女"
+        #     prize: []
+            
           
             
             

@@ -1113,6 +1113,10 @@ class Game
                 drunkCount--
 
 
+        # 魔女·反逆者模式：为每个玩家随机分配一个魔法（antimode为majoanti时触发）
+        if @rule.antimode == "majoanti"
+            assignMajoantiMagics @
+
         # プレイヤーシャッフル
         @players=shuffle @players
         @participants=@players.concat []    # コピー
@@ -13366,6 +13370,372 @@ class Complex
                 res[key] ||= value
         res
 
+
+# ============================================================
+# 魔女·反逆者模式支持
+# ============================================================
+
+# 魔女·反逆者模式检测函数（通过antimode配置判断）
+isMajoantiMode = (antimode)->
+    return antimode == "majoanti"
+
+# 魔女·反逆者模式 - 22种魔法副职业类（白板职业，只有名称不同）
+# ============================================================
+
+# 1. 缔结
+class MajoantiBond extends Complex
+    cmplType:"MajoantiBond"
+    formType: FormType.optional
+    # 显示格式：主职业【魔法名】
+    getJobname:-> @game.i18n.t "roles:MajoantiBond.jobname", {jobname: @main.getJobname()}
+    getJobDisp:-> @game.i18n.t "roles:MajoantiBond.jobname", {jobname: @main.getJobDisp()}
+    sleeping:->true
+    jobdone:->true
+    # 提供详情信息（点击"详细"时显示魔法信息）
+    makejobinfo:(game,result)->
+        @main.makejobinfo game, result
+        result.desc ?= []
+        result.desc.push {
+            name: @game.i18n.t "roles:MajoantiBond.name"
+            type: "MajoantiBond"
+        }
+
+# 2. 幻视
+class MajoantiVision extends Complex
+    cmplType:"MajoantiVision"
+    formType: FormType.optional
+    getJobname:-> @game.i18n.t "roles:MajoantiVision.jobname", {jobname: @main.getJobname()}
+    getJobDisp:-> @game.i18n.t "roles:MajoantiVision.jobname", {jobname: @main.getJobDisp()}
+    sleeping:->true
+    jobdone:->true
+    makejobinfo:(game,result)->
+        @main.makejobinfo game, result
+        result.desc ?= []
+        result.desc.push {
+            name: @game.i18n.t "roles:MajoantiVision.name"
+            type: "MajoantiVision"
+        }
+
+# 3. 谎言侦测
+class MajoantiLieDetector extends Complex
+    cmplType:"MajoantiLieDetector"
+    formType: FormType.optional
+    getJobname:-> @game.i18n.t "roles:MajoantiLieDetector.jobname", {jobname: @main.getJobname()}
+    getJobDisp:-> @game.i18n.t "roles:MajoantiLieDetector.jobname", {jobname: @main.getJobDisp()}
+    sleeping:->true
+    jobdone:->true
+    makejobinfo:(game,result)->
+        @main.makejobinfo game, result
+        result.desc ?= []
+        result.desc.push {
+            name: @game.i18n.t "roles:MajoantiLieDetector.name"
+            type: "MajoantiLieDetector"
+        }
+
+# 4. 魔女杀手
+class MajoantiWitchKiller extends Complex
+    cmplType:"MajoantiWitchKiller"
+    formType: FormType.optional
+    getJobname:-> @game.i18n.t "roles:MajoantiWitchKiller.jobname", {jobname: @main.getJobname()}
+    getJobDisp:-> @game.i18n.t "roles:MajoantiWitchKiller.jobname", {jobname: @main.getJobDisp()}
+    sleeping:->true
+    jobdone:->true
+    makejobinfo:(game,result)->
+        @main.makejobinfo game, result
+        result.desc ?= []
+        result.desc.push {
+            name: @game.i18n.t "roles:MajoantiWitchKiller.name"
+            type: "MajoantiWitchKiller"
+        }
+
+# 5. 身体交换
+class MajoantiBodySwap extends Complex
+    cmplType:"MajoantiBodySwap"
+    formType: FormType.optional
+    getJobname:-> @game.i18n.t "roles:MajoantiBodySwap.jobname", {jobname: @main.getJobname()}
+    getJobDisp:-> @game.i18n.t "roles:MajoantiBodySwap.jobname", {jobname: @main.getJobDisp()}
+    sleeping:->true
+    jobdone:->true
+    makejobinfo:(game,result)->
+        @main.makejobinfo game, result
+        result.desc ?= []
+        result.desc.push {
+            name: @game.i18n.t "roles:MajoantiBodySwap.name"
+            type: "MajoantiBodySwap"
+        }
+
+# 6. 未来视
+class MajoantiFutureSight extends Complex
+    cmplType:"MajoantiFutureSight"
+    formType: FormType.optional
+    getJobname:-> @game.i18n.t "roles:MajoantiFutureSight.jobname", {jobname: @main.getJobname()}
+    getJobDisp:-> @game.i18n.t "roles:MajoantiFutureSight.jobname", {jobname: @main.getJobDisp()}
+    sleeping:->true
+    jobdone:->true
+    makejobinfo:(game,result)->
+        @main.makejobinfo game, result
+        result.desc ?= []
+        result.desc.push {
+            name: @game.i18n.t "roles:MajoantiFutureSight.name"
+            type: "MajoantiFutureSight"
+        }
+
+# 7. 治愈
+class MajoantiHeal extends Complex
+    cmplType:"MajoantiHeal"
+    formType: FormType.optional
+    getJobname:-> @game.i18n.t "roles:MajoantiHeal.jobname", {jobname: @main.getJobname()}
+    getJobDisp:-> @game.i18n.t "roles:MajoantiHeal.jobname", {jobname: @main.getJobDisp()}
+    sleeping:->true
+    jobdone:->true
+    makejobinfo:(game,result)->
+        @main.makejobinfo game, result
+        result.desc ?= []
+        result.desc.push {
+            name: @game.i18n.t "roles:MajoantiHeal.name"
+            type: "MajoantiHeal"
+        }
+
+# 8. 洗脑
+class MajoantiBrainwash extends Complex
+    cmplType:"MajoantiBrainwash"
+    formType: FormType.optional
+    getJobname:-> @game.i18n.t "roles:MajoantiBrainwash.jobname", {jobname: @main.getJobname()}
+    getJobDisp:-> @game.i18n.t "roles:MajoantiBrainwash.jobname", {jobname: @main.getJobDisp()}
+    sleeping:->true
+    jobdone:->true
+    makejobinfo:(game,result)->
+        @main.makejobinfo game, result
+        result.desc ?= []
+        result.desc.push {
+            name: @game.i18n.t "roles:MajoantiBrainwash.name"
+            type: "MajoantiBrainwash"
+        }
+
+# 9. 声音模仿
+class MajoantiVoiceMimic extends Complex
+    cmplType:"MajoantiVoiceMimic"
+    formType: FormType.optional
+    getJobname:-> @game.i18n.t "roles:MajoantiVoiceMimic.jobname", {jobname: @main.getJobname()}
+    getJobDisp:-> @game.i18n.t "roles:MajoantiVoiceMimic.jobname", {jobname: @main.getJobDisp()}
+    sleeping:->true
+    jobdone:->true
+    makejobinfo:(game,result)->
+        @main.makejobinfo game, result
+        result.desc ?= []
+        result.desc.push {
+            name: @game.i18n.t "roles:MajoantiVoiceMimic.name"
+            type: "MajoantiVoiceMimic"
+        }
+
+# 10. 怪力
+class MajoantiStrength extends Complex
+    cmplType:"MajoantiStrength"
+    formType: FormType.optional
+    getJobname:-> @game.i18n.t "roles:MajoantiStrength.jobname", {jobname: @main.getJobname()}
+    getJobDisp:-> @game.i18n.t "roles:MajoantiStrength.jobname", {jobname: @main.getJobDisp()}
+    sleeping:->true
+    jobdone:->true
+    makejobinfo:(game,result)->
+        @main.makejobinfo game, result
+        result.desc ?= []
+        result.desc.push {
+            name: @game.i18n.t "roles:MajoantiStrength.name"
+            type: "MajoantiStrength"
+        }
+
+# 11. 漂浮
+class MajoantiFloat extends Complex
+    cmplType:"MajoantiFloat"
+    formType: FormType.optional
+    getJobname:-> @game.i18n.t "roles:MajoantiFloat.jobname", {jobname: @main.getJobname()}
+    getJobDisp:-> @game.i18n.t "roles:MajoantiFloat.jobname", {jobname: @main.getJobDisp()}
+    sleeping:->true
+    jobdone:->true
+    makejobinfo:(game,result)->
+        @main.makejobinfo game, result
+        result.desc ?= []
+        result.desc.push {
+            name: @game.i18n.t "roles:MajoantiFloat.name"
+            type: "MajoantiFloat"
+        }
+
+# 12. 千里眼
+class MajoantiClairvoyance extends Complex
+    cmplType:"MajoantiClairvoyance"
+    formType: FormType.optional
+    getJobname:-> @game.i18n.t "roles:MajoantiClairvoyance.jobname", {jobname: @main.getJobname()}
+    getJobDisp:-> @game.i18n.t "roles:MajoantiClairvoyance.jobname", {jobname: @main.getJobDisp()}
+    sleeping:->true
+    jobdone:->true
+    makejobinfo:(game,result)->
+        @main.makejobinfo game, result
+        result.desc ?= []
+        result.desc.push {
+            name: @game.i18n.t "roles:MajoantiClairvoyance.name"
+            type: "MajoantiClairvoyance"
+        }
+
+# 13. 视线引导
+class MajoantiGazeGuide extends Complex
+    cmplType:"MajoantiGazeGuide"
+    formType: FormType.optional
+    getJobname:-> @game.i18n.t "roles:MajoantiGazeGuide.jobname", {jobname: @main.getJobname()}
+    getJobDisp:-> @game.i18n.t "roles:MajoantiGazeGuide.jobname", {jobname: @main.getJobDisp()}
+    sleeping:->true
+    jobdone:->true
+    makejobinfo:(game,result)->
+        @main.makejobinfo game, result
+        result.desc ?= []
+        result.desc.push {
+            name: @game.i18n.t "roles:MajoantiGazeGuide.name"
+            type: "MajoantiGazeGuide"
+        }
+
+# 14. 火焰操纵
+class MajoantiFlame extends Complex
+    cmplType:"MajoantiFlame"
+    formType: FormType.optional
+    getJobname:-> @game.i18n.t "roles:MajoantiFlame.jobname", {jobname: @main.getJobname()}
+    getJobDisp:-> @game.i18n.t "roles:MajoantiFlame.jobname", {jobname: @main.getJobDisp()}
+    sleeping:->true
+    jobdone:->true
+    makejobinfo:(game,result)->
+        @main.makejobinfo game, result
+        result.desc ?= []
+        result.desc.push {
+            name: @game.i18n.t "roles:MajoantiFlame.name"
+            type: "MajoantiFlame"
+        }
+
+# 15. 液体操纵
+class MajoantiLiquid extends Complex
+    cmplType:"MajoantiLiquid"
+    formType: FormType.optional
+    getJobname:-> @game.i18n.t "roles:MajoantiLiquid.jobname", {jobname: @main.getJobname()}
+    getJobDisp:-> @game.i18n.t "roles:MajoantiLiquid.jobname", {jobname: @main.getJobDisp()}
+    sleeping:->true
+    jobdone:->true
+    makejobinfo:(game,result)->
+        @main.makejobinfo game, result
+        result.desc ?= []
+        result.desc.push {
+            name: @game.i18n.t "roles:MajoantiLiquid.name"
+            type: "MajoantiLiquid"
+        }
+
+# 16. 反逆者
+class MajoantiRebel extends Complex
+    cmplType:"MajoantiRebel"
+    formType: FormType.optional
+    getJobname:-> @game.i18n.t "roles:MajoantiRebel.jobname", {jobname: @main.getJobname()}
+    getJobDisp:-> @game.i18n.t "roles:MajoantiRebel.jobname", {jobname: @main.getJobDisp()}
+    sleeping:->true
+    jobdone:->true
+    makejobinfo:(game,result)->
+        @main.makejobinfo game, result
+        result.desc ?= []
+        result.desc.push {
+            name: @game.i18n.t "roles:MajoantiRebel.name"
+            type: "MajoantiRebel"
+        }
+
+# 17. 残骸
+class MajoantiRemains extends Complex
+    cmplType:"MajoantiRemains"
+    formType: FormType.optional
+    getJobname:-> @game.i18n.t "roles:MajoantiRemains.jobname", {jobname: @main.getJobname()}
+    getJobDisp:-> @game.i18n.t "roles:MajoantiRemains.jobname", {jobname: @main.getJobDisp()}
+    sleeping:->true
+    jobdone:->true
+    makejobinfo:(game,result)->
+        @main.makejobinfo game, result
+        result.desc ?= []
+        result.desc.push {
+            name: @game.i18n.t "roles:MajoantiRemains.name"
+            type: "MajoantiRemains"
+        }
+
+# 18. 大魔女
+class MajoantiGreatWitch extends Complex
+    cmplType:"MajoantiGreatWitch"
+    formType: FormType.optional
+    getJobname:-> @game.i18n.t "roles:MajoantiGreatWitch.jobname", {jobname: @main.getJobname()}
+    getJobDisp:-> @game.i18n.t "roles:MajoantiGreatWitch.jobname", {jobname: @main.getJobDisp()}
+    sleeping:->true
+    jobdone:->true
+    makejobinfo:(game,result)->
+        @main.makejobinfo game, result
+        result.desc ?= []
+        result.desc.push {
+            name: @game.i18n.t "roles:MajoantiGreatWitch.name"
+            type: "MajoantiGreatWitch"
+        }
+
+# 19. 死亡回溯
+class MajoantiDeathRecall extends Complex
+    cmplType:"MajoantiDeathRecall"
+    formType: FormType.optional
+    getJobname:-> @game.i18n.t "roles:MajoantiDeathRecall.jobname", {jobname: @main.getJobname()}
+    getJobDisp:-> @game.i18n.t "roles:MajoantiDeathRecall.jobname", {jobname: @main.getJobDisp()}
+    sleeping:->true
+    jobdone:->true
+    makejobinfo:(game,result)->
+        @main.makejobinfo game, result
+        result.desc ?= []
+        result.desc.push {
+            name: @game.i18n.t "roles:MajoantiDeathRecall.name"
+            type: "MajoantiDeathRecall"
+        }
+
+# 20. 怨念反噬
+class MajoantiGrudgeBite extends Complex
+    cmplType:"MajoantiGrudgeBite"
+    formType: FormType.optional
+    getJobname:-> @game.i18n.t "roles:MajoantiGrudgeBite.jobname", {jobname: @main.getJobname()}
+    getJobDisp:-> @game.i18n.t "roles:MajoantiGrudgeBite.jobname", {jobname: @main.getJobDisp()}
+    sleeping:->true
+    jobdone:->true
+    makejobinfo:(game,result)->
+        @main.makejobinfo game, result
+        result.desc ?= []
+        result.desc.push {
+            name: @game.i18n.t "roles:MajoantiGrudgeBite.name"
+            type: "MajoantiGrudgeBite"
+        }
+
+# 21. 时间操纵
+class MajoantiTime extends Complex
+    cmplType:"MajoantiTime"
+    formType: FormType.optional
+    getJobname:-> @game.i18n.t "roles:MajoantiTime.jobname", {jobname: @main.getJobname()}
+    getJobDisp:-> @game.i18n.t "roles:MajoantiTime.jobname", {jobname: @main.getJobDisp()}
+    sleeping:->true
+    jobdone:->true
+    makejobinfo:(game,result)->
+        @main.makejobinfo game, result
+        result.desc ?= []
+        result.desc.push {
+            name: @game.i18n.t "roles:MajoantiTime.name"
+            type: "MajoantiTime"
+        }
+
+# 22. 特异占卜
+class MajoantiSpecialDivination extends Complex
+    cmplType:"MajoantiSpecialDivination"
+    formType: FormType.optional
+    getJobname:-> @game.i18n.t "roles:MajoantiSpecialDivination.jobname", {jobname: @main.getJobname()}
+    getJobDisp:-> @game.i18n.t "roles:MajoantiSpecialDivination.jobname", {jobname: @main.getJobDisp()}
+    sleeping:->true
+    jobdone:->true
+    makejobinfo:(game,result)->
+        @main.makejobinfo game, result
+        result.desc ?= []
+        result.desc.push {
+            name: @game.i18n.t "roles:MajoantiSpecialDivination.name"
+            type: "MajoantiSpecialDivination"
+        }
+
 # 灵能者念杀护卫的复合类 - 只能护卫念杀攻击
 class GuardedByPsychic extends Complex
     cmplType: "GuardedByPsychic"
@@ -15130,6 +15500,30 @@ complexes=
     HouseKeeped: HouseKeeped
     GuardedByPsychic:GuardedByPsychic
 
+    # 魔女·反逆者モード用魔法クラス
+    MajoantiBond: MajoantiBond
+    MajoantiVision: MajoantiVision
+    MajoantiLieDetector: MajoantiLieDetector
+    MajoantiWitchKiller: MajoantiWitchKiller
+    MajoantiBodySwap: MajoantiBodySwap
+    MajoantiFutureSight: MajoantiFutureSight
+    MajoantiHeal: MajoantiHeal
+    MajoantiBrainwash: MajoantiBrainwash
+    MajoantiVoiceMimic: MajoantiVoiceMimic
+    MajoantiStrength: MajoantiStrength
+    MajoantiFloat: MajoantiFloat
+    MajoantiClairvoyance: MajoantiClairvoyance
+    MajoantiGazeGuide: MajoantiGazeGuide
+    MajoantiFlame: MajoantiFlame
+    MajoantiLiquid: MajoantiLiquid
+    MajoantiRebel: MajoantiRebel
+    MajoantiRemains: MajoantiRemains
+    MajoantiGreatWitch: MajoantiGreatWitch
+    MajoantiDeathRecall: MajoantiDeathRecall
+    MajoantiGrudgeBite: MajoantiGrudgeBite
+    MajoantiTime: MajoantiTime
+    MajoantiSpecialDivination: MajoantiSpecialDivination
+
     # 役職ごとの強さ
 jobStrength=
     Human:5
@@ -15419,6 +15813,7 @@ module.exports.actions=(req,res,ss)->
             ruleinfo_str="" # 開始告知
 
             console.log "query.jobrule is ", query.jobrule
+
             if query.jobrule in ["特殊规则.自由配置","特殊规则.手调黑暗火锅"]   # 自由のときはクエリを参考にする
                 for job in Shared.game.jobs
                     joblist[job]=parseInt(query[job]) || 0    # 仕事の数
@@ -16490,6 +16885,13 @@ module.exports.actions=(req,res,ss)->
                     comment: game.i18n.t "system.gamestart.divinerModeChanged"
                 splashlog game.id,game,log
 
+            # 魔女·反逆者模式：公布大日志
+            if query.antimode == "majoanti"
+                log=
+                    mode:"system"
+                    comment: game.i18n.t "system.gamestart.majoantiMode"
+                splashlog game.id,game,log
+
             if query.shoji=="on" && LOG_PEEKING_JOBS.some((job)-> joblist[job] > 0)
                 log=
                     mode:"system"
@@ -16571,7 +16973,8 @@ module.exports.actions=(req,res,ss)->
             "poisonwolf",
             "friendssplit",
             "quantumwerewolf_table","quantumwerewolf_dead","quantumwerewolf_diviner","quantumwerewolf_firstattack","yaminabe_hidejobs","yaminabe_safety",
-            "hide_singleton_teams"
+            "hide_singleton_teams",
+            "antimode"  # 魔女·反逆者模式配置（anti/majoanti）
             ]
 
                 ruleobj[x]=query[x] ? null
@@ -17448,3 +17851,61 @@ shuffle= (arr)->
 # ゲーム情報ツイート
 tweet=(roomid,message)->
     Server.oauth.template roomid,message,Config.admin.password
+
+
+# 魔女·反逆者模式的魔法列表
+MAJOANTI_MAGICS = [
+    "MajoantiBond",           # 1. 缔结
+    "MajoantiVision",         # 2. 幻视
+    "MajoantiLieDetector",    # 3. 谎言侦测
+    "MajoantiWitchKiller",    # 4. 魔女杀手
+    "MajoantiBodySwap",       # 5. 身体交换
+    "MajoantiFutureSight",    # 6. 未来视
+    "MajoantiHeal",           # 7. 治愈
+    "MajoantiBrainwash",      # 8. 洗脑
+    "MajoantiVoiceMimic",     # 9. 声音模仿
+    "MajoantiStrength",       # 10. 怪力
+    "MajoantiFloat",          # 11. 漂浮
+    "MajoantiClairvoyance",   # 12. 千里眼
+    "MajoantiGazeGuide",      # 13. 视线引导
+    "MajoantiFlame",          # 14. 火焰操纵
+    "MajoantiLiquid",         # 15. 液体操纵
+    "MajoantiRebel",          # 16. 反逆者
+    "MajoantiRemains",        # 17. 残骸
+    "MajoantiGreatWitch",     # 18. 大魔女
+    "MajoantiDeathRecall",    # 19. 死亡回溯
+    "MajoantiGrudgeBite",     # 20. 怨念反噬
+    "MajoantiTime",           # 21. 时间操纵
+    "MajoantiSpecialDivination" # 22. 特异占卜
+]
+
+# 魔女·反逆者模式：为每个玩家随机分配一个魔法
+assignMajoantiMagics = (game)->
+    playerCount = game.players.length
+    magicCount = MAJOANTI_MAGICS.length  # 22
+
+    # 如果玩家人数超过魔法数（22人），不进行分配
+    if playerCount > magicCount
+        return
+
+    # 根据玩家人数确定可用的魔法列表（使用前N种）
+    # 例如：5人游戏使用前5种魔法，15人游戏使用前15种魔法
+    availableMagics = MAJOANTI_MAGICS.slice(0, playerCount)
+
+    # 创建可用的魔法副本用于随机分配（不放回抽样）
+    shuffledMagics = availableMagics.slice()
+
+    # 遍历所有玩家，为每人分配一个唯一的魔法
+    for pl in game.players
+        # 随机选择一个魔法索引
+        magicIndex = Math.floor(Math.random() * shuffledMagics.length)
+        # 从数组中取出并移除该魔法（不放回）
+        magicType = shuffledMagics.splice(magicIndex, 1)[0]
+
+        # 创建魔法Complex并附加到玩家身上
+        magicClass = complexes[magicType]
+        unless magicClass?
+            continue
+        newpl = Player.factory null, game, pl, null, magicClass
+        pl.transProfile newpl
+        pl.transform game, newpl, true, true

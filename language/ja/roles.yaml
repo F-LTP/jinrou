@@ -211,6 +211,30 @@ jobname:
   Waiting: '尚未分配'
   Watching: '观战者'
 
+# 魔女·反逆者モード用魔法（副職業）
+  MajoantiBond: '缔结'
+  MajoantiVision: '幻视'
+  MajoantiLieDetector: '谎言侦测'
+  MajoantiWitchKiller: '魔女杀手'
+  MajoantiBodySwap: '身体交换'
+  MajoantiFutureSight: '未来视'
+  MajoantiHeal: '治愈'
+  MajoantiBrainwash: '洗脑'
+  MajoantiVoiceMimic: '声音模仿'
+  MajoantiStrength: '怪力'
+  MajoantiFloat: '漂浮'
+  MajoantiClairvoyance: '千里眼'
+  MajoantiGazeGuide: '视线引导'
+  MajoantiFlame: '火焰操纵'
+  MajoantiLiquid: '液体操纵'
+  MajoantiRebel: '反逆者'
+  MajoantiRemains: '残骸'
+  MajoantiGreatWitch: '大魔女'
+  MajoantiDeathRecall: '死亡回溯'
+  MajoantiGrudgeBite: '怨念反噬'
+  MajoantiTime: '时间操纵'
+  MajoantiSpecialDivination: '特异占卜'
+
 # Name of categories.
 categoryName:
   Human: '村人系'
@@ -1286,6 +1310,74 @@ Decider:
 
 Authority:
   jobname: '{{jobname}}（权力者）'
+
+# 魔女·反逆者モード用魔法
+MajoantiBond:
+  name: '缔结'
+  jobname: '{{jobname}}（缔结）'
+MajoantiVision:
+  name: '幻视'
+  jobname: '{{jobname}}（幻视）'
+MajoantiLieDetector:
+  name: '谎言侦测'
+  jobname: '{{jobname}}（谎言侦测）'
+MajoantiWitchKiller:
+  name: '魔女杀手'
+  jobname: '{{jobname}}（魔女杀手）'
+MajoantiBodySwap:
+  name: '身体交换'
+  jobname: '{{jobname}}（身体交换）'
+MajoantiFutureSight:
+  name: '未来视'
+  jobname: '{{jobname}}（未来视）'
+MajoantiHeal:
+  name: '治愈'
+  jobname: '{{jobname}}（治愈）'
+MajoantiBrainwash:
+  name: '洗脑'
+  jobname: '{{jobname}}（洗脑）'
+MajoantiVoiceMimic:
+  name: '声音模仿'
+  jobname: '{{jobname}}（声音模仿）'
+MajoantiStrength:
+  name: '怪力'
+  jobname: '{{jobname}}（怪力）'
+MajoantiFloat:
+  name: '漂浮'
+  jobname: '{{jobname}}（漂浮）'
+MajoantiClairvoyance:
+  name: '千里眼'
+  jobname: '{{jobname}}（千里眼）'
+MajoantiGazeGuide:
+  name: '视线引导'
+  jobname: '{{jobname}}（视线引导）'
+MajoantiFlame:
+  name: '火焰操纵'
+  jobname: '{{jobname}}（火焰操纵）'
+MajoantiLiquid:
+  name: '液体操纵'
+  jobname: '{{jobname}}（液体操纵）'
+MajoantiRebel:
+  name: '反逆者'
+  jobname: '{{jobname}}（反逆者）'
+MajoantiRemains:
+  name: '残骸'
+  jobname: '{{jobname}}（残骸）'
+MajoantiGreatWitch:
+  name: '大魔女'
+  jobname: '{{jobname}}（大魔女）'
+MajoantiDeathRecall:
+  name: '死亡回溯'
+  jobname: '{{jobname}}（死亡回溯）'
+MajoantiGrudgeBite:
+  name: '怨念反噬'
+  jobname: '{{jobname}}（怨念反噬）'
+MajoantiTime:
+  name: '时间操纵'
+  jobname: '{{jobname}}（时间操纵）'
+MajoantiSpecialDivination:
+  name: '特异占卜'
+  jobname: '{{jobname}}（特异占卜）'
 
 Chemical:
   jobname: '{{left}}×{{right}}'

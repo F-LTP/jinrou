@@ -473,7 +473,7 @@ normal3=(number)->
             ret.Fox++
             if number>=24
                 ret.Fox++
-    if number>=14 && (number!=16 || number!=17)
+    if (number >= 14 && number != 16 && number != 17)
         ret.Poisoner=1 #猫
     ret
 
@@ -1644,6 +1644,18 @@ exports.new_rules=[
                     defaultChecked: false
                     value:"1"
                     disabled:(rule)->rule.casting=="特殊规则.量子人狼"
+            }
+            {
+                type: 'item'
+                value:
+                    type:"select"
+                    id:"antimode"
+                    defaultValue: ''
+                    values: [
+                        "no"
+                        # "anti"
+                        "majoanti"
+                    ]
             }
             {
                 type: 'item'
