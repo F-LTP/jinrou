@@ -1650,7 +1650,7 @@ exports.new_rules=[
                 value:
                     type:"select"
                     id:"antimode"
-                    defaultValue: ''
+                    defaultValue: 'no'
                     values: [
                         "no"
                         # "anti"
