@@ -13399,8 +13399,6 @@ class MajoantiBond extends Complex
     # 显示格式：主职业【魔法名】
     getJobname:-> @game.i18n.t "roles:MajoantiBond.jobname", {jobname: @main.getJobname()}
     getJobDisp:-> @game.i18n.t "roles:MajoantiBond.jobname", {jobname: @main.getJobDisp()}
-    sleeping:->true
-    jobdone:->true
     # 提供详情信息（点击"详细"时显示魔法信息）
     makejobinfo:(game,result)->
         @main.makejobinfo game, result
@@ -13416,8 +13414,6 @@ class MajoantiVision extends Complex
     formType: FormType.optional
     getJobname:-> @game.i18n.t "roles:MajoantiVision.jobname", {jobname: @main.getJobname()}
     getJobDisp:-> @game.i18n.t "roles:MajoantiVision.jobname", {jobname: @main.getJobDisp()}
-    sleeping:->true
-    jobdone:->true
     makejobinfo:(game,result)->
         @main.makejobinfo game, result
         result.desc ?= []
@@ -13432,8 +13428,6 @@ class MajoantiLieDetector extends Complex
     formType: FormType.optional
     getJobname:-> @game.i18n.t "roles:MajoantiLieDetector.jobname", {jobname: @main.getJobname()}
     getJobDisp:-> @game.i18n.t "roles:MajoantiLieDetector.jobname", {jobname: @main.getJobDisp()}
-    sleeping:->true
-    jobdone:->true
     makejobinfo:(game,result)->
         @main.makejobinfo game, result
         result.desc ?= []
@@ -13448,8 +13442,6 @@ class MajoantiWitchKiller extends Complex
     formType: FormType.optional
     getJobname:-> @game.i18n.t "roles:MajoantiWitchKiller.jobname", {jobname: @main.getJobname()}
     getJobDisp:-> @game.i18n.t "roles:MajoantiWitchKiller.jobname", {jobname: @main.getJobDisp()}
-    sleeping:->true
-    jobdone:->true
     makejobinfo:(game,result)->
         @main.makejobinfo game, result
         result.desc ?= []
@@ -13464,8 +13456,6 @@ class MajoantiBodySwap extends Complex
     formType: FormType.optional
     getJobname:-> @game.i18n.t "roles:MajoantiBodySwap.jobname", {jobname: @main.getJobname()}
     getJobDisp:-> @game.i18n.t "roles:MajoantiBodySwap.jobname", {jobname: @main.getJobDisp()}
-    sleeping:->true
-    jobdone:->true
     makejobinfo:(game,result)->
         @main.makejobinfo game, result
         result.desc ?= []
@@ -13480,8 +13470,6 @@ class MajoantiFutureSight extends Complex
     formType: FormType.optional
     getJobname:-> @game.i18n.t "roles:MajoantiFutureSight.jobname", {jobname: @main.getJobname()}
     getJobDisp:-> @game.i18n.t "roles:MajoantiFutureSight.jobname", {jobname: @main.getJobDisp()}
-    sleeping:->true
-    jobdone:->true
     makejobinfo:(game,result)->
         @main.makejobinfo game, result
         result.desc ?= []
@@ -13496,8 +13484,6 @@ class MajoantiHeal extends Complex
     formType: FormType.optional
     getJobname:-> @game.i18n.t "roles:MajoantiHeal.jobname", {jobname: @main.getJobname()}
     getJobDisp:-> @game.i18n.t "roles:MajoantiHeal.jobname", {jobname: @main.getJobDisp()}
-    sleeping:->true
-    jobdone:->true
     makejobinfo:(game,result)->
         @main.makejobinfo game, result
         result.desc ?= []
@@ -13512,8 +13498,6 @@ class MajoantiBrainwash extends Complex
     formType: FormType.optional
     getJobname:-> @game.i18n.t "roles:MajoantiBrainwash.jobname", {jobname: @main.getJobname()}
     getJobDisp:-> @game.i18n.t "roles:MajoantiBrainwash.jobname", {jobname: @main.getJobDisp()}
-    sleeping:->true
-    jobdone:->true
     makejobinfo:(game,result)->
         @main.makejobinfo game, result
         result.desc ?= []
@@ -13528,8 +13512,6 @@ class MajoantiVoiceMimic extends Complex
     formType: FormType.optional
     getJobname:-> @game.i18n.t "roles:MajoantiVoiceMimic.jobname", {jobname: @main.getJobname()}
     getJobDisp:-> @game.i18n.t "roles:MajoantiVoiceMimic.jobname", {jobname: @main.getJobDisp()}
-    sleeping:->true
-    jobdone:->true
     makejobinfo:(game,result)->
         @main.makejobinfo game, result
         result.desc ?= []
@@ -13544,8 +13526,6 @@ class MajoantiStrength extends Complex
     formType: FormType.optional
     getJobname:-> @game.i18n.t "roles:MajoantiStrength.jobname", {jobname: @main.getJobname()}
     getJobDisp:-> @game.i18n.t "roles:MajoantiStrength.jobname", {jobname: @main.getJobDisp()}
-    sleeping:->true
-    jobdone:->true
     makejobinfo:(game,result)->
         @main.makejobinfo game, result
         result.desc ?= []
@@ -13560,8 +13540,6 @@ class MajoantiFloat extends Complex
     formType: FormType.optional
     getJobname:-> @game.i18n.t "roles:MajoantiFloat.jobname", {jobname: @main.getJobname()}
     getJobDisp:-> @game.i18n.t "roles:MajoantiFloat.jobname", {jobname: @main.getJobDisp()}
-    sleeping:->true
-    jobdone:->true
     makejobinfo:(game,result)->
         @main.makejobinfo game, result
         result.desc ?= []
@@ -13576,8 +13554,6 @@ class MajoantiClairvoyance extends Complex
     formType: FormType.optional
     getJobname:-> @game.i18n.t "roles:MajoantiClairvoyance.jobname", {jobname: @main.getJobname()}
     getJobDisp:-> @game.i18n.t "roles:MajoantiClairvoyance.jobname", {jobname: @main.getJobDisp()}
-    sleeping:->true
-    jobdone:->true
     makejobinfo:(game,result)->
         @main.makejobinfo game, result
         result.desc ?= []
@@ -13592,8 +13568,6 @@ class MajoantiGazeGuide extends Complex
     formType: FormType.optional
     getJobname:-> @game.i18n.t "roles:MajoantiGazeGuide.jobname", {jobname: @main.getJobname()}
     getJobDisp:-> @game.i18n.t "roles:MajoantiGazeGuide.jobname", {jobname: @main.getJobDisp()}
-    sleeping:->true
-    jobdone:->true
     makejobinfo:(game,result)->
         @main.makejobinfo game, result
         result.desc ?= []
@@ -13608,8 +13582,6 @@ class MajoantiFlame extends Complex
     formType: FormType.optional
     getJobname:-> @game.i18n.t "roles:MajoantiFlame.jobname", {jobname: @main.getJobname()}
     getJobDisp:-> @game.i18n.t "roles:MajoantiFlame.jobname", {jobname: @main.getJobDisp()}
-    sleeping:->true
-    jobdone:->true
     makejobinfo:(game,result)->
         @main.makejobinfo game, result
         result.desc ?= []
@@ -13624,8 +13596,6 @@ class MajoantiLiquid extends Complex
     formType: FormType.optional
     getJobname:-> @game.i18n.t "roles:MajoantiLiquid.jobname", {jobname: @main.getJobname()}
     getJobDisp:-> @game.i18n.t "roles:MajoantiLiquid.jobname", {jobname: @main.getJobDisp()}
-    sleeping:->true
-    jobdone:->true
     makejobinfo:(game,result)->
         @main.makejobinfo game, result
         result.desc ?= []
@@ -13640,8 +13610,6 @@ class MajoantiRebel extends Complex
     formType: FormType.optional
     getJobname:-> @game.i18n.t "roles:MajoantiRebel.jobname", {jobname: @main.getJobname()}
     getJobDisp:-> @game.i18n.t "roles:MajoantiRebel.jobname", {jobname: @main.getJobDisp()}
-    sleeping:->true
-    jobdone:->true
     makejobinfo:(game,result)->
         @main.makejobinfo game, result
         result.desc ?= []
@@ -13656,8 +13624,6 @@ class MajoantiRemains extends Complex
     formType: FormType.optional
     getJobname:-> @game.i18n.t "roles:MajoantiRemains.jobname", {jobname: @main.getJobname()}
     getJobDisp:-> @game.i18n.t "roles:MajoantiRemains.jobname", {jobname: @main.getJobDisp()}
-    sleeping:->true
-    jobdone:->true
     makejobinfo:(game,result)->
         @main.makejobinfo game, result
         result.desc ?= []
@@ -13672,8 +13638,6 @@ class MajoantiGreatWitch extends Complex
     formType: FormType.optional
     getJobname:-> @game.i18n.t "roles:MajoantiGreatWitch.jobname", {jobname: @main.getJobname()}
     getJobDisp:-> @game.i18n.t "roles:MajoantiGreatWitch.jobname", {jobname: @main.getJobDisp()}
-    sleeping:->true
-    jobdone:->true
     makejobinfo:(game,result)->
         @main.makejobinfo game, result
         result.desc ?= []
@@ -13688,8 +13652,6 @@ class MajoantiDeathRecall extends Complex
     formType: FormType.optional
     getJobname:-> @game.i18n.t "roles:MajoantiDeathRecall.jobname", {jobname: @main.getJobname()}
     getJobDisp:-> @game.i18n.t "roles:MajoantiDeathRecall.jobname", {jobname: @main.getJobDisp()}
-    sleeping:->true
-    jobdone:->true
     makejobinfo:(game,result)->
         @main.makejobinfo game, result
         result.desc ?= []
@@ -13704,8 +13666,6 @@ class MajoantiGrudgeBite extends Complex
     formType: FormType.optional
     getJobname:-> @game.i18n.t "roles:MajoantiGrudgeBite.jobname", {jobname: @main.getJobname()}
     getJobDisp:-> @game.i18n.t "roles:MajoantiGrudgeBite.jobname", {jobname: @main.getJobDisp()}
-    sleeping:->true
-    jobdone:->true
     makejobinfo:(game,result)->
         @main.makejobinfo game, result
         result.desc ?= []
@@ -13720,8 +13680,6 @@ class MajoantiTime extends Complex
     formType: FormType.optional
     getJobname:-> @game.i18n.t "roles:MajoantiTime.jobname", {jobname: @main.getJobname()}
     getJobDisp:-> @game.i18n.t "roles:MajoantiTime.jobname", {jobname: @main.getJobDisp()}
-    sleeping:->true
-    jobdone:->true
     makejobinfo:(game,result)->
         @main.makejobinfo game, result
         result.desc ?= []
@@ -13736,8 +13694,6 @@ class MajoantiSpecialDivination extends Complex
     formType: FormType.optional
     getJobname:-> @game.i18n.t "roles:MajoantiSpecialDivination.jobname", {jobname: @main.getJobname()}
     getJobDisp:-> @game.i18n.t "roles:MajoantiSpecialDivination.jobname", {jobname: @main.getJobDisp()}
-    sleeping:->true
-    jobdone:->true
     makejobinfo:(game,result)->
         @main.makejobinfo game, result
         result.desc ?= []
