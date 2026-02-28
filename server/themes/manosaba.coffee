@@ -196,13 +196,18 @@ module.exports=
              prize: []
              
         mai:
-             avatar: "https://s2.loli.net/2025/10/24/fNk31DTKavy2VIH.jpg"
+             avatar: "https://s41.ax1x.com/2026/02/28/pZzfyTA.png"
              name: "志波千羽"
              prize: []
              
         onigi:
              avatar: "https://s41.ax1x.com/2026/01/30/pZfaMRK.png"
              name: "鬼崎弥弥"
+             prize: []
+             
+        neko:
+             avatar: "https://s41.ax1x.com/2026/02/28/pZzhCkR.png"
+             name: "猫沟野良"
              prize: []
             
         # jocho:
