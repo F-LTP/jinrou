@@ -647,7 +647,7 @@ cosplayer=(number)->
             if number>=24
                 ret.Fox++
     if number>=17
-        ret.Guard=1 #猎人
+        ret.WanderingGuard=1 #猎人
     if number>=21
         ret.Poisoner=1
     ret
