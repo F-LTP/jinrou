@@ -283,7 +283,7 @@ export const NewRoom: React.FunctionComponent<IPropNewRoom> = observer(
               compact={!store.descriptionShown}
             >
               <Select ref={themeSelectRef}>
-                <option value="">{t('theme.none')}</option>
+                <option value="openavatar">{t('theme.none')}</option>
                 {themes.map(theme => (
                   <option key={theme.value} value={theme.value}>
                     {theme.name}

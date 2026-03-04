@@ -61,6 +61,8 @@ module.exports.actions =(req,res,ss)->
         results=[]
         try
             for t of themes
+                # 过滤掉 openavatar 主题（它是特殊的跨主题选择模式，不应该作为普通主题出现）
+                continue if t == 'openavatar'
                 results.push {
                     value:t
                     name:themes[t].name

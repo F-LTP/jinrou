@@ -362,7 +362,7 @@ queen=(number)->
         ret.Werewolf++
         if number>=13
             ret.Werewolf++
-            if number>=16
+            if number>=17
                 ret.Werewolf++
                 if number>=19
                     ret.Werewolf++
@@ -391,8 +391,8 @@ queen=(number)->
             ret.Madman--
             ret.HearMadman=1
             ret.Couple=2
-        if number>=16
-            ret.Cosplayer=1
+        if number>=17
+            ret.Poisoner=1
             ret.Baker=1
             if number>=18
                 ret.Madman--
@@ -403,11 +403,70 @@ queen=(number)->
                 ret.Madman=1
         if number>=22
             ret.Madman++
-    if number>=16
+    if number>=20
         ret.Fox=1 #狐
         if number>=22
             ret.Fox++
             if number>=23
+                ret.Fox++
+    ret
+
+queen2=(number)->
+    ret={}
+    #狼
+    ret.Werewolf=1
+    if number>=8
+        ret.Werewolf++
+        if number>=14
+            ret.Werewolf++
+            if number>=17
+                ret.Werewolf++
+                if number>=20
+                    ret.Werewolf++
+                    if number>=23
+                        ret.Werewolf++
+                        if number>=27
+                            ret.Werewolf++
+                            if number>=29
+                                ret.Werewolf++
+    ret.Diviner=1 #占い
+    if number>=23
+        ret.Diviner++
+    if number>=8
+        ret.Psychic=1 #灵能
+        if number>=23
+            ret.Psychic++
+    if number>=6
+        ret.Madman=1 #狂人
+        ret.Guard=1 #猎人
+        ret.QueenSpectator=1 #女王
+        if 14<=number<=15
+            ret.Madman--
+            ret.Fanatic=1 #狂信者
+            ret.Couple=2
+        if number==16
+            ret.Madman--
+            ret.HearMadman=1
+            ret.Couple=2
+        if number>=17
+            ret.Cosplayer=1
+            ret.Guard--
+            ret.WanderingGuard=1
+            ret.Baker=1
+            if number>=19
+                ret.Madman--
+                ret.Fanatic=1 #狂信者
+                ret.Immoral=1
+            if number==20
+                ret.Fanatic--
+                ret.Madman=1
+        if number>=23
+            ret.Madman++
+    if number>=21
+        ret.Fox=1 #狐
+        if number>=23
+            ret.Fox++
+            if number>=24
                 ret.Fox++
     ret
 
@@ -697,7 +756,14 @@ exports.jobrules=[
           ret=queen number
           ret
             
-      }
+      },
+      {
+        name:"女王村（有欠）"
+        minNumber:10
+        rule:(number)->
+          ret=queen2 number
+          ret
+      },
       {
         name:"黑骑士"
         rule:(number)->
@@ -708,15 +774,6 @@ exports.jobrules=[
         name:"魔女反逆者"
         rule:(number)->
           ret=fanni1 number
-          ret
-      }
-      {
-        name:"低语狂人"
-        rule:(number)->
-          ret=normal1 number
-          if ret.Madman>0
-            ret.WhisperingMad=1
-            ret.Madman--
           ret
       }
     ]

@@ -435,10 +435,9 @@ module.exports.actions=(req,res,ss)->
                 if room.theme && theme != null
                     # OpenAvatar 跨主题选择模式
                     if theme.openAvatar
-                        # 自定义模式：使用自定义名字和头像
-                        if opt.customName? and opt.customIcon?
+                        # 自定义模式：使用自定义名字和头像（头像可为空）
+                        if opt.customName?
                             customName = opt.customName.trim()
-                            customIcon = opt.customIcon.trim()
                             # 检查名字是否已被使用
                             if room.players.some((pl)->pl.name==customName)
                                 res error:"该名字已被使用，请选择其他名字。"
@@ -448,7 +447,10 @@ module.exports.actions=(req,res,ss)->
                                 res error:"名字太长了。"
                                 return
                             user.name = customName
-                            user.icon = customIcon
+                            # customIcon 可以为空，如果提供了则使用
+                            if opt.customIcon?
+                                customIcon = opt.customIcon.trim()
+                                user.icon = customIcon
                             # 生成随机用户ID
                             loop
                                 user.userid=crypto.randomBytes(10).toString('hex')

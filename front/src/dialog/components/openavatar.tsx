@@ -35,6 +35,7 @@ export class OpenAvatarDialog extends React.PureComponent<
     activeTab: TabType;
     customName: string;
     customIcon: string;
+    themeFilter: string;
   }
 > {
   constructor(props: IPropOpenAvatarDialog) {
@@ -47,6 +48,7 @@ export class OpenAvatarDialog extends React.PureComponent<
       activeTab: 'role',
       customName: '',
       customIcon: '',
+      themeFilter: '',
     };
   }
 
@@ -93,6 +95,7 @@ export class OpenAvatarDialog extends React.PureComponent<
       activeTab,
       customName,
       customIcon,
+      themeFilter,
     } = this.state;
 
     const selectedTheme = themeGroups
@@ -109,7 +112,7 @@ export class OpenAvatarDialog extends React.PureComponent<
     const canConfirm =
       activeTab === 'role'
         ? selectedRole && !isTaken
-        : customName.trim().length > 0 && customIcon.trim().length > 0;
+        : customName.trim().length > 0; // customIcon 可以为空
 
     return (
       <Dialog
@@ -170,19 +173,72 @@ export class OpenAvatarDialog extends React.PureComponent<
                 {activeTab === 'role' && (
                   <>
                     <div style={styles.selectGroup}>
+                      <label style={styles.label}>搜索主题</label>
+                      <input
+                        type="text"
+                        value={themeFilter}
+                        onChange={this.handleThemeFilterChange}
+                        placeholder="输入主题名称筛选..."
+                        style={styles.input}
+                      />
+                    </div>
+
+                    <div style={styles.selectGroup}>
                       <label style={styles.label}>选择主题</label>
-                      <select
-                        value={selectedThemeName}
-                        onChange={this.handleThemeChange}
-                        style={styles.select}
-                      >
-                        <option value="">-- 请选择主题 --</option>
-                        {themeGroups!.map(group => (
-                          <option key={group.themeName} value={group.themeName}>
-                            {group.themeName} ({group.roles.length}个角色)
-                          </option>
-                        ))}
-                      </select>
+                      <div style={styles.themeSelectContainer}>
+                        <div style={styles.themeList}>
+                          {themeGroups!
+                            .filter(
+                              group =>
+                                themeFilter.trim() === '' ||
+                                group.themeName
+                                  .toLowerCase()
+                                  .includes(themeFilter.toLowerCase()),
+                            )
+                            .map(group => (
+                              <div
+                                key={group.themeName}
+                                style={{
+                                  ...styles.themeOption,
+                                  ...(selectedThemeName === group.themeName
+                                    ? styles.themeOptionSelected
+                                    : {}),
+                                }}
+                                onClick={() =>
+                                  this.handleThemeSelect(group.themeName)
+                                }
+                                onMouseEnter={e => {
+                                  if (selectedThemeName !== group.themeName) {
+                                    (e.currentTarget as HTMLElement).style.backgroundColor =
+                                      '#f5f5f5';
+                                  }
+                                }}
+                                onMouseLeave={e => {
+                                  if (selectedThemeName !== group.themeName) {
+                                    (e.currentTarget as HTMLElement).style.backgroundColor =
+                                      'transparent';
+                                  }
+                                }}
+                              >
+                                <div style={styles.themeOptionName}>
+                                  {group.themeName}
+                                </div>
+                                <div style={styles.themeOptionCount}>
+                                  {group.roles.length}个角色
+                                </div>
+                              </div>
+                            ))}
+                          {themeGroups!.filter(
+                            group =>
+                              themeFilter.trim() === '' ||
+                              group.themeName
+                                .toLowerCase()
+                                .includes(themeFilter.toLowerCase()),
+                          ).length === 0 && (
+                            <div style={styles.noResult}>未找到匹配的主题</div>
+                          )}
+                        </div>
+                      </div>
                     </div>
 
                     {selectedTheme && (
@@ -315,6 +371,21 @@ export class OpenAvatarDialog extends React.PureComponent<
   }
 
   @bind
+  private handleThemeFilterChange(
+    e: React.ChangeEvent<HTMLInputElement>,
+  ): void {
+    this.setState({ themeFilter: e.target.value });
+  }
+
+  @bind
+  private handleThemeSelect(themeName: string): void {
+    this.setState({
+      selectedThemeName: themeName,
+      selectedSkinKey: '',
+    });
+  }
+
+  @bind
   private handleRoleChange(e: React.ChangeEvent<HTMLSelectElement>): void {
     this.setState({ selectedSkinKey: e.target.value });
   }
@@ -408,13 +479,13 @@ export class OpenAvatarDialog extends React.PureComponent<
         skinKey: role.skinKey,
       });
     } else {
-      // Custom mode
-      if (!customName.trim() || !customIcon.trim()) return;
+      // Custom mode - customIcon 可以为空
+      if (!customName.trim()) return;
 
       this.props.onSelect({
         type: 'custom',
         customName: customName.trim(),
-        customIcon: customIcon.trim(),
+        customIcon: customIcon.trim(), // 允许为空字符串
       });
     }
   }
@@ -471,6 +542,42 @@ const styles: { [key: string]: React.CSSProperties } = {
     border: '1px solid #ccc',
     borderRadius: '4px',
     boxSizing: 'border-box' as const,
+  },
+  themeSelectContainer: {
+    border: '1px solid #ccc',
+    borderRadius: '4px',
+    overflow: 'hidden',
+  },
+  themeList: {
+    maxHeight: '200px',
+    overflowY: 'auto' as const,
+  },
+  themeOption: {
+    padding: '10px 12px',
+    borderBottom: '1px solid #eee',
+    cursor: 'pointer',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    transition: 'background-color 0.2s',
+  },
+  themeOptionSelected: {
+    backgroundColor: '#e3f2fd',
+    borderLeft: '3px solid #2196F3',
+  },
+  themeOptionName: {
+    fontSize: '14px',
+    color: '#333',
+  },
+  themeOptionCount: {
+    fontSize: '12px',
+    color: '#999',
+  },
+  noResult: {
+    padding: '20px',
+    textAlign: 'center',
+    color: '#999',
+    fontSize: '14px',
   },
   preview: {
     display: 'flex',
