@@ -325,6 +325,8 @@ module.exports=
                     realid:player.realid
                     name:player.name
                 }
+                # Waiting 不在 jobs 列表中，需要手动设置 jobname
+                newpl.jobname = game.i18n.t "roles:jobname.Waiting"
                 newpl.setTarget null
                 game.players.push newpl
                 game.participants.push newpl
@@ -16973,11 +16975,50 @@ module.exports.actions=(req,res,ss)->
                 # 役職選択中
                 game.phase = Phase.rolerequesting
                 game.rolerequesttable={}
+
+                # サーバー再起動後は game.players が不完全な可能性があるため、
+                # room.players から完全な game.players を再構築する
+                newPlayers = []
+
+                # 既存のプレイヤーオブジェクトを再利用（objidを維持するため）
+                existingPlayersMap = new Map()
+                for pl in game.players
+                    existingPlayersMap.set(pl.realid, pl)
+                for pl in game.participants
+                    existingPlayersMap.set(pl.realid, pl) if pl.realid?
+
+                for plobj in room.players
+                    existingPl = existingPlayersMap.get(plobj.realid)
+                    if existingPl?
+                        # 既存のプレイヤーオブジェクトを再利用
+                        if existingPl.type == "Waiting" && !existingPl.jobname?
+                            existingPl.jobname = game.i18n.t "roles:jobname.Waiting"
+                        newPlayers.push existingPl
+                    else
+                        # 新規プレイヤー（サーバー再起動後など）
+                        if plobj.mode == "gm"
+                            newpl = Player.factory "GameMaster", game
+                        else
+                            newpl=Player.factory "Waiting", game
+                            newpl.jobname = game.i18n.t "roles:jobname.Waiting"
+                        newpl.setProfile {
+                            id:plobj.userid
+                            realid:plobj.realid
+                            name:plobj.name
+                        }
+                        newpl.setTarget null
+                        newPlayers.push newpl
+
+                game.players = newPlayers
+                game.participants = newPlayers.concat []
+
                 res null
                 log=
                     mode:"system"
                     comment: game.i18n.t "system.gamestart.roleRequesting"
                 splashlog game.id,game,log
+                # 保存游戏状态到数据库（サーバー再起動後は全プレイヤーが含まれる）
+                game.save()
                 game.timer()
                 ss.publish.channel "room#{roomid}","refresh",{id:roomid}
             else
