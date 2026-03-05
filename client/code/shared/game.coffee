@@ -397,10 +397,11 @@ queen=(number)->
             if number>=18
                 ret.Madman--
                 ret.Fanatic=1 #狂信者
-                ret.Immoral=1
             if number==19
                 ret.Fanatic--
                 ret.Madman=1
+            if number>=20
+                ret.Immoral=1
         if number>=22
             ret.Madman++
     if number>=20
@@ -456,13 +457,14 @@ queen2=(number)->
             if number>=19
                 ret.Madman--
                 ret.Fanatic=1 #狂信者
-                ret.Immoral=1
             if number==20
                 ret.Fanatic--
                 ret.Madman=1
+            if number>=20
+                ret.Immoral=1
         if number>=23
             ret.Madman++
-    if number>=21
+    if number>=20
         ret.Fox=1 #狐
         if number>=23
             ret.Fox++
