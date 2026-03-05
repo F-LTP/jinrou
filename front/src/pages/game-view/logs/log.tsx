@@ -590,6 +590,7 @@ const Icon = styled(LogPart)<IPropLogPart>`
     width: 1em;
     height: 1em;
     vertical-align: bottom;
+    object-fit: cover;
     ${({ noName }) => String(noName)};
   }
 

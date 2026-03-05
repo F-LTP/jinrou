@@ -387,7 +387,7 @@ queen=(number)->
             ret.Madman--
             ret.Fanatic=1 #狂信者
             ret.Couple=2
-        if number==15
+        if number==15 || number==16
             ret.Madman--
             ret.HearMadman=1
             ret.Couple=2

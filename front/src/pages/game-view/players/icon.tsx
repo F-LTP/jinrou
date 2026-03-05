@@ -50,4 +50,5 @@ const IconImg = styled.img<{ dead?: boolean }>`
   filter: ${props => (props.dead ? 'grayscale(100%)' : 'none')};
   width: 48px;
   height: 48px;
+  object-fit: cover;
 `;

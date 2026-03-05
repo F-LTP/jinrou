@@ -29,4 +29,5 @@ const IconImg = styled.img`
   display: inline-block;
   width: 48px;
   height: 48px;
+  object-fit: cover;
 `;
