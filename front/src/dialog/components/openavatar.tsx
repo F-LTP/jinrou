@@ -553,7 +553,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     overflowY: 'auto' as const,
   },
   themeOption: {
-    padding: '10px 12px',
+    padding: '5px 6px',
     borderBottom: '1px solid #eee',
     cursor: 'pointer',
     display: 'flex',
