@@ -263,6 +263,9 @@ module.exports.actions=(req,res,ss)->
             room.password=query.password ? null
             room.blind=query.blind
             room.theme=query.theme
+            # 匿名模式且无主题时，自动使用 openavatar（开放匿名主题）
+            if room.blind in ['yes', 'complete'] && (!room.theme? or room.theme == '')
+                room.theme = 'openavatar'
             if room.theme
                 theme = Server.game.themes.getTheme room.theme
                 unless theme

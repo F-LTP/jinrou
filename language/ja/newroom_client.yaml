@@ -42,7 +42,7 @@ theme:
   title: "主题房间"
   description: "匿名模式下的主题房间，玩家的昵称将由系统随机分配。"
   # label for no theme.
-  none: "开放匿名主题"
+  none: "无（匿名时为开放主题）"
 
 
 # GM
