@@ -4661,85 +4661,63 @@ class SuperFox extends Fox
     midnightSort:100
     formType: FormType.optionalOnce
     isFox:->true
-    constructor:->
-        super
-        @setFlag []
-            # {player:Player, result:String, day: number}
-    sleeping:(game)->true # 占いは必須ではない
-    jobdone:(game)->@flag.length > 0
+    sleeping:(game)->true 
+    chooseJobDay:(game)->true
+    jobdone:(game)->
+        if Phase.isDay(game.phase)
+            @flag?
+        else
+            super
     job:(game,playerid,query)->
-        # 占い
-        if @flag.length > 0
+        if @flag
             return game.i18n.t "error.common.alreadyUsed"
+        unless Phase.isDay(game.phase)
+            return game.i18n.t "error.common.cannotUseSkillNow"
         pl=game.getPlayer playerid
+        # pl.touched game,@id
         unless pl?
             return game.i18n.t "error.common.nonexistentPlayer"
-        @setFlag [{
-            results: @flag.results
-            target: playerid
-        }]
         @setTarget playerid
-        pl.touched game,@id
+        @setFlag true
         log=
             mode:"skill"
             to:@id
             comment: game.i18n.t "roles:SuperFox.select", {name: @name, target: pl.name}
         splashlog game.id,game,log
-        if game.rule.divineresult=="immediate"
-            @dodivine game
-            @showdivineresult game, playerid
         null
-    sunrise:(game)->
-        super
-        unless game.rule.divineresult=="immediate"
-            @showdivineresult game, @flag.target
-    midnight:(game,midnightSort)->
-        super
-        unless game.rule.divineresult=="immediate"
-            @dodivine game
-        @divineeffect game
-    #占い実行
-    dodivine:(game)->
-        target = game.skillTargetHook.get @target
-        origp = game.getPlayer @target
-        p=game.getPlayer target
-        if p? && origp?
-            # show original target's name even if target is forced to another player.
-            @setFlag @flag.concat {
-                player: origp.publicinfo()
-                result: game.i18n.t "roles:SuperFox.resultlog", {name: @name, target: origp.name, result: p.getMainJobname()}
-                day: game.day
-            }
-            @addGamelog game,"divine",p.type,@target    # 占った
-    showdivineresult:(game, target)->
-        r=@flag[@flag.length-1]
-        return unless r?
-        # result of which day to show?
-        resday = (
-            if game.rule.divineresult == "immediate"
-                game.day
-            else
-                game.day - 1)
-        return if r.day != resday
+    sunset:(game)->
+        t=game.getPlayer @target
+        unless t?
+            return super
+        if t.dead
+            return super
+
+        # 威嚇して能力無しにする
+        @addGamelog game,"threaten",t.type,@target
+        # 複合させる
 
         log=
             mode:"skill"
-            to:@id
-            comment:r.result
+            to:t.id
+            comment: game.i18n.t "roles:SuperFox.affected", {name: t.name}
         splashlog game.id,game,log
+
+        newpl=Player.factory null, game, t,null,Threatened  # カウンセリングされた
+        t.transProfile newpl
+        t.transform game,newpl,true
+
+        super
     getOpenForms:(game)->
-        res = super
-        if Phase.isNight(game.phase)
-            unless @flag?
-                # 占いが可能
-                res.push {
-                    type: @type
-                    options: @makeJobSelection game, false
-                    formType: FormType.optionalOnce
-                    objid: @objid
-                }
+        res = []
+        if Phase.isDay(game.phase) && !@dead && !@flag?
+            #昼の能力選択可能
+            res.push {
+                type: "SuperFox"
+                options: @makeJobSelection game, false
+                formType: FormType.optionalOnce
+                objid: @objid
+            }
         return res
-    divineeffect:(game)->
 
 class Bat extends Player
     type:"Bat"

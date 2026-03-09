@@ -295,10 +295,10 @@ Diviner:
 
 # SuperFox
 SuperFox:
-  # Selected a target.
-  select: 'SP妖狐 {{name}} 占卜了 {{target}} 的真实身份。'
-  # Divining result.
-  resultlog: 'SP妖狐 {{name}} 占卜了 {{target}} 的真实身份，他是 {{result}}。'
+    # Select a threatening.
+  select: '{{name}} 狐咒了 {{target}}。'
+  # Affected by threatening.
+  affected: '{{name}} 被狐咒影响，今夜无法发动能力。'
 
 SuperDiviner:
   # Divine result
