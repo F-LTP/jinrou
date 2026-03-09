@@ -26,6 +26,8 @@ import {
   ButtonArea,
   LabeledControl,
   SpeakControlsSlim,
+  InputWithCountWrapper,
+  CharCount,
 } from './layout';
 import { IsPhone } from '../../../common/media';
 import { FontAwesomeIcon } from '../../../util/icon';
@@ -103,10 +105,15 @@ export class SpeakForm extends React.PureComponent<
      * only effective on phones UI.
      */
     additionalControlsShown: boolean;
+    /**
+     * Current character count.
+     */
+    charCount: number;
   }
 > {
   state = {
     additionalControlsShown: false,
+    charCount: 0,
   };
   protected comment: HTMLInputElement | HTMLTextAreaElement | null = null;
   /**
@@ -131,7 +138,7 @@ export class SpeakForm extends React.PureComponent<
       widePage,
       timer,
     } = this.props;
-    const { additionalControlsShown } = this.state;
+    const { additionalControlsShown, charCount } = this.state;
     // whether speech is allowed.
     const speakAllowed = !(roleInfo == null && !gameInfo.watchspeak);
     const nsecondSilent = (() => {
@@ -180,32 +187,42 @@ export class SpeakForm extends React.PureComponent<
                           value={t('game_client:speak.noWatchSpeak')}
                         />
                       ) : multiline ? (
-                        <SpeakTextArea
-                          key="allowed-speakinput-multiline"
-                          ref={e => (this.comment = e)}
-                          cols={50}
-                          rows={4}
-                          required
-                          autoComplete="off"
-                          defaultValue={this.commentString}
-                          onChange={this.handleCommentChange}
-                          onFocus={this.handleFocus}
-                          onBlur={this.handleBlur}
-                        />
+                        <InputWithCountWrapper>
+                          <SpeakTextArea
+                            key="allowed-speakinput-multiline"
+                            ref={e => (this.comment = e)}
+                            cols={50}
+                            rows={4}
+                            required
+                            autoComplete="off"
+                            defaultValue={this.commentString}
+                            onChange={this.handleCommentChange}
+                            onFocus={this.handleFocus}
+                            onBlur={this.handleBlur}
+                          />
+                          <CharCount hasContent={charCount > 0}>
+                            {charCount}
+                          </CharCount>
+                        </InputWithCountWrapper>
                       ) : (
-                        <SpeakInput
-                          key="allowed-speakinput"
-                          ref={e => (this.comment = e)}
-                          type="text"
-                          size={50}
-                          required
-                          autoComplete="off"
-                          defaultValue={this.commentString}
-                          onChange={this.handleCommentChange}
-                          onKeyDown={this.handleKeyDownComment}
-                          onFocus={this.handleFocus}
-                          onBlur={this.handleBlur}
-                        />
+                        <InputWithCountWrapper>
+                          <SpeakInput
+                            key="allowed-speakinput"
+                            ref={e => (this.comment = e)}
+                            type="text"
+                            size={50}
+                            required
+                            autoComplete="off"
+                            defaultValue={this.commentString}
+                            onChange={this.handleCommentChange}
+                            onKeyDown={this.handleKeyDownComment}
+                            onFocus={this.handleFocus}
+                            onBlur={this.handleBlur}
+                          />
+                          <CharCount hasContent={charCount > 0}>
+                            {charCount}
+                          </CharCount>
+                        </InputWithCountWrapper>
                       )}
                     </SpeakInputArea>
                     {/* Speak button. */}
@@ -362,6 +379,7 @@ export class SpeakForm extends React.PureComponent<
    */
   public appendToComment(text: string) {
     this.commentString += text;
+    this.setState({ charCount: this.commentString.length });
     if (this.comment != null) {
       this.comment.value = this.commentString;
       this.comment.focus();
@@ -384,6 +402,7 @@ export class SpeakForm extends React.PureComponent<
     this.props.onSpeak(query);
     // reset the comment form.
     this.commentString = '';
+    this.setState({ charCount: 0 });
     if (this.comment != null) {
       this.comment.value = '';
     }
@@ -396,6 +415,7 @@ export class SpeakForm extends React.PureComponent<
     e: React.SyntheticEvent<HTMLInputElement | HTMLTextAreaElement>,
   ): void {
     this.commentString = e.currentTarget.value;
+    this.setState({ charCount: this.commentString.length });
   }
   /**
    * Handle a keydown event of comment input.
@@ -408,6 +428,7 @@ export class SpeakForm extends React.PureComponent<
       // this keyboard input switches to the multiline mode.
       e.preventDefault();
       this.commentString += '\n';
+      this.setState({ charCount: this.commentString.length });
       this.focus = true;
       this.props.onUpdate({
         multiline: true,
