@@ -4673,6 +4673,8 @@ class SuperFox extends Fox
             return game.i18n.t "error.common.alreadyUsed"
         unless Phase.isDay(game.phase)
             return game.i18n.t "error.common.cannotUseSkillNow"
+        if playerid==@id
+            return game.i18n.t "error.common.noSelectSelf"
         pl=game.getPlayer playerid
         # pl.touched game,@id
         unless pl?
