@@ -373,11 +373,9 @@ const Wrapper = styled.div<{ open: boolean }>`
   transition: height 250ms ease-out;
   display: ${({ open }) => (open ? 'block' : 'none')};
   margin: 0 -8px;
-
+  overflow-y: auto;
   background-color: #636363;
   color: #ffffff;
-  overflow-y: auto;
-  max-height: 400px;
 `;
 
 const Content = styled.div`
