@@ -548,9 +548,9 @@ super1=(number)->
         ret.Werewolf++
         if number>=13
             ret.Werewolf++
-            if number>=17
+            if number>=18
                 ret.Werewolf++
-                if number>=19
+                if number>=20
                     ret.Werewolf++
                     if number>=22
                         ret.Werewolf++
@@ -577,10 +577,13 @@ super1=(number)->
         if 15<=number<=16
             ret.Madman--
             ret.Fanatic=1 #狂信者
-            if number==16
-                ret.Heretic=1
+        if number>=16
+            ret.Perfidious=1
+        if number==17
+            ret.HearMadman=1
+                
         if 19<=number<=22
-            ret.Heretic=1 
+            ret.Perfidious=1 
             if number==19
                 ret.Madman--
                 ret.Fanatic=1 #狂信者
@@ -599,7 +602,7 @@ super1=(number)->
             ret.SuperFox++
             if number>=24
                 ret.SuperFox++
-    if number>=17
+    if number>=18
         ret.Poisoner=1 #猫
     ret
 
