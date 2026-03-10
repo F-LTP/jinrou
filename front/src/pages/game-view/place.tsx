@@ -75,6 +75,10 @@ export interface IPlaceOptions {
    */
   onWillChange: (will: string) => void;
   /**
+   * Handle an update to the note.
+   */
+  onNoteChange: (note: string) => void;
+  /**
    * Handle a submit of report form.
    */
   onReportFormSubmit: (query: ReportFormQuery) => void;
@@ -116,6 +120,7 @@ export function place({
   onRefuseRevival,
   onJobQuery,
   onWillChange,
+  onNoteChange,
   onReportFormSubmit,
   roomControlHandlers,
 }: IPlaceOptions): IPlaceResult {
@@ -137,6 +142,7 @@ export function place({
       onRefuseRevival={refuseRevivalLogic}
       onJobQuery={onJobQuery}
       onWillChange={onWillChange}
+      onNoteChange={onNoteChange}
       onReportFormSubmit={onReportFormSubmit}
       roomControlHandlers={roomControlHandlers}
     />

@@ -97,6 +97,10 @@ interface IPropGame {
    */
   onWillChange: (will: string) => void;
   /**
+   * Handle a note update event.
+   */
+  onNoteChange: (note: string) => void;
+  /**
    * Handle a report form submit event.
    */
   onReportFormSubmit: (query: ReportFormQuery) => void;
@@ -133,6 +137,7 @@ export class Game extends React.Component<IPropGame, {}> {
       shareButton,
       onJobQuery,
       onWillChange,
+      onNoteChange,
       onReportFormSubmit,
       roomControlHandlers,
     } = this.props;
@@ -208,6 +213,7 @@ export class Game extends React.Component<IPropGame, {}> {
                 onRefuseRevival={this.handleRefuseRevival}
                 onRuleOpen={this.handleRuleOpen}
                 onWillChange={onWillChange}
+                onNoteChange={onNoteChange}
                 onFocus={this.handleSpeakFocus}
                 timer={timer}
                 {...speakState}

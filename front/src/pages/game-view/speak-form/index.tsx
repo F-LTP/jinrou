@@ -13,7 +13,44 @@ import {
 
 import { LogVisibilityControl } from './log-visibility';
 import { WillForm } from './will-form';
+import { NoteForm } from './note-form';
 import { makeMapByKey } from '../../../util/map-by-key';
+
+// Storage key for speak draft.
+const SPEAK_DRAFT_STORAGE_KEY = 'jinrou-speak-draft';
+
+/**
+ * Load speak draft from localStorage.
+ */
+function loadSpeakDraftFromStorage(): string {
+  try {
+    return localStorage.getItem(SPEAK_DRAFT_STORAGE_KEY) || '';
+  } catch {
+    return '';
+  }
+}
+
+/**
+ * Save speak draft to localStorage.
+ */
+function saveSpeakDraftToStorage(content: string): void {
+  try {
+    localStorage.setItem(SPEAK_DRAFT_STORAGE_KEY, content);
+  } catch {
+    // Ignore storage errors.
+  }
+}
+
+/**
+ * Clear speak draft from localStorage.
+ */
+function clearSpeakDraftFromStorage(): void {
+  try {
+    localStorage.removeItem(SPEAK_DRAFT_STORAGE_KEY);
+  } catch {
+    // Ignore storage errors.
+  }
+}
 import { SpeakKindSelect, speakKindLabel } from './speak-kind-select';
 import {
   MainForm,
@@ -81,6 +118,10 @@ export interface IPropSpeakForm extends SpeakState {
    */
   onWillChange: (will: string) => void;
   /**
+   * Change the note.
+   */
+  onNoteChange: (note: string) => void;
+  /**
    * Focus/unfocus the speak input.
    */
   onFocus: (focus: boolean) => void;
@@ -119,7 +160,7 @@ export class SpeakForm extends React.PureComponent<
   /**
    * Temporally saved comment.
    */
-  protected commentString: string = '';
+  protected commentString: string = loadSpeakDraftFromStorage();
   /**
    * Temporal flag to focus on the comment input.
    */
@@ -133,6 +174,7 @@ export class SpeakForm extends React.PureComponent<
       kind,
       multiline,
       willOpen,
+      noteOpen,
       logVisibility,
       rule,
       widePage,
@@ -296,6 +338,12 @@ export class SpeakForm extends React.PureComponent<
                           ? t('game_client:speak.will.close')
                           : t('game_client:speak.will.open')}
                       </button>
+                      {/* Note open button. */}
+                      <button type="button" onClick={this.handleNoteClick}>
+                        {noteOpen
+                          ? t('game_client:speak.note.close')
+                          : t('game_client:speak.note.open')}
+                      </button>
                       {/* Show rule button. */}
                       <RuleButton
                         t={t}
@@ -351,6 +399,14 @@ export class SpeakForm extends React.PureComponent<
                     will={(roleInfo && roleInfo.will) || undefined}
                     onWillChange={this.handleWillChange}
                   />
+                  <NoteForm
+                    hidden={othersHidden}
+                    t={t}
+                    open={noteOpen}
+                    note={undefined}
+                    players={players}
+                    onNoteChange={this.handleNoteChange}
+                  />
                 </>
               );
             }}
@@ -384,6 +440,8 @@ export class SpeakForm extends React.PureComponent<
       this.comment.value = this.commentString;
       this.comment.focus();
     }
+    // Auto-save to localStorage.
+    saveSpeakDraftToStorage(this.commentString);
   }
   /**
    * Handle submission of the speak form.
@@ -406,6 +464,8 @@ export class SpeakForm extends React.PureComponent<
     if (this.comment != null) {
       this.comment.value = '';
     }
+    // Clear draft from localStorage after sending.
+    clearSpeakDraftFromStorage();
   }
   /**
    * Handle a change of comment input.
@@ -416,6 +476,8 @@ export class SpeakForm extends React.PureComponent<
   ): void {
     this.commentString = e.currentTarget.value;
     this.setState({ charCount: this.commentString.length });
+    // Auto-save to localStorage.
+    saveSpeakDraftToStorage(this.commentString);
   }
   /**
    * Handle a keydown event of comment input.
@@ -496,6 +558,27 @@ export class SpeakForm extends React.PureComponent<
       willOpen: false,
     });
     onWillChange(will);
+  }
+  /**
+   * Handle a click of note button.
+   */
+  @bind
+  protected handleNoteClick(): void {
+    this.props.onUpdate({
+      noteOpen: !this.props.noteOpen,
+    });
+  }
+  /**
+   * Handle a change to the note.
+   */
+  @bind
+  protected handleNoteChange(note: string): void {
+    const { onUpdate, onNoteChange } = this.props;
+    // close note form.
+    onUpdate({
+      noteOpen: false,
+    });
+    onNoteChange(note);
   }
   /**
    * Handle an update of log visibility.
