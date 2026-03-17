@@ -4093,6 +4093,12 @@ class MumouDiviner extends Player
         unless game.rule.divineresult=="immediate"
             @dodivine game
         @divineeffect game
+        # 对自己施加无法被守护
+        newpl = Player.factory null, game, @, null, NoGuarded
+        @transProfile newpl
+        newpl.cmplFlag = @id
+        @transform game, newpl, true
+
     #占った影響を与える
     divineeffect:(game)->
         p=game.getPlayer game.skillTargetHook.get @target
@@ -4127,11 +4133,6 @@ class MumouDiviner extends Player
             to:@id
             comment:r.result
         splashlog game.id,game,log
-    sunsetAlways:(game)->
-        pl = game.getPlayer @id
-        newpl=Player.factory null, game, pl,null,NoGuarded # 毎日護衛無効（仮仕様）
-        pl.transProfile newpl
-        pl.transform game,newpl,true
 
 class SuperDiviner extends Diviner
     type:"SuperDiviner"
