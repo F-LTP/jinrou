@@ -7,6 +7,7 @@ import { phone, notPhone } from '../../../common/media';
 import { Theme } from '../../../theme';
 import { FixedSizeLogRow } from './elements';
 import { CommentContent } from './comment';
+import { StoredLog } from './log-store';
 import { useState, useRef, useCallback } from 'react';
 
 /**
@@ -16,28 +17,31 @@ function useDoubleClick(callback: () => void, delay = 300) {
   const [lastClickTime, setLastClickTime] = useState(0);
   const clickTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  return useCallback(() => {
-    const now = Date.now();
-    const timeDiff = now - lastClickTime;
+  return useCallback(
+    () => {
+      const now = Date.now();
+      const timeDiff = now - lastClickTime;
 
-    if (timeDiff < delay && timeDiff > 0) {
-      callback();
-      setLastClickTime(0);
-      if (clickTimeoutRef.current) {
-        clearTimeout(clickTimeoutRef.current);
-        clickTimeoutRef.current = null;
-      }
-    } else {
-      setLastClickTime(now);
-      if (clickTimeoutRef.current) {
-        clearTimeout(clickTimeoutRef.current);
-      }
-      clickTimeoutRef.current = setTimeout(() => {
+      if (timeDiff < delay && timeDiff > 0) {
+        callback();
         setLastClickTime(0);
-        clickTimeoutRef.current = null;
-      }, delay);
-    }
-  }, [callback, delay, lastClickTime]);
+        if (clickTimeoutRef.current) {
+          clearTimeout(clickTimeoutRef.current);
+          clickTimeoutRef.current = null;
+        }
+      } else {
+        setLastClickTime(now);
+        if (clickTimeoutRef.current) {
+          clearTimeout(clickTimeoutRef.current);
+        }
+        clickTimeoutRef.current = setTimeout(() => {
+          setLastClickTime(0);
+          clickTimeoutRef.current = null;
+        }, delay);
+      }
+    },
+    [callback, delay, lastClickTime],
+  );
 }
 
 export interface IPropOneLog {
@@ -70,7 +74,7 @@ export interface IPropOneLog {
   /**
    * Function to resolve log by shortId for reply reference.
    */
-  resolveLogById?: (shortId: string) => string | null;
+  resolveLogById?: (shortId: string) => StoredLog | null;
   /**
    * Callback for shortId click.
    */
@@ -239,12 +243,12 @@ class OneLogInner extends React.PureComponent<IPropOneLog, {}> {
         log.mode === 'nextturn' || !log.name
           ? null
           : log.mode === 'monologue' || log.mode === 'heavenmonologue'
-          ? t('log.monologue', { name: log.name }) + ':'
-          : log.mode === 'will'
-          ? t('log.will', { name: log.name }) + ':'
-          : log.mode === 'streaming'
-          ? t('log.streaming', { name: log.name }) + ':'
-          : log.name + ':';
+            ? t('log.monologue', { name: log.name }) + ':'
+            : log.mode === 'will'
+              ? t('log.will', { name: log.name }) + ':'
+              : log.mode === 'streaming'
+                ? t('log.streaming', { name: log.name }) + ':'
+                : log.name + ':';
       // Auto-link URLs and room numbers in it.
       const noName = icon == null && !nameText;
       const props = {
@@ -653,8 +657,7 @@ const Name = styled(NameInner)<IPropName>`
   ${({ size }) =>
     size === 'big' || size === 'small'
       ? 'line-height: 1.2;'
-      : 'line-height: 1.27;'}
-  ${phone<IPropLogPart>`
+      : 'line-height: 1.27;'} ${phone<IPropLogPart>`
     ${({ noName }) => (noName ? 'display: none;' : '')}
     max-width: none;
     text-align: left;
@@ -687,8 +690,8 @@ const getFontSize = (size: 'big' | 'small' | undefined) =>
   size === 'big'
     ? 'calc(1.07 * var(--base-font-size))'
     : size === 'small'
-    ? 'calc(1.25 * var(--base-font-size))'
-    : 'var(--base-font-size)';
+      ? 'calc(1.25 * var(--base-font-size))'
+      : 'var(--base-font-size)';
 
 /**
  * Log comment box.
@@ -701,8 +704,8 @@ const Comment = styled(Main)<IPropComment>`
     size === 'big'
       ? 'font-weight: bold; line-height: 1.2;'
       : size === 'small'
-      ? 'text-decoration: underline; font-weight: bold; line-height: 1.2;'
-      : 'line-height: 1.27'};
+        ? 'text-decoration: underline; font-weight: bold; line-height: 1.2;'
+        : 'line-height: 1.27'};
 `;
 
 /**

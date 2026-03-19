@@ -10,11 +10,12 @@ import {
 import { createPortal } from 'react-dom';
 import autolink, { compile } from 'my-autolink';
 import React from 'react';
+import { StoredLog } from './log-store';
 
 export interface IPropCommentContent {
   comment: string;
   supplement?: LogSupplement[];
-  resolveLogById?: (shortId: string) => string | null;
+  resolveLogById?: (shortId: string) => StoredLog | null;
 }
 
 const GAP = 12;
@@ -42,114 +43,126 @@ export const LogReferenceTooltip = React.memo<{
   const closeThisTooltip = () => setVisible(false);
 
   /** 用真实高度修正 Y */
-  useLayoutEffect(() => {
-    if (!visible || !tooltipRef.current) return;
+  useLayoutEffect(
+    () => {
+      if (!visible || !tooltipRef.current) return;
 
-    const el = tooltipRef.current;
-    const rect = el.getBoundingClientRect();
+      const el = tooltipRef.current;
+      const rect = el.getBoundingClientRect();
 
-    const vw = window.innerWidth;
-    const vh = window.innerHeight;
-    const gap = 12;
-    const safe = 8; // 安全边距
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      const gap = 12;
+      const safe = 8; // 安全边距
 
-    let top = 0;
-    let left = 0;
+      let top = 0;
+      let left = 0;
 
-    // =========================
-    // ① 先决定上下
-    // =========================
-    const spaceAbove = pos.y;
-    const spaceBelow = vh - pos.y;
+      // =========================
+      // ① 先决定上下
+      // =========================
+      const spaceAbove = pos.y;
+      const spaceBelow = vh - pos.y;
 
-    if (spaceAbove >= rect.height + gap) {
-      // 优先上
-      top = pos.y - rect.height - gap;
-    } else if (spaceBelow >= rect.height + gap) {
-      // 不够就下
-      top = pos.y + gap;
-    } else {
-      // 两边都不够 → 选空间大的那边
-      top = spaceAbove > spaceBelow ? safe : vh - rect.height - safe;
-    }
+      if (spaceAbove >= rect.height + gap) {
+        // 优先上
+        top = pos.y - rect.height - gap;
+      } else if (spaceBelow >= rect.height + gap) {
+        // 不够就下
+        top = pos.y + gap;
+      } else {
+        // 两边都不够 → 选空间大的那边
+        top = spaceAbove > spaceBelow ? safe : vh - rect.height - safe;
+      }
 
-    // =========================
-    // ② 决定左右展开方向
-    // =========================
-    const spaceLeft = pos.x;
-    const spaceRight = vw - pos.x;
+      // =========================
+      // ② 决定左右展开方向
+      // =========================
+      const spaceLeft = pos.x;
+      const spaceRight = vw - pos.x;
 
-    if (spaceRight >= rect.width / 2 && spaceLeft >= rect.width / 2) {
-      // 居中
-      left = pos.x - rect.width / 2;
-    } else if (spaceRight >= rect.width) {
-      // 向右展开
-      left = pos.x + gap;
-    } else if (spaceLeft >= rect.width) {
-      // 向左展开
-      left = pos.x - rect.width - gap;
-    } else {
-      // 哪边空间大靠哪边
-      left = spaceRight > spaceLeft ? safe : vw - rect.width - safe;
-    }
+      if (spaceRight >= rect.width / 2 && spaceLeft >= rect.width / 2) {
+        // 居中
+        left = pos.x - rect.width / 2;
+      } else if (spaceRight >= rect.width) {
+        // 向右展开
+        left = pos.x + gap;
+      } else if (spaceLeft >= rect.width) {
+        // 向左展开
+        left = pos.x - rect.width - gap;
+      } else {
+        // 哪边空间大靠哪边
+        left = spaceRight > spaceLeft ? safe : vw - rect.width - safe;
+      }
 
-    // =========================
-    // ③ 最终兜底防出屏
-    // =========================
-    left = Math.min(Math.max(left, safe), vw - rect.width - safe);
-    top = Math.min(Math.max(top, safe), vh - rect.height - safe);
+      // =========================
+      // ③ 最终兜底防出屏
+      // =========================
+      left = Math.min(Math.max(left, safe), vw - rect.width - safe);
+      top = Math.min(Math.max(top, safe), vh - rect.height - safe);
 
-    el.style.left = `${left}px`;
-    el.style.top = `${top}px`;
-  }, [visible, pos.x, pos.y]);
+      el.style.left = `${left}px`;
+      el.style.top = `${top}px`;
+    },
+    [visible, pos.x, pos.y],
+  );
 
   /** 全局点击关闭tooltip */
-  useEffect(() => {
-    if (!visible) return;
+  useEffect(
+    () => {
+      if (!visible) return;
 
-    const handleClick = (e: Event) => {
-      // 检查点击目标是否是 tooltip 或其内部元素
-      if (tooltipRef.current && tooltipRef.current.contains(e.target as Node)) {
-        return;
-      }
-      // 检查点击目标是否是触发元素（>>xxx）或其内部
-      const target = e.target as HTMLElement;
-      if (target && target.closest('[data-tooltip-trigger]')) {
-        return;
-      }
-      setVisible(false);
-    };
+      const handleClick = (e: Event) => {
+        // 检查点击目标是否是 tooltip 或其内部元素
+        if (
+          tooltipRef.current &&
+          tooltipRef.current.contains(e.target as Node)
+        ) {
+          return;
+        }
+        // 检查点击目标是否是触发元素（>>xxx）或其内部
+        const target = e.target as HTMLElement;
+        if (target && target.closest('[data-tooltip-trigger]')) {
+          return;
+        }
+        setVisible(false);
+      };
 
-    document.addEventListener('click', handleClick);
+      document.addEventListener('click', handleClick);
 
-    return () => {
-      document.removeEventListener('click', handleClick);
-    };
-  }, [visible]);
+      return () => {
+        document.removeEventListener('click', handleClick);
+      };
+    },
+    [visible],
+  );
 
   /** 管理 tooltip 互斥显示 */
-  useEffect(() => {
-    if (!visible) {
-      // 当隐藏时，如果这是当前注册的 tooltip，清除注册
-      if (currentTooltipClose && currentTooltipClose === closeThisTooltip) {
-        currentTooltipClose = null;
+  useEffect(
+    () => {
+      if (!visible) {
+        // 当隐藏时，如果这是当前注册的 tooltip，清除注册
+        if (currentTooltipClose && currentTooltipClose === closeThisTooltip) {
+          currentTooltipClose = null;
+        }
+        return;
       }
-      return;
-    }
 
-    // 显示时，先关闭其他 tooltip，然后注册自己
-    if (currentTooltipClose && currentTooltipClose !== closeThisTooltip) {
-      currentTooltipClose();
-    }
-    currentTooltipClose = closeThisTooltip;
-
-    return () => {
-      // 清理时移除注册
-      if (currentTooltipClose === closeThisTooltip) {
-        currentTooltipClose = null;
+      // 显示时，先关闭其他 tooltip，然后注册自己
+      if (currentTooltipClose && currentTooltipClose !== closeThisTooltip) {
+        currentTooltipClose();
       }
-    };
-  }, [visible]);
+      currentTooltipClose = closeThisTooltip;
+
+      return () => {
+        // 清理时移除注册
+        if (currentTooltipClose === closeThisTooltip) {
+          currentTooltipClose = null;
+        }
+      };
+    },
+    [visible],
+  );
 
   /** 点击切换显示 */
   const onClick = (e: React.MouseEvent | React.TouchEvent) => {
@@ -256,116 +269,116 @@ const autolinkSetting = compile(
   },
 );
 
-export const CommentContent: React.FunctionComponent<IPropCommentContent> = memo(
-  ({ comment, supplement, resolveLogById }) => {
-    // 检查是否包含特殊命令（骰子或引用）
-    const hasSpecialCommand = /!(\d+)[dD](\d+)|>>\s*\d+/.test(comment);
+export const CommentContent: React.FunctionComponent<
+  IPropCommentContent
+> = memo(({ comment, supplement, resolveLogById }) => {
+  // 检查是否包含特殊命令（骰子或引用）
+  const hasSpecialCommand = /!(\d+)[dD](\d+)|>>\s*\d+/.test(comment);
 
-    if (!hasSpecialCommand) {
-      return (
-        <span
-          dangerouslySetInnerHTML={{
-            __html: autolink(comment, autolinkSetting),
-          }}
-        />
-      );
-    }
-
-    // perform calculation of special commands.
-    const commandr = /!(\d+)[dD](\d+)|>>\s*(\d+)/g;
-    const nodes: React.ReactNode[] = [];
-    let currentIndex = 0;
-    let supplementIndex = 0;
-    let res;
-    while ((res = commandr.exec(comment))) {
-      // 1. 把普通文本补进去
-      if (res.index > currentIndex) {
-        nodes.push(comment.slice(currentIndex, res.index));
-      }
-      currentIndex = commandr.lastIndex;
-
-      // ======================
-      // 2. 处理骰子 !XdY
-      // ======================
-      if (res[1] != null) {
-        if (!supplement) {
-          nodes.push(res[0]);
-          continue;
-        }
-        const sup = supplement[supplementIndex++];
-
-        if (sup == null || sup.type !== 'dice') {
-          nodes.push(res[0]);
-          continue;
-        }
-
-        const { result } = sup;
-        if (!result || result.length === 0) {
-          nodes.push(res[0]);
-          continue;
-        }
-
-        // dice result
-        if (result.length === 1) {
-          nodes.push(
-            <b key={`dice-${res.index}`}>
-              【{res[1]}D{res[2]}={result[0]}】
-            </b>,
-          );
-        } else {
-          const sum = result.reduce((a, b) => a + b, 0);
-          nodes.push(
-            <b key={`dice-${res.index}`}>
-              【{res[1]}D{res[2]}={sum}({result.join('+')})】
-            </b>,
-          );
-        }
-        continue;
-      }
-
-      // ======================
-      // 3. 处理 >>y 引用
-      // ======================
-      if (res[3] != null) {
-        const shortId = res[3]; // 不再需要补齐，直接使用原始数字
-        let msg = null;
-        let playerName = undefined;
-
-        if (resolveLogById) {
-          const original = resolveLogById(shortId);
-          if (original != null) {
-            const logobj = JSON.parse(original);
-            if (logobj != null) {
-              playerName = logobj.name;
-              msg =
-                logobj.name != null && logobj.comment != null
-                  ? `${logobj.name}：\n${logobj.comment}`
-                  : logobj.comment != null
-                  ? logobj.comment
-                  : null;
-            }
-          }
-        }
-
-        nodes.push(
-          <LogReferenceTooltip
-            key={`ref-${res.index}`}
-            shortId={shortId}
-            msg={msg}
-            playerName={playerName}
-          />,
-        );
-        continue;
-      }
-    }
-
-    if (currentIndex < comment.length) {
-      nodes.push(comment.slice(currentIndex));
-    }
-
+  if (!hasSpecialCommand) {
     return (
-      <>
-        {nodes.map((node, i) =>
+      <span
+        dangerouslySetInnerHTML={{
+          __html: autolink(comment, autolinkSetting),
+        }}
+      />
+    );
+  }
+
+  // perform calculation of special commands.
+  const commandr = /!(\d+)[dD](\d+)|>>\s*(\d+)/g;
+  const nodes: React.ReactNode[] = [];
+  let currentIndex = 0;
+  let supplementIndex = 0;
+  let res;
+  while ((res = commandr.exec(comment))) {
+    // 1. 把普通文本补进去
+    if (res.index > currentIndex) {
+      nodes.push(comment.slice(currentIndex, res.index));
+    }
+    currentIndex = commandr.lastIndex;
+
+    // ======================
+    // 2. 处理骰子 !XdY
+    // ======================
+    if (res[1] != null) {
+      if (!supplement) {
+        nodes.push(res[0]);
+        continue;
+      }
+      const sup = supplement[supplementIndex++];
+
+      if (sup == null || sup.type !== 'dice') {
+        nodes.push(res[0]);
+        continue;
+      }
+
+      const { result } = sup;
+      if (!result || result.length === 0) {
+        nodes.push(res[0]);
+        continue;
+      }
+
+      // dice result
+      if (result.length === 1) {
+        nodes.push(
+          <b key={`dice-${res.index}`}>
+            【{res[1]}D{res[2]}={result[0]}】
+          </b>,
+        );
+      } else {
+        const sum = result.reduce((a, b) => a + b, 0);
+        nodes.push(
+          <b key={`dice-${res.index}`}>
+            【{res[1]}D{res[2]}={sum}({result.join('+')}
+            )】
+          </b>,
+        );
+      }
+      continue;
+    }
+
+    // ======================
+    // 3. 处理 >>y 引用
+    // ======================
+    if (res[3] != null) {
+      const shortId = res[3]; // 不再需要补齐，直接使用原始数字
+      let msg = null;
+      let playerName = undefined;
+
+      if (resolveLogById) {
+        const logobj = resolveLogById(shortId);
+        if (logobj != null) {
+          playerName = logobj.name;
+          msg =
+            logobj.name != null && logobj.comment != null
+              ? `${logobj.name}：\n${logobj.comment}`
+              : logobj.comment != null
+                ? logobj.comment
+                : null;
+        }
+      }
+
+      nodes.push(
+        <LogReferenceTooltip
+          key={`ref-${res.index}`}
+          shortId={shortId}
+          msg={msg}
+          playerName={playerName}
+        />,
+      );
+      continue;
+    }
+  }
+
+  if (currentIndex < comment.length) {
+    nodes.push(comment.slice(currentIndex));
+  }
+
+  return (
+    <>
+      {nodes.map(
+        (node, i) =>
           typeof node === 'string' ? (
             <Fragment key={i}>
               <span
@@ -377,8 +390,7 @@ export const CommentContent: React.FunctionComponent<IPropCommentContent> = memo
           ) : (
             <Fragment key={i}>{node}</Fragment>
           ),
-        )}
-      </>
-    );
-  },
-);
+      )}
+    </>
+  );
+});

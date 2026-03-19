@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { observer, Observer } from 'mobx-react';
+import { observer } from 'mobx-react';
 import { Log, LogVisibility, maxLogsInGrid } from '../defs';
 import { Rule } from '../../../defs';
 
@@ -79,10 +79,10 @@ export class Logs extends React.Component<IPropLogs, IStateLogs> {
   /**
    * Resolve log by shortId for reply reference.
    * This is a performance-optimized lookup using the shortId index.
+   * Returns the StoredLog object directly to avoid JSON serialization overhead.
    */
-  private resolveLogById = (shortId: string): string | null => {
-    const log = this.props.logs.findByShortId(shortId);
-    return log ? JSON.stringify(log) : null;
+  private resolveLogById = (shortId: string): StoredLog | null => {
+    return this.props.logs.findByShortId(shortId);
   };
 
   public render() {
@@ -189,7 +189,7 @@ class LogChunk extends React.Component<
     /**
      * Function to resolve log by shortId for reply reference.
      */
-    resolveLogById?: (shortId: string) => string | null;
+    resolveLogById?: (shortId: string) => StoredLog | null;
     /**
      * Callback for shortId click.
      */
@@ -216,32 +216,28 @@ class LogChunk extends React.Component<
       renderedNumber >= logs.length
         ? logs
         : renderedNumber > 0
-        ? logs.slice(-renderedNumber)
-        : [];
+          ? logs.slice(-renderedNumber)
+          : [];
 
     const chunkContent = (
       <I18n namespace="game_client">
-        {t => (
-          <Observer>
-            {() =>
-              mapReverse(logsToRender, log => {
-                return (
-                  <OneLog
-                    key={`${log.time}-${(log as any).comment || ''}`}
-                    t={t}
-                    logClass={logClass}
-                    fixedSize={fixedSize}
-                    log={log}
-                    rule={rule}
-                    icons={icons}
-                    resolveLogById={resolveLogById}
-                    onShortIdClick={onShortIdClick}
-                  />
-                );
-              })
-            }
-          </Observer>
-        )}
+        {t =>
+          mapReverse(logsToRender, log => {
+            return (
+              <OneLog
+                key={log.logid}
+                t={t}
+                logClass={logClass}
+                fixedSize={fixedSize}
+                log={log}
+                rule={rule}
+                icons={icons}
+                resolveLogById={resolveLogById}
+                onShortIdClick={onShortIdClick}
+              />
+            );
+          })
+        }
       </I18n>
     );
     if (fixedSize) {
