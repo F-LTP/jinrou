@@ -7,6 +7,19 @@ exports.start=(userid)->
         $("#uname").text user.name
         $("#userid").text userid
         $("#usercomment").text user.comment
+
+        # レベル情報を表示
+        if obj.levelInfo?
+            levelInfo = obj.levelInfo
+            expText = if levelInfo.nextLevelExp?
+                "#{levelInfo.exp - levelInfo.currentLevelExp} / #{levelInfo.nextLevelExp - levelInfo.currentLevelExp}"
+            else
+                "MAX"
+            $("#userlevel").html """
+                <p>等级：<b>#{levelInfo.level}</b></p>
+                <p>经验值：#{expText} (总计: #{levelInfo.exp})</p>
+            """
+
         # 战绩
         usersummary = obj.usersummary
         if usersummary?

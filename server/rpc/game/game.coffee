@@ -11,6 +11,7 @@ libi18n      = require '../../libs/i18n.coffee'
 libgame      = require '../../libs/game.coffee'
 libcasting   = require '../../libs/casting.coffee'
 libtime      = require '../../libs/time.coffee'
+libexp       = require '../../libs/exp.coffee'
 libspeak     = require '../../libs/speak.coffee'
 
 cron=require 'cron'
@@ -2708,6 +2709,7 @@ class Game
             @save()
             @saveUserRawLogs()
             @prize_check()
+            @exp_reward()
 
             # generate the list of Sudden Dead Player
             norevivers=@gamelogs.filter((x)->x.event=="found" && x.flag in ["gone-day","gone-night"]).map((x)->x.id)
@@ -2988,6 +2990,33 @@ class Game
                         mode:"system"
                         comment:@i18n.t "system.prize", {name: pl.name, prize: pnames.join ''}
                     splashlog @id,this,log
+    # 経験値報酬
+    exp_reward:->
+        for pl in @players
+            continue if pl.realid == "替身君"
+            continue if pl.originalType in ["Watching"]
+
+            # 経験値を計算
+            expEarned = libexp.calculateGameExp(pl, this)
+            console.log "[EXP] #{pl.realid} earned #{expEarned} EXP"
+
+            # ユーザーの経験値を更新
+            do (pl) =>
+                libexp.addUserExp pl.realid, expEarned, (err, result) =>
+                    return if err?
+
+                    console.log "[EXP] #{pl.realid} result:", result
+                    # レベルアップした場合はシステムメッセージ
+                    if result.levelUp
+                        console.log "[EXP] #{pl.realid} LEVEL UP! #{result.oldLevel} -> #{result.newLevel}"
+                        # 直接使用 pl 对象，而不是通过 getPlayerReal 查找
+                        log =
+                            mode: "system"
+                            comment: @i18n.t "system.levelUp", {
+                                name: pl.name
+                                level: result.newLevel
+                            }
+                        splashlog @id, this, log
     # ユーザーのゲームログを保存
     saveUserRawLogs:->
         libuserlogs.addGameLogs this, (err)->

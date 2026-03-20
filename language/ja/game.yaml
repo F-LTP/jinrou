@@ -233,6 +233,7 @@ system:
   judge: '【{{short}}】{{result}}'
   # A user got prizes
   prize: '{{name}} 获得了称号{{prize}}。'
+  levelUp: '{{name}} 升到了 {{level}} 级！'
 
 # User-shown name of phases
 phase:

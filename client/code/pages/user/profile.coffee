@@ -119,5 +119,13 @@ exports.start=(user)->
             # みたのでお知らせを除去
             $("#newNewsNotice").remove()
 
+    # レベル情報を取得
+    ss.rpc "user.getUserLevelInfo",(result)->
+        if result?.error?
+            console.error result.error
+            return
+        pappReady.then ()->
+            mypage_view.store.gotLevelInfo result
+
 exports.end=->
     mypage_view?.unmount()

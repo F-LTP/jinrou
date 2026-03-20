@@ -10,6 +10,31 @@ import { SubActiveButton } from '../../../common/forms/button';
 import { IconEdit } from './edit-icon';
 import { showPromptDialog } from '../../../dialog';
 import { ProfileSaveQuery } from '../defs';
+import styled from '../../../util/styled';
+
+const LevelDisplay = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  font-size: 0.9em;
+  color: #666;
+  margin: 0.5em 0;
+
+  .level-label {
+    font-weight: normal;
+  }
+
+  .level-value {
+    font-weight: bold;
+    color: #ffd700;
+    font-size: 1.1em;
+  }
+
+  .exp-text {
+    font-size: 0.85em;
+    margin-left: auto;
+  }
+`;
 
 export const Profile: React.FunctionComponent<{
   store: Store;
@@ -102,10 +127,24 @@ export const Profile: React.FunctionComponent<{
             mail.new
               ? t('profile.mailAddressChanging')
               : mail.address && !mail.verified
-                ? t('profile.mailAddressNotVerified')
-                : undefined
+              ? t('profile.mailAddressNotVerified')
+              : undefined
           }
         />
+        {store.levelInfo ? (
+          <LevelDisplay>
+            <FontAwesomeIcon icon="star" />
+            <span className="level-label">{t('level.title') || '等级'}:</span>
+            <span className="level-value">{store.levelInfo.level}</span>
+            <span className="exp-text">
+              {store.levelInfo.nextLevelExp
+                ? `${store.levelInfo.exp -
+                    store.levelInfo.currentLevelExp} / ${store.levelInfo
+                    .nextLevelExp - store.levelInfo.currentLevelExp} EXP`
+                : 'MAX LEVEL'}
+            </span>
+          </LevelDisplay>
+        ) : null}
         <IconEdit icon={icon} setIcon={setIcon} setEditing={setEditing} />
         {editing ? (
           <SaveButtonArea>
