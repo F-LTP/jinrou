@@ -606,6 +606,49 @@ super1=(number)->
         ret.Poisoner=1 #猫
     ret
 
+mumou1=(number)->
+    ret={}
+    #狼
+    ret.Werewolf=1
+    if number>=8
+        ret.Werewolf++
+        if number>=16
+            ret.Werewolf++
+            if number>=18
+                ret.Werewolf++
+                if number>=20
+                    ret.Werewolf++
+                    if number>=23
+                        ret.Werewolf++
+                        if number>=27
+                            ret.Werewolf++
+                            if number>=29
+                                ret.Werewolf++
+    ret.Diviner=1 #占い
+    ret.MumouDiviner=1
+    if number>=23
+        ret.Diviner++
+    if number>=8
+        ret.Psychic=1 #灵能
+        if number>=23
+            ret.Psychic++
+    if number>=6
+        ret.Fanatic=1 #狂信者
+        ret.Guard=1 #猎人
+        if number>=14
+            if number%2!=0
+                ret.Fanatic--
+                ret.HearMadman=1
+    if number>=21
+        ret.Couple=2 #共有
+        if number>=25
+            ret.Couple++
+    if number>=12
+        ret.Fox=2 #狐
+    if number>=18
+        ret.Poisoner=1 #猫
+    ret
+
 fanni1=(number)->
     ret={}
     #狼
@@ -776,11 +819,17 @@ exports.jobrules=[
         rule:(number)->
           ret=cosplayer number
           ret
-      }
+      },
       {
         name:"魔女反逆者"
         rule:(number)->
           ret=fanni1 number
+          ret
+      },
+      {
+        name:"无谋占卜师"
+        rule:(number)->
+          ret=mumou1 number
           ret
       }
     ]
@@ -2371,3 +2420,8 @@ isAllJobsMode=(rule)->
        # 役職が隠されている場合もtrue
        return true
    return false
+
+# Export normal1, normal2, normal3 for server-side use
+exports.normal1 = normal1
+exports.normal2 = normal2
+exports.normal3 = normal3
