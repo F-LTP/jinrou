@@ -15,7 +15,6 @@ url=require 'url'
 libblacklist = require '../libs/blacklist.coffee'
 libuserlogs  = require '../libs/userlogs.coffee'
 libi18n      = require '../libs/i18n.coffee'
-libexp       = require '../libs/exp.coffee'
 
 i18n = libi18n.getWithDefaultNS 'user'
 
@@ -199,21 +198,10 @@ exports.actions =(req,res,ss)->
                 else
                     null
 
-                # レベル情報を計算
-                exp = record.exp || 0
-                level = libexp.getLevel(exp)
-                levelProgress = libexp.getExpProgress(exp)
-
                 res {
                     user: record
                     userlog: userlog
                     usersummary: usersummary
-                    levelInfo:
-                        level: level
-                        exp: exp
-                        currentLevelExp: levelProgress.currentLevelExp
-                        nextLevelExp: levelProgress.nextLevelExp
-                        progress: levelProgress.progress
                 }
     myProfile: ->
         unless req.session.userId
@@ -558,16 +546,6 @@ exports.actions =(req,res,ss)->
                     return
                 res {value: value}
 
-    # 获取等级信息
-    getUserLevelInfo: ->
-        unless req.session.userId
-            res {error: i18n.t "common:error.needLogin"}
-            return
-        libexp.getUserLevelInfo req.session.userId, (err, levelInfo) ->
-            if err?
-                res {error: String err}
-                return
-            res levelInfo
 
     # 私をBANしてください!!!!!!!!
     requestban:(banid)->
@@ -605,7 +583,6 @@ makeuserdata=(query)->
                 # [{type:"prize",value:(prizeid)},{type:"conjunction",value:"が"},...]
         data_open_recent: false # 最近の战绩を公開するかどうか
         data_open_all: false # 全期間の战绩を公開するかどうか
-        exp: 0 # 経験値
     }
 
 # profileに表示する用のユーザーデータをdocから作る
@@ -676,7 +653,6 @@ getUserOpenData = (userid, cb)->
                 comment: true
                 data_open_all: true
                 data_open_recent: true
-                exp: true
             }
         }, cb
 

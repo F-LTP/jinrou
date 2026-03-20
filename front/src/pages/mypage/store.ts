@@ -1,5 +1,5 @@
 import { observable, action } from 'mobx';
-import { UserProfile, NewsEntry, BanInfo, PrizeInfo, LevelInfo } from './defs';
+import { UserProfile, NewsEntry, BanInfo, PrizeInfo } from './defs';
 
 interface StoreInit {
   profile: UserProfile;
@@ -27,9 +27,6 @@ export class Store {
   @observable
   public prize: PrizeInfo;
 
-  @observable
-  public levelInfo?: LevelInfo;
-
   constructor(init: StoreInit) {
     this.profile = init.profile;
     this.mailConfirmSecurity = init.mailConfirmSecurity;
@@ -41,10 +38,5 @@ export class Store {
   public gotNews(entries: NewsEntry[]) {
     this.newsIsLoading = false;
     this.newsEntries = entries;
-  }
-
-  @action
-  public gotLevelInfo(levelInfo: LevelInfo) {
-    this.levelInfo = levelInfo;
   }
 }

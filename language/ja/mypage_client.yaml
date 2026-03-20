@@ -58,12 +58,6 @@ ban:
   periodLessThanMinute: '尚余不足1分钟'
   notice: '如果在受限时长结束后，限制仍未解除的，请尝试刷新页面。'
 
-# level section
-level:
-  title: '等级'
-  currentLevel: '当前等级'
-  totalExp: '总经验值'
-
 # links section
 links:
   rooms:

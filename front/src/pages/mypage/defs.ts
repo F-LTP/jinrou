@@ -17,21 +17,7 @@ export interface UserProfile {
      */
     address: string;
   };
-  exp?: number;
 }
-
-/**
- * Level information for user
- */
-export type LevelInfo = {
-  userid: string;
-  name: string;
-  exp: number;
-  level: number;
-  currentLevelExp: number;
-  nextLevelExp: number | null;
-  progress: number;
-};
 
 export type NewsEntry = {
   time: number;
