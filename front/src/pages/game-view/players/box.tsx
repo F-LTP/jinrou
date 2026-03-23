@@ -47,14 +47,14 @@ export class PlayerBox extends React.Component<IPropPlayerBox, {}> {
           )}
         </Name>
         <ToolIcons>
-          <span onClick={this.handleFilterClick}>
-            <FontAwesomeIcon icon="search" />
-          </span>
           {onInsertName && (
             <span onClick={this.handleInsertNameClick}>
               <FontAwesomeIcon icon="plus" />
             </span>
           )}
+          <span onClick={this.handleFilterClick}>
+            <FontAwesomeIcon icon="search" />
+          </span>
         </ToolIcons>
         <Jobname>
           {flags.length > 0
@@ -133,14 +133,15 @@ const Name = styled.span<{ dead: boolean }>`
 const ToolIcons = styled.span`
   grid-column: 3;
   grid-row: 1;
-  visibility: hidden;
   cursor: pointer;
   margin: 0 0 0 0.3em;
   display: flex;
   gap: 0.3em;
+  opacity: 0.5;
+  transition: opacity 0.2s;
 
   ${Wrapper}:hover & {
-    visibility: visible;
+    opacity: 1;
   }
 
   ${phone`

@@ -38,7 +38,7 @@ export interface IPropLogs {
    */
   rule: Rule | undefined;
   /**
-   * Callback for resetting log pickup filter.
+   * Callback for resetting log pickup filter (triggered by double-click).
    */
   onResetLogPickup(): void;
   /**
@@ -49,6 +49,13 @@ export interface IPropLogs {
 
 export interface IStateLogs {
   renderingState: LogsRenderingState;
+  /**
+   * Double-click detection state for resetting log pickup.
+   */
+  doubleClickState: {
+    lastClickTime: number;
+    clickTimeout: NodeJS.Timeout | null;
+  };
 }
 
 /**
@@ -66,6 +73,10 @@ export class Logs extends React.Component<IPropLogs, IStateLogs> {
       // what if logs is updated?
       // (getDerivedStateFromProps)
       renderingState: new LogsRenderingState(this.props.logs),
+      doubleClickState: {
+        lastClickTime: 0,
+        clickTimeout: null,
+      },
     };
   }
   public componentDidUpdate(prevProps: IPropLogs) {
@@ -75,6 +86,10 @@ export class Logs extends React.Component<IPropLogs, IStateLogs> {
   }
   public componentWillUnmount() {
     this.state.renderingState.dispose();
+    // Clear timeout if exists
+    if (this.state.doubleClickState.clickTimeout) {
+      clearTimeout(this.state.doubleClickState.clickTimeout);
+    }
   }
 
   /**
@@ -84,6 +99,50 @@ export class Logs extends React.Component<IPropLogs, IStateLogs> {
    */
   private resolveLogById = (shortId: string): StoredLog | null => {
     return this.props.logs.findByShortId(shortId);
+  };
+
+  /**
+   * Handle click for double-click detection to reset log pickup.
+   * This is compatible with both desktop and mobile devices.
+   */
+  private handleLogWrapperClick = () => {
+    const now = Date.now();
+    const { lastClickTime, clickTimeout } = this.state.doubleClickState;
+    const timeDiff = now - lastClickTime;
+    const delay = 300;
+
+    if (timeDiff < delay && timeDiff > 0) {
+      // Double-click detected
+      this.props.onResetLogPickup();
+      this.setState({
+        doubleClickState: {
+          lastClickTime: 0,
+          clickTimeout: null,
+        },
+      });
+      if (clickTimeout) {
+        clearTimeout(clickTimeout);
+      }
+    } else {
+      // Potential single-click, wait for second click
+      if (clickTimeout) {
+        clearTimeout(clickTimeout);
+      }
+      const newTimeout = setTimeout(() => {
+        this.setState({
+          doubleClickState: {
+            lastClickTime: 0,
+            clickTimeout: null,
+          },
+        });
+      }, delay);
+      this.setState({
+        doubleClickState: {
+          lastClickTime: now,
+          clickTimeout: newTimeout,
+        },
+      });
+    }
   };
 
   public render() {
@@ -114,7 +173,7 @@ export class Logs extends React.Component<IPropLogs, IStateLogs> {
         logPickup={logPickup}
         logClass={this.logClass}
         fixedSize={fixedSize}
-        onClick={onResetLogPickup}
+        onClick={this.handleLogWrapperClick}
       >
         {mapReverse(logs.chunks, (chunk, i) => {
           // Decide whether this chunk should be shown.
