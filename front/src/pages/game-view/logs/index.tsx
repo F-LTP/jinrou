@@ -2,6 +2,7 @@ import * as React from 'react';
 import { observer } from 'mobx-react';
 import { Log, LogVisibility, maxLogsInGrid } from '../defs';
 import { Rule } from '../../../defs';
+import { TranslationFunction } from '../../../i18n';
 
 import { OneLog } from './log';
 import { StoredLog, LogStore } from './log-store';
@@ -135,6 +136,7 @@ export class Logs extends React.Component<IPropLogs, IStateLogs> {
               key={chunk.day}
               logClass={this.logClass}
               logs={chunk.logs}
+              version={chunk.version}
               renderedNumber={chunkRenderedLogs}
               visible={visible}
               fixedSize={fixedSize}
@@ -155,49 +157,133 @@ export class Logs extends React.Component<IPropLogs, IStateLogs> {
 
 /**
  * Show chunk of logs.
+ * Optimized with React.memo to prevent unnecessary re-renders.
  */
-class LogChunk extends React.Component<
-  {
-    /**
-     * Class attached to each log.
-     */
-    logClass: string;
-    /**
-     * Logs to render.
-     */
-    logs: StoredLog[];
-    /**
-     * Whether this chunk is visible.
-     */
-    visible: boolean;
-    /**
-     * Whether logs are rendered in fixed-size mode.
-     */
-    fixedSize: boolean;
-    /**
-     * Number of logs to render.
-     */
-    renderedNumber: number;
-    /**
-     * Icon of each user.
-     */
-    icons: Record<string, string | undefined>;
-    /**
-     * Current rule.
-     */
-    rule: Rule | undefined;
-    /**
-     * Function to resolve log by shortId for reply reference.
-     */
-    resolveLogById?: (shortId: string) => StoredLog | null;
-    /**
-     * Callback for shortId click.
-     */
-    onShortIdClick?: (shortId: string) => void;
+interface ILogChunkProps {
+  /**
+   * Class attached to each log.
+   */
+  logClass: string;
+  /**
+   * Logs to render.
+   */
+  logs: StoredLog[];
+  /**
+   * Version number that increments when logs are added.
+   * Used for efficient React.memo comparison.
+   */
+  version: number;
+  /**
+   * Whether this chunk is visible.
+   */
+  visible: boolean;
+  /**
+   * Whether logs are rendered in fixed-size mode.
+   */
+  fixedSize: boolean;
+  /**
+   * Number of logs to render.
+   */
+  renderedNumber: number;
+  /**
+   * Icon of each user.
+   */
+  icons: Record<string, string | undefined>;
+  /**
+   * Current rule.
+   */
+  rule: Rule | undefined;
+  /**
+   * Function to resolve log by shortId for reply reference.
+   */
+  resolveLogById?: (shortId: string) => StoredLog | null;
+  /**
+   * Callback for shortId click.
+   */
+  onShortIdClick?: (shortId: string) => void;
+}
+
+const LogChunkContent = React.memo<
+  Omit<ILogChunkProps, 'version'> & { t: TranslationFunction }
+>(
+  ({
+    t,
+    logClass,
+    logs,
+    visible,
+    fixedSize,
+    renderedNumber,
+    rule,
+    icons,
+    resolveLogById,
+    onShortIdClick,
+  }) => {
+    // Use useMemo to cache logsToRender calculation
+    const logsToRender = React.useMemo(() => {
+      if (renderedNumber >= logs.length) {
+        return logs;
+      }
+      if (renderedNumber > 0) {
+        return logs.slice(-renderedNumber);
+      }
+      return [];
+    }, [logs, renderedNumber]);
+
+    // Early return if not visible and not fixed size
+    if (!visible && !fixedSize) {
+      return null;
+    }
+
+    return (
+      <>
+        {mapReverse(logsToRender, log => {
+          return (
+            <OneLog
+              key={log.logid}
+              t={t}
+              logClass={logClass}
+              fixedSize={fixedSize}
+              log={log}
+              rule={rule}
+              icons={icons}
+              resolveLogById={resolveLogById}
+              onShortIdClick={onShortIdClick}
+            />
+          );
+        })}
+      </>
+    );
   },
-  {}
-> {
-  public render() {
+  (prevProps, nextProps) => {
+    // Custom comparison for better performance
+    // Check if logs length changed (new log added)
+    const logsChanged = prevProps.logs.length !== nextProps.logs.length;
+    if (logsChanged) {
+      return false; // Re-render when logs array length changes
+    }
+    // For other props, use shallow comparison
+    return (
+      prevProps.logClass === nextProps.logClass &&
+      prevProps.visible === nextProps.visible &&
+      prevProps.fixedSize === nextProps.fixedSize &&
+      prevProps.renderedNumber === nextProps.renderedNumber &&
+      prevProps.rule === nextProps.rule &&
+      prevProps.icons === nextProps.icons &&
+      prevProps.resolveLogById === nextProps.resolveLogById &&
+      prevProps.onShortIdClick === nextProps.onShortIdClick &&
+      prevProps.t === nextProps.t
+    );
+  },
+);
+
+LogChunkContent.displayName = 'LogChunkContent';
+
+/**
+ * LogChunk component with React.memo using version number for comparison.
+ * This avoids unnecessary re-renders when the chunk hasn't changed.
+ */
+const LogChunk = React.memo<ILogChunkProps>(
+  props => {
     const {
       logClass,
       logs,
@@ -208,46 +294,58 @@ class LogChunk extends React.Component<
       icons,
       resolveLogById,
       onShortIdClick,
-    } = this.props;
+    } = props;
+
+    // Early return if not visible and not fixed size
     if (!visible && !fixedSize) {
       return null;
     }
-    const logsToRender =
-      renderedNumber >= logs.length
-        ? logs
-        : renderedNumber > 0
-          ? logs.slice(-renderedNumber)
-          : [];
 
-    const chunkContent = (
+    const content = (
       <I18n namespace="game_client">
-        {t =>
-          mapReverse(logsToRender, log => {
-            return (
-              <OneLog
-                key={log.logid}
-                t={t}
-                logClass={logClass}
-                fixedSize={fixedSize}
-                log={log}
-                rule={rule}
-                icons={icons}
-                resolveLogById={resolveLogById}
-                onShortIdClick={onShortIdClick}
-              />
-            );
-          })
-        }
+        {t => (
+          <LogChunkContent
+            t={t}
+            logClass={logClass}
+            logs={logs}
+            visible={visible}
+            fixedSize={fixedSize}
+            renderedNumber={renderedNumber}
+            rule={rule}
+            icons={icons}
+            resolveLogById={resolveLogById}
+            onShortIdClick={onShortIdClick}
+          />
+        )}
       </I18n>
     );
+
     if (fixedSize) {
       return (
         <FixedSizeChunkWrapper visible={visible}>
-          {chunkContent}
+          {content}
         </FixedSizeChunkWrapper>
       );
     } else {
-      return chunkContent;
+      return content;
     }
-  }
-}
+  },
+  (prevProps, nextProps) => {
+    // Custom comparison using version number
+    // If version changed, re-render (return false)
+    // If version same AND other props same, skip re-render (return true)
+    return (
+      prevProps.version === nextProps.version &&
+      prevProps.logClass === nextProps.logClass &&
+      prevProps.visible === nextProps.visible &&
+      prevProps.fixedSize === nextProps.fixedSize &&
+      prevProps.renderedNumber === nextProps.renderedNumber &&
+      prevProps.rule === nextProps.rule &&
+      prevProps.icons === nextProps.icons &&
+      prevProps.resolveLogById === nextProps.resolveLogById &&
+      prevProps.onShortIdClick === nextProps.onShortIdClick
+    );
+  },
+);
+
+LogChunk.displayName = 'LogChunk';

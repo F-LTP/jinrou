@@ -21,6 +21,11 @@ export type StoredLog = Log & {
 export interface LogChunk {
   day: number;
   logs: StoredLog[];
+  /**
+   * Version number that increments when logs are added.
+   * Used for efficient React.memo comparison.
+   */
+  version: number;
 }
 
 /**
@@ -32,6 +37,7 @@ export class LogStore {
     {
       day: 1,
       logs: [],
+      version: 0,
     },
   ];
   /**
@@ -73,6 +79,7 @@ export class LogStore {
       this.chunks.push({
         day: this.currentDay,
         logs: [],
+        version: 0,
       });
     }
     // current chunk of logs.
@@ -86,6 +93,9 @@ export class LogStore {
       day: this.currentDay,
     };
     chunk.logs.push(stored);
+
+    // Increment version to trigger React.memo re-render
+    chunk.version++;
 
     // Add to shortId index for quick lookup
     if (stored.shortId) {
@@ -101,6 +111,7 @@ export class LogStore {
       {
         day: 1,
         logs: [],
+        version: 0,
       },
     ];
     this.shortIdIndex.clear();

@@ -380,4 +380,44 @@ export const CommentContent: React.FunctionComponent<IPropCommentContent> = memo
       </>
     );
   },
+  (prevProps, nextProps) => {
+    // Custom comparison for better performance
+    // Only re-render if comment or supplement actually changed
+    if (prevProps.comment !== nextProps.comment) {
+      return false;
+    }
+    // Deep compare supplement arrays
+    const prevSupplement = prevProps.supplement;
+    const nextSupplement = nextProps.supplement;
+    if (prevSupplement === nextSupplement) {
+      return true;
+    }
+    if (prevSupplement == null || nextSupplement == null) {
+      return false;
+    }
+    if (prevSupplement.length !== nextSupplement.length) {
+      return false;
+    }
+    for (let i = 0; i < prevSupplement.length; i++) {
+      const prev = prevSupplement[i];
+      const next = nextSupplement[i];
+      if ((prev && prev.type) !== (next && next.type)) {
+        return false;
+      }
+      const prevResult = prev && prev.result;
+      const nextResult = next && next.result;
+      const prevLength = prevResult ? prevResult.length : 0;
+      const nextLength = nextResult ? nextResult.length : 0;
+      if (prevLength !== nextLength) {
+        return false;
+      }
+      const prevStr = prevResult ? prevResult.join(',') : '';
+      const nextStr = nextResult ? nextResult.join(',') : '';
+      if (prevStr !== nextStr) {
+        return false;
+      }
+    }
+    // resolveLogById function reference is stable, so we don't need to compare it
+    return true;
+  },
 );
