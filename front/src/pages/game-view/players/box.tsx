@@ -47,11 +47,12 @@ export class PlayerBox extends React.Component<IPropPlayerBox, {}> {
           )}
         </Name>
         <ToolIcons>
-          {onInsertName && (
+          {/* Plus icon for name insertion - hidden but functional */}
+          {/* {onInsertName && (
             <span onClick={this.handleInsertNameClick}>
               <FontAwesomeIcon icon="plus" />
             </span>
-          )}
+          )} */}
           <span onClick={this.handleFilterClick}>
             <FontAwesomeIcon icon="search" />
           </span>

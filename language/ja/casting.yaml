@@ -90,3 +90,8 @@ castingGroupName:
     _name: "其他"
   特殊规则:
     _name: "特殊规则"
+
+# Quick input shortcuts for chat autocomplete.
+quickInput:
+  黑: "●"
+  白: "○"

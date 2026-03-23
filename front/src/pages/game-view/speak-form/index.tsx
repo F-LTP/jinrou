@@ -15,6 +15,7 @@ import { LogVisibilityControl } from './log-visibility';
 import { WillForm } from './will-form';
 import { NoteForm } from './note-form';
 import { makeMapByKey } from '../../../util/map-by-key';
+import { AutocompleteDropdown, AutocompleteItem } from './autocomplete';
 
 // Storage key for speak draft.
 const SPEAK_DRAFT_STORAGE_KEY = 'jinrou-speak-draft';
@@ -138,6 +139,17 @@ export interface IPropSpeakForm extends SpeakState {
 /**
  * Speaking controls.
  */
+interface AutocompleteState {
+  show: boolean;
+  position: { top: number; left: number };
+  searchTerm: string;
+  items: AutocompleteItem[];
+  triggerStart: number; // Position of the trigger character
+  triggerChar: string; // The trigger character that was used ("、" or "/")
+  shortcuts: AutocompleteItem[]; // Quick input shortcuts
+  selectedIndex: number; // Currently selected item index
+}
+
 export class SpeakForm extends React.PureComponent<
   IPropSpeakForm,
   {
@@ -150,13 +162,28 @@ export class SpeakForm extends React.PureComponent<
      * Current character count.
      */
     charCount: number;
+    /**
+     * Autocomplete state.
+     */
+    autocomplete: AutocompleteState;
   }
 > {
   state = {
     additionalControlsShown: false,
     charCount: 0,
+    autocomplete: {
+      show: false,
+      position: { top: 0, left: 0 },
+      searchTerm: '',
+      items: [],
+      triggerStart: 0,
+      triggerChar: '',
+      shortcuts: [],
+      selectedIndex: 0,
+    },
   };
   protected comment: HTMLInputElement | HTMLTextAreaElement | null = null;
+  protected shortcutsLoaded = false;
   /**
    * Temporally saved comment.
    */
@@ -209,211 +236,232 @@ export class SpeakForm extends React.PureComponent<
     const playersMap = makeMapByKey(players, 'id');
     return (
       <I18n>
-        {t => (
-          <IsPhone>
-            {isPhone => {
-              // whether additional controls are actually hidden.
-              const othersHidden = isPhone && !additionalControlsShown;
-              return (
-                <>
-                  <MainForm onSubmit={this.handleSubmit}>
-                    {/* Comment input form. */}
-                    <SpeakInputArea>
-                      {!speakAllowed ? (
-                        <SpeakInput
-                          key="nonallowed-speakinput"
-                          ref={e => (this.comment = e)}
-                          type="text"
-                          size={50}
-                          disabled
-                          value={t('game_client:speak.noWatchSpeak')}
-                        />
-                      ) : multiline ? (
-                        <InputWithCountWrapper>
-                          <SpeakTextArea
-                            key="allowed-speakinput-multiline"
-                            ref={e => (this.comment = e)}
-                            cols={50}
-                            rows={4}
-                            required
-                            autoComplete="off"
-                            defaultValue={this.commentString}
-                            onChange={this.handleCommentChange}
-                            onFocus={this.handleFocus}
-                            onBlur={this.handleBlur}
-                          />
-                          <CharCount hasContent={charCount > 0}>
-                            {charCount}
-                          </CharCount>
-                        </InputWithCountWrapper>
-                      ) : (
-                        <InputWithCountWrapper>
+        {t => {
+          // Load shortcuts on first render
+          this.loadShortcutsIfNeeded(t);
+          return (
+            <IsPhone>
+              {isPhone => {
+                // whether additional controls are actually hidden.
+                const othersHidden = isPhone && !additionalControlsShown;
+                return (
+                  <>
+                    <MainForm onSubmit={this.handleSubmit}>
+                      {/* Comment input form. */}
+                      <SpeakInputArea>
+                        {!speakAllowed ? (
                           <SpeakInput
-                            key="allowed-speakinput"
+                            key="nonallowed-speakinput"
                             ref={e => (this.comment = e)}
                             type="text"
                             size={50}
-                            required
-                            autoComplete="off"
-                            defaultValue={this.commentString}
-                            onChange={this.handleCommentChange}
-                            onKeyDown={this.handleKeyDownComment}
-                            onFocus={this.handleFocus}
-                            onBlur={this.handleBlur}
+                            disabled
+                            value={t('game_client:speak.noWatchSpeak')}
                           />
-                          <CharCount hasContent={charCount > 0}>
-                            {charCount}
-                          </CharCount>
-                        </InputWithCountWrapper>
-                      )}
-                    </SpeakInputArea>
-                    {/* Speak button. */}
-                    <SpeakButtonArea>
-                      <input
-                        type="submit"
-                        value={t('game_client:speak.say')}
-                        disabled={!speakAllowed || !nsecondSilent}
-                      />
-                    </SpeakButtonArea>
-                    {/* Speech-related controls. */}
-                    <SpeakControlsArea hidden={othersHidden}>
-                      {othersHidden ? (
-                        <SpeakControlsSlim>
-                          {t('game_client:speak.size.description')}:
-                          {t(`game_client:speak.size.${size}`)}
-                          {'　'}
-                          {speakKindLabel(t, playersMap, kind || speaks[0])}
-                        </SpeakControlsSlim>
-                      ) : (
-                        <>
-                          {/* Speak size select control. */}
-                          <LabeledControl
-                            label={t('game_client:speak.size.description')}
-                          >
-                            <select
-                              value={size}
-                              onChange={this.handleSizeChange}
-                            >
-                              <option value="small">
-                                {t('game_client:speak.size.small')}
-                              </option>
-                              <option value="normal">
-                                {t('game_client:speak.size.normal')}
-                              </option>
-                              <option value="big">
-                                {t('game_client:speak.size.big')}
-                              </option>
-                            </select>
-                          </LabeledControl>
-                          {/* Speech kind selection. */}
-                          <LabeledControl
-                            label={t('game_client:speak.kind.description')}
-                          >
-                            <SpeakKindSelect
-                              kinds={speaks}
-                              current={kind}
-                              t={t}
-                              playersMap={playersMap}
-                              onChange={this.handleKindChange}
+                        ) : multiline ? (
+                          <InputWithCountWrapper>
+                            <SpeakTextArea
+                              key="allowed-speakinput-multiline"
+                              ref={e => (this.comment = e)}
+                              cols={50}
+                              rows={4}
+                              required
+                              autoComplete="off"
+                              defaultValue={this.commentString}
+                              onChange={this.handleCommentChange}
+                              onKeyDown={this.handleKeyDownComment as any}
+                              onFocus={this.handleFocus}
+                              onBlur={this.handleBlur}
                             />
-                          </LabeledControl>
-                          {/* Multiline checkbox. */}
+                            <CharCount hasContent={charCount > 0}>
+                              {charCount}
+                            </CharCount>
+                          </InputWithCountWrapper>
+                        ) : (
+                          <InputWithCountWrapper>
+                            <SpeakInput
+                              key="allowed-speakinput"
+                              ref={e => (this.comment = e)}
+                              type="text"
+                              size={50}
+                              required
+                              autoComplete="off"
+                              defaultValue={this.commentString}
+                              onChange={this.handleCommentChange}
+                              onKeyDown={this.handleKeyDownComment}
+                              onFocus={this.handleFocus}
+                              onBlur={this.handleBlur}
+                            />
+                            <CharCount hasContent={charCount > 0}>
+                              {charCount}
+                            </CharCount>
+                          </InputWithCountWrapper>
+                        )}
+                      </SpeakInputArea>
+                      {/* Speak button. */}
+                      <SpeakButtonArea>
+                        <input
+                          type="submit"
+                          value={t('game_client:speak.say')}
+                          disabled={!speakAllowed || !nsecondSilent}
+                        />
+                      </SpeakButtonArea>
+                      {/* Speech-related controls. */}
+                      <SpeakControlsArea hidden={othersHidden}>
+                        {othersHidden ? (
+                          <SpeakControlsSlim>
+                            {t('game_client:speak.size.description')}:
+                            {t(`game_client:speak.size.${size}`)}
+                            {'　'}
+                            {speakKindLabel(t, playersMap, kind || speaks[0])}
+                          </SpeakControlsSlim>
+                        ) : (
+                          <>
+                            {/* Speak size select control. */}
+                            <LabeledControl
+                              label={t('game_client:speak.size.description')}
+                            >
+                              <select
+                                value={size}
+                                onChange={this.handleSizeChange}
+                              >
+                                <option value="small">
+                                  {t('game_client:speak.size.small')}
+                                </option>
+                                <option value="normal">
+                                  {t('game_client:speak.size.normal')}
+                                </option>
+                                <option value="big">
+                                  {t('game_client:speak.size.big')}
+                                </option>
+                              </select>
+                            </LabeledControl>
+                            {/* Speech kind selection. */}
+                            <LabeledControl
+                              label={t('game_client:speak.kind.description')}
+                            >
+                              <SpeakKindSelect
+                                kinds={speaks}
+                                current={kind}
+                                t={t}
+                                playersMap={playersMap}
+                                onChange={this.handleKindChange}
+                              />
+                            </LabeledControl>
+                            {/* Multiline checkbox. */}
+                            <label>
+                              <input
+                                type="checkbox"
+                                name="multilinecheck"
+                                checked={multiline}
+                                onChange={this.handleMultilineChange}
+                              />
+                              {t('game_client:speak.multiline')}
+                            </label>
+                          </>
+                        )}
+                      </SpeakControlsArea>
+                      {/* Other controls. */}
+                      <OthersArea hidden={othersHidden}>
+                        {/* Will open button. */}
+                        <button type="button" onClick={this.handleWillClick}>
+                          {willOpen
+                            ? t('game_client:speak.will.close')
+                            : t('game_client:speak.will.open')}
+                        </button>
+                        {/* Note open button. */}
+                        <button type="button" onClick={this.handleNoteClick}>
+                          {noteOpen
+                            ? t('game_client:speak.note.close')
+                            : t('game_client:speak.note.open')}
+                        </button>
+                        {/* Show rule button. */}
+                        <RuleButton
+                          t={t}
+                          handleRuleClick={this.props.onRuleOpen}
+                          disabled={!rule}
+                          isPhone={isPhone}
+                        />
+                        {/* Log visibility control. */}
+                        <LabeledControl
+                          label={t(
+                            'game_client:speak.logVisibility.description',
+                          )}
+                        >
+                          <LogVisibilityControl
+                            visibility={logVisibility}
+                            day={gameInfo.day}
+                            onUpdate={this.handleVisibilityUpdate}
+                          />
+                        </LabeledControl>
+                        {/* Refuse revival button. */}
+                        <button
+                          type="button"
+                          onClick={this.handleRefuseRevival}
+                          disabled={gameInfo.status !== 'playing'}
+                        >
+                          {t('game_client:speak.refuseRevival')}
+                        </button>
+                        {/* Wide page checkbox. */}
+                        {isPhone ? (
+                          ''
+                        ) : (
                           <label>
                             <input
                               type="checkbox"
-                              name="multilinecheck"
-                              checked={multiline}
-                              onChange={this.handleMultilineChange}
+                              id="widepagecheck"
+                              checked={widePage}
+                              onChange={this.handleWidepageChange}
                             />
-                            {t('game_client:speak.multiline')}
+                            {t('game_client:speak.widepage')}
                           </label>
-                        </>
-                      )}
-                    </SpeakControlsArea>
-                    {/* Other controls. */}
-                    <OthersArea hidden={othersHidden}>
-                      {/* Will open button. */}
-                      <button type="button" onClick={this.handleWillClick}>
-                        {willOpen
-                          ? t('game_client:speak.will.close')
-                          : t('game_client:speak.will.open')}
-                      </button>
-                      {/* Note open button. */}
-                      <button type="button" onClick={this.handleNoteClick}>
-                        {noteOpen
-                          ? t('game_client:speak.note.close')
-                          : t('game_client:speak.note.open')}
-                      </button>
-                      {/* Show rule button. */}
-                      <RuleButton
-                        t={t}
-                        handleRuleClick={this.props.onRuleOpen}
-                        disabled={!rule}
-                        isPhone={isPhone}
-                      />
-                      {/* Log visibility control. */}
-                      <LabeledControl
-                        label={t('game_client:speak.logVisibility.description')}
-                      >
-                        <LogVisibilityControl
-                          visibility={logVisibility}
-                          day={gameInfo.day}
-                          onUpdate={this.handleVisibilityUpdate}
+                        )}
+                      </OthersArea>
+                      <ButtonArea>
+                        <ExpandButton
+                          isPhone={isPhone}
+                          additionalControlsShown={additionalControlsShown}
+                          onClick={this.handleAdditionalControls}
                         />
-                      </LabeledControl>
-                      {/* Refuse revival button. */}
-                      <button
-                        type="button"
-                        onClick={this.handleRefuseRevival}
-                        disabled={gameInfo.status !== 'playing'}
-                      >
-                        {t('game_client:speak.refuseRevival')}
-                      </button>
-                      {/* Wide page checkbox. */}
-                      {isPhone ? (
-                        ''
-                      ) : (
-                        <label>
-                          <input
-                            type="checkbox"
-                            id="widepagecheck"
-                            checked={widePage}
-                            onChange={this.handleWidepageChange}
-                          />
-                          {t('game_client:speak.widepage')}
-                        </label>
-                      )}
-                    </OthersArea>
-                    <ButtonArea>
-                      <ExpandButton
-                        isPhone={isPhone}
-                        additionalControlsShown={additionalControlsShown}
-                        onClick={this.handleAdditionalControls}
+                      </ButtonArea>
+                    </MainForm>
+                    <WillForm
+                      hidden={othersHidden}
+                      t={t}
+                      open={willOpen}
+                      will={(roleInfo && roleInfo.will) || undefined}
+                      onWillChange={this.handleWillChange}
+                    />
+                    <NoteForm
+                      hidden={othersHidden}
+                      t={t}
+                      open={noteOpen}
+                      note={undefined}
+                      players={players}
+                      onNoteChange={this.handleNoteChange}
+                    />
+                    {/* Autocomplete dropdown */}
+                    {this.state.autocomplete.show && (
+                      <AutocompleteDropdown
+                        items={this.state.autocomplete.items}
+                        searchTerm={this.state.autocomplete.searchTerm}
+                        position={this.state.autocomplete.position}
+                        selectedIndex={this.state.autocomplete.selectedIndex}
+                        onSelect={this.handleAutocompleteSelect}
+                        onClose={this.handleAutocompleteClose}
                       />
-                    </ButtonArea>
-                  </MainForm>
-                  <WillForm
-                    hidden={othersHidden}
-                    t={t}
-                    open={willOpen}
-                    will={(roleInfo && roleInfo.will) || undefined}
-                    onWillChange={this.handleWillChange}
-                  />
-                  <NoteForm
-                    hidden={othersHidden}
-                    t={t}
-                    open={noteOpen}
-                    note={undefined}
-                    players={players}
-                    onNoteChange={this.handleNoteChange}
-                  />
-                </>
-              );
-            }}
-          </IsPhone>
-        )}
+                    )}
+                  </>
+                );
+              }}
+            </IsPhone>
+          );
+        }}
       </I18n>
     );
+  }
+  public componentDidMount() {
+    // Shortcuts will be loaded during first render
   }
   public componentDidUpdate() {
     // process the temporal flag to focus.
@@ -474,18 +522,289 @@ export class SpeakForm extends React.PureComponent<
   protected handleCommentChange(
     e: React.SyntheticEvent<HTMLInputElement | HTMLTextAreaElement>,
   ): void {
-    this.commentString = e.currentTarget.value;
+    const value = e.currentTarget.value;
+    this.commentString = value;
     this.setState({ charCount: this.commentString.length });
     // Auto-save to localStorage.
     saveSpeakDraftToStorage(this.commentString);
+
+    // Check for autocomplete trigger
+    this.handleAutocompleteTrigger(e.currentTarget);
+  }
+
+  /**
+   * Handle autocomplete trigger detection.
+   * Supports multiple trigger characters: "、", "/"
+   */
+  @bind
+  protected handleAutocompleteTrigger(
+    input: HTMLInputElement | HTMLTextAreaElement,
+  ): void {
+    const value = input.value;
+    const cursorPos = input.selectionStart || value.length;
+    const shortcuts = this.state.autocomplete.shortcuts;
+
+    // Supported trigger characters
+    const triggers = ['、', '/'];
+
+    // Find the last occurrence of any trigger character before cursor
+    let lastTriggerIndex = -1;
+    let triggerChar = '';
+
+    for (const trigger of triggers) {
+      const index = value.lastIndexOf(trigger, cursorPos);
+      if (index > lastTriggerIndex) {
+        lastTriggerIndex = index;
+        triggerChar = trigger;
+      }
+    }
+
+    if (lastTriggerIndex !== -1 && lastTriggerIndex < cursorPos) {
+      // We have a trigger, get the search term (after the trigger char)
+      const searchTerm = value.substring(lastTriggerIndex + 1, cursorPos);
+
+      // Filter items based on search term
+      const items = this.getFilteredItems(searchTerm, shortcuts);
+
+      if (items.length > 0 || searchTerm.length > 0) {
+        // Calculate dropdown position
+        const position = this.calculateDropdownPosition(input);
+
+        this.setState({
+          autocomplete: {
+            ...this.state.autocomplete,
+            show: true,
+            position,
+            searchTerm,
+            items,
+            triggerStart: lastTriggerIndex,
+            triggerChar,
+            selectedIndex: 0,
+          },
+        });
+        return;
+      }
+    }
+
+    // No trigger or no results, hide autocomplete
+    this.setState({
+      autocomplete: {
+        ...this.state.autocomplete,
+        show: false,
+        searchTerm: '',
+        items: [],
+        triggerStart: 0,
+        triggerChar: '',
+        selectedIndex: 0,
+      },
+    });
+  }
+
+  /**
+   * Get filtered items based on search term.
+   */
+  @bind
+  protected getFilteredItems(
+    searchTerm: string,
+    shortcuts: AutocompleteItem[],
+  ): AutocompleteItem[] {
+    const { players } = this.props;
+    const items: AutocompleteItem[] = [];
+    const lowerSearchTerm = searchTerm.toLowerCase();
+
+    // Add all players (no filtering by dead status)
+    for (const player of players) {
+      if (player.name.toLowerCase().includes(lowerSearchTerm)) {
+        items.push({
+          label: player.name,
+          value: player.name,
+          type: 'player',
+          searchKey: player.name,
+        });
+      }
+    }
+
+    // Add matching shortcuts (match against searchKey, display label)
+    for (const shortcut of shortcuts) {
+      if (shortcut.searchKey.toLowerCase().includes(lowerSearchTerm)) {
+        items.push(shortcut);
+      }
+    }
+
+    return items;
+  }
+
+  /**
+   * Calculate dropdown position based on input element.
+   */
+  @bind
+  protected calculateDropdownPosition(
+    input: HTMLInputElement | HTMLTextAreaElement,
+  ): { top: number; left: number } {
+    const rect = input.getBoundingClientRect();
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    const scrollLeft =
+      window.pageXOffset || document.documentElement.scrollLeft;
+
+    return {
+      top: rect.bottom + scrollTop + 4,
+      left: rect.left + scrollLeft,
+    };
+  }
+
+  /**
+   * Handle autocomplete item selection.
+   */
+  @bind
+  protected handleAutocompleteSelect(item: AutocompleteItem): void {
+    const { autocomplete } = this.state;
+    const before = this.commentString.substring(0, autocomplete.triggerStart);
+    const after = this.commentString.substring(
+      autocomplete.triggerStart + autocomplete.searchTerm.length + 1,
+    );
+
+    // Replace trigger + search term with selected value
+    this.commentString = before + item.value + after;
+
+    this.setState({
+      charCount: this.commentString.length,
+      autocomplete: {
+        ...autocomplete,
+        show: false,
+        searchTerm: '',
+        items: [],
+        triggerStart: 0,
+        triggerChar: '',
+        selectedIndex: 0,
+      },
+    });
+
+    if (this.comment != null) {
+      this.comment.value = this.commentString;
+      // Set cursor position after inserted value
+      const newPos = autocomplete.triggerStart + item.value.length;
+      this.comment.setSelectionRange(newPos, newPos);
+      this.comment.focus();
+    }
+
+    // Auto-save to localStorage.
+    saveSpeakDraftToStorage(this.commentString);
+  }
+
+  /**
+   * Handle autocomplete close.
+   */
+  @bind
+  protected handleAutocompleteClose(): void {
+    this.setState({
+      autocomplete: {
+        ...this.state.autocomplete,
+        show: false,
+        searchTerm: '',
+        items: [],
+        triggerStart: 0,
+        triggerChar: '',
+        selectedIndex: 0,
+      },
+    });
+  }
+
+  /**
+   * Get quick input shortcuts.
+   */
+  @bind
+  protected getQuickInputShortcuts(t: TranslationFunction): AutocompleteItem[] {
+    // Default shortcuts: black dot and white circle
+    const defaultShortcuts: AutocompleteItem[] = [
+      { label: '●', value: '●', type: 'shortcut', searchKey: '黑' },
+      { label: '○', value: '○', type: 'shortcut', searchKey: '白' },
+    ];
+    return defaultShortcuts;
+  }
+
+  /**
+   * Load shortcuts from casting config into state (called during render).
+   */
+  @bind
+  protected loadShortcutsIfNeeded(t: TranslationFunction): void {
+    if (this.shortcutsLoaded) {
+      return;
+    }
+    const shortcuts = this.getQuickInputShortcuts(t);
+    this.shortcutsLoaded = true;
+
+    // Use setTimeout to avoid updating state during render
+    if (shortcuts.length > 0) {
+      setTimeout(() => {
+        this.setState({
+          autocomplete: {
+            ...this.state.autocomplete,
+            shortcuts,
+          },
+        });
+      }, 0);
+    }
   }
   /**
    * Handle a keydown event of comment input.
    */
   @bind
   protected handleKeyDownComment(
-    e: React.KeyboardEvent<HTMLInputElement>,
+    e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>,
   ): void {
+    const { autocomplete } = this.state;
+
+    // Handle autocomplete navigation
+    if (autocomplete.show && autocomplete.items.length > 0) {
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        const newIndex = Math.min(
+          autocomplete.selectedIndex + 1,
+          autocomplete.items.length - 1,
+        );
+        this.setState({
+          autocomplete: { ...autocomplete, selectedIndex: newIndex },
+        });
+        return;
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        const newIndex = Math.max(autocomplete.selectedIndex - 1, 0);
+        this.setState({
+          autocomplete: { ...autocomplete, selectedIndex: newIndex },
+        });
+        return;
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        const newIndex = Math.max(autocomplete.selectedIndex - 1, 0);
+        this.setState({
+          autocomplete: { ...autocomplete, selectedIndex: newIndex },
+        });
+        return;
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        const newIndex = Math.min(
+          autocomplete.selectedIndex + 1,
+          autocomplete.items.length - 1,
+        );
+        this.setState({
+          autocomplete: { ...autocomplete, selectedIndex: newIndex },
+        });
+        return;
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        const selectedItem = autocomplete.items[autocomplete.selectedIndex];
+        if (selectedItem) {
+          this.handleAutocompleteSelect(selectedItem);
+        }
+        return;
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        this.handleAutocompleteClose();
+        return;
+      }
+    }
+
+    // Original keyboard handling
     if (e.key === 'Enter' && (e.shiftKey || e.ctrlKey || e.metaKey)) {
       // this keyboard input switches to the multiline mode.
       e.preventDefault();

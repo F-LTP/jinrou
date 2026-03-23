@@ -629,14 +629,28 @@ const NameInner = ({
     }
   });
 
+  // 只在有 shortId 时显示名字文字的双击效果
+  if (shortId && onShortIdClick) {
+    return (
+      <LogPart
+        logStyle={logStyle}
+        className={className}
+        data-userid={dataUserid}
+        data-shortid={shortId}
+      >
+        <NameText onClick={handleDoubleClick} style={{ cursor: 'pointer' }}>
+          {children}
+        </NameText>
+      </LogPart>
+    );
+  }
+
   return (
     <LogPart
       logStyle={logStyle}
       className={className}
       data-userid={dataUserid}
       data-shortid={shortId}
-      onClick={handleDoubleClick}
-      style={{ cursor: shortId && onShortIdClick ? 'pointer' : 'default' }}
     >
       {children}
     </LogPart>
@@ -662,6 +676,14 @@ const Name = styled(NameInner)<IPropName>`
     font-size: calc(0.75 * var(--base-font-size));
     border-bottom: none;
   `};
+`;
+
+/**
+ * Name text wrapper for double-click interaction.
+ * Only the text itself should be clickable, not the entire name area.
+ */
+const NameText = styled.span`
+  display: inline;
 `;
 
 /**
