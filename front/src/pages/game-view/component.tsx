@@ -163,7 +163,11 @@ export class Game extends React.Component<IPropGame, {}> {
           <AppWrapper>
             {/* List of players. */}
             <RoomHeaderPart ref={this.playersElement}>
-              <Players players={players} onFilter={this.handleLogFilter} />
+              <Players
+                players={players}
+                onFilter={this.handleLogFilter}
+                onInsertName={this.handlePlayerNameClick}
+              />
             </RoomHeaderPart>
             {/* Room control buttons. */}
             {roomControls != null ? (
@@ -337,6 +341,15 @@ export class Game extends React.Component<IPropGame, {}> {
   protected handleShortIdClick(shortId: string): void {
     if (this.speakFormRef.current != null) {
       this.speakFormRef.current.appendToComment(`>>${shortId} `);
+    }
+  }
+  /**
+   * Handle a click on player name in log.
+   */
+  @bind
+  protected handlePlayerNameClick(playerName: string): void {
+    if (this.speakFormRef.current != null) {
+      this.speakFormRef.current.appendToComment(playerName);
     }
   }
   /**
