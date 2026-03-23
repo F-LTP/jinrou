@@ -48,7 +48,8 @@ function useDoubleClick(callback: () => void, delay = 300) {
 
 /**
  * 兼容单击和双击的 Hook
- * 单击显示 tooltip，双击跳转到原消息
+ * 单击立即显示 tooltip，双击跳转到原消息
+ * 双击时阻止事件冒泡，避免触发其他双击事件
  */
 function useClickOrDoubleClick(
   onSingleClick: () => void,
@@ -64,33 +65,37 @@ function useClickOrDoubleClick(
     callbacksRef.current = { onSingleClick, onDoubleClick };
   });
 
-  return useCallback(() => {
-    const now = Date.now();
-    const lastTime = lastClickTimeRef.current;
-    const timeDiff = now - lastTime;
+  return useCallback(
+    (e: React.MouseEvent | React.TouchEvent) => {
+      const now = Date.now();
+      const lastTime = lastClickTimeRef.current;
+      const timeDiff = now - lastTime;
 
-    if (timeDiff < delay && timeDiff > 0) {
-      // Double-click detected
-      callbacksRef.current.onDoubleClick();
-      lastClickTimeRef.current = 0;
-      if (clickTimeoutRef.current) {
-        clearTimeout(clickTimeoutRef.current);
-        clickTimeoutRef.current = null;
-      }
-    } else {
-      // Potential single-click, wait for second click
-      lastClickTimeRef.current = now;
-      if (clickTimeoutRef.current) {
-        clearTimeout(clickTimeoutRef.current);
-      }
-      clickTimeoutRef.current = setTimeout(() => {
-        // Confirmed single-click
-        callbacksRef.current.onSingleClick();
+      if (timeDiff < delay && timeDiff > 0) {
+        // Double-click detected
+        e.stopPropagation(); // 阻止事件冒泡，避免触发其他双击事件
+        if (clickTimeoutRef.current) {
+          clearTimeout(clickTimeoutRef.current);
+          clickTimeoutRef.current = null;
+        }
+        callbacksRef.current.onDoubleClick();
         lastClickTimeRef.current = 0;
-        clickTimeoutRef.current = null;
-      }, delay);
-    }
-  }, [delay]);
+      } else {
+        // Potential single-click, 立即触发单击效果
+        callbacksRef.current.onSingleClick();
+        lastClickTimeRef.current = now;
+        if (clickTimeoutRef.current) {
+          clearTimeout(clickTimeoutRef.current);
+        }
+        // 设置超时重置状态
+        clickTimeoutRef.current = setTimeout(() => {
+          lastClickTimeRef.current = 0;
+          clickTimeoutRef.current = null;
+        }, delay);
+      }
+    },
+    [delay],
+  );
 }
 
 export interface IPropCommentContent {
@@ -178,8 +183,8 @@ export const LogReferenceTooltip = React.memo<{
 
     lastClickPosRef.current = { x: clientX, y: clientY };
 
-    // 调用双击检测逻辑
-    handleDoubleClick();
+    // 调用双击检测逻辑（传递事件以支持 stopPropagation）
+    handleDoubleClick(e);
   };
 
   /** 用真实高度修正 Y */
