@@ -4,6 +4,7 @@ import {
   Fragment,
   useState,
   useRef,
+  useCallback,
   useLayoutEffect,
   useEffect,
 } from 'react';
@@ -11,6 +12,86 @@ import { createPortal } from 'react-dom';
 import autolink, { compile } from 'my-autolink';
 import React from 'react';
 import { StoredLog } from './log-store';
+
+/**
+ * 兼容移动端和桌面端的双击检测 Hook
+ */
+function useDoubleClick(callback: () => void, delay = 300) {
+  const [lastClickTime, setLastClickTime] = useState(0);
+  const clickTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  return useCallback(() => {
+    const now = Date.now();
+    const timeDiff = now - lastClickTime;
+
+    if (timeDiff < delay && timeDiff > 0) {
+      // 双击：触发回调
+      callback();
+      setLastClickTime(0);
+      if (clickTimeoutRef.current) {
+        clearTimeout(clickTimeoutRef.current);
+        clickTimeoutRef.current = null;
+      }
+    } else {
+      // 第一次点击：等待第二次点击
+      setLastClickTime(now);
+      if (clickTimeoutRef.current) {
+        clearTimeout(clickTimeoutRef.current);
+      }
+      clickTimeoutRef.current = setTimeout(() => {
+        setLastClickTime(0);
+        clickTimeoutRef.current = null;
+      }, delay);
+    }
+  }, [callback, delay, lastClickTime]);
+}
+
+/**
+ * 兼容单击和双击的 Hook
+ * 单击显示 tooltip，双击跳转到原消息
+ */
+function useClickOrDoubleClick(
+  onSingleClick: () => void,
+  onDoubleClick: () => void,
+  delay = 300,
+) {
+  const lastClickTimeRef = useRef(0);
+  const clickTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const callbacksRef = useRef({ onSingleClick, onDoubleClick });
+
+  // Keep callbacks ref updated
+  useEffect(() => {
+    callbacksRef.current = { onSingleClick, onDoubleClick };
+  });
+
+  return useCallback(() => {
+    const now = Date.now();
+    const lastTime = lastClickTimeRef.current;
+    const timeDiff = now - lastTime;
+
+    if (timeDiff < delay && timeDiff > 0) {
+      // Double-click detected
+      callbacksRef.current.onDoubleClick();
+      lastClickTimeRef.current = 0;
+      if (clickTimeoutRef.current) {
+        clearTimeout(clickTimeoutRef.current);
+        clickTimeoutRef.current = null;
+      }
+    } else {
+      // Potential single-click, wait for second click
+      lastClickTimeRef.current = now;
+      if (clickTimeoutRef.current) {
+        clearTimeout(clickTimeoutRef.current);
+      }
+      clickTimeoutRef.current = setTimeout(() => {
+        // Confirmed single-click
+        callbacksRef.current.onSingleClick();
+        lastClickTimeRef.current = 0;
+        clickTimeoutRef.current = null;
+      }, delay);
+    }
+  }, [delay]);
+}
 
 export interface IPropCommentContent {
   comment: string;
@@ -38,9 +119,68 @@ export const LogReferenceTooltip = React.memo<{
   const [visible, setVisible] = useState(false);
   const [pos, setPos] = useState({ x: 0, y: 0 });
   const tooltipRef = useRef<HTMLDivElement>(null);
+  const lastClickPosRef = useRef<{ x: number; y: number } | null>(null);
 
   /** 关闭当前 tooltip 的函数 */
   const closeThisTooltip = () => setVisible(false);
+
+  /** 显示 tooltip（单击触发） */
+  const showTooltip = () => {
+    // 使用上次记录的点击位置
+    if (lastClickPosRef.current) {
+      setPos(lastClickPosRef.current);
+      setVisible(v => !v);
+    }
+  };
+
+  /** 跳转到原消息（双击触发） */
+  const navigateToOriginal = () => {
+    setVisible(false);
+
+    // 通过 data-shortid 查找原消息元素
+    const targetElement = document.querySelector(
+      `[data-shortid="${shortId}"]`,
+    ) as HTMLElement;
+    if (targetElement) {
+      // 平滑滚动到原消息
+      targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      // 添加高亮效果
+      targetElement.style.transition = 'background-color 0.3s ease';
+      const originalBg = targetElement.style.backgroundColor;
+      targetElement.style.backgroundColor = 'rgba(255, 255, 0, 0.3)';
+      setTimeout(() => {
+        targetElement.style.backgroundColor = originalBg;
+      }, 1500);
+    }
+  };
+
+  /** 使用单击/双击检测 hook */
+  const handleDoubleClick = useClickOrDoubleClick(
+    showTooltip, // 单击：显示/隐藏 tooltip
+    navigateToOriginal, // 双击：跳转到原消息
+  );
+
+  /** 处理点击事件 - 记录位置并调用双击检测 */
+  const onClick = (e: React.MouseEvent | React.TouchEvent) => {
+    // 记录点击位置
+    let clientX: number;
+    let clientY: number;
+
+    if ('touches' in e) {
+      const t = e.touches[0];
+      if (!t) return;
+      clientX = t.clientX;
+      clientY = t.clientY;
+    } else {
+      clientX = e.clientX;
+      clientY = e.clientY;
+    }
+
+    lastClickPosRef.current = { x: clientX, y: clientY };
+
+    // 调用双击检测逻辑
+    handleDoubleClick();
+  };
 
   /** 用真实高度修正 Y */
   useLayoutEffect(() => {
@@ -152,25 +292,6 @@ export const LogReferenceTooltip = React.memo<{
     };
   }, [visible]);
 
-  /** 点击切换显示 */
-  const onClick = (e: React.MouseEvent | React.TouchEvent) => {
-    let clientX: number;
-    let clientY: number;
-
-    if ('touches' in e) {
-      const t = e.touches[0];
-      if (!t) return;
-      clientX = t.clientX;
-      clientY = t.clientY;
-    } else {
-      clientX = e.clientX;
-      clientY = e.clientY;
-    }
-
-    setPos({ x: clientX, y: clientY });
-    setVisible(v => !v);
-  };
-
   return (
     <>
       <b
@@ -181,6 +302,7 @@ export const LogReferenceTooltip = React.memo<{
           textDecoration: 'underline',
           textDecorationColor: '#0066cc',
         }}
+        title="单击查看引用，双击跳转到原消息"
       >
         {playerName ? (
           `>>${shortId}:${playerName}`

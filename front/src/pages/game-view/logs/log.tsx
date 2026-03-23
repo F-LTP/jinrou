@@ -17,31 +17,28 @@ function useDoubleClick(callback: () => void, delay = 300) {
   const [lastClickTime, setLastClickTime] = useState(0);
   const clickTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  return useCallback(
-    () => {
-      const now = Date.now();
-      const timeDiff = now - lastClickTime;
+  return useCallback(() => {
+    const now = Date.now();
+    const timeDiff = now - lastClickTime;
 
-      if (timeDiff < delay && timeDiff > 0) {
-        callback();
-        setLastClickTime(0);
-        if (clickTimeoutRef.current) {
-          clearTimeout(clickTimeoutRef.current);
-          clickTimeoutRef.current = null;
-        }
-      } else {
-        setLastClickTime(now);
-        if (clickTimeoutRef.current) {
-          clearTimeout(clickTimeoutRef.current);
-        }
-        clickTimeoutRef.current = setTimeout(() => {
-          setLastClickTime(0);
-          clickTimeoutRef.current = null;
-        }, delay);
+    if (timeDiff < delay && timeDiff > 0) {
+      callback();
+      setLastClickTime(0);
+      if (clickTimeoutRef.current) {
+        clearTimeout(clickTimeoutRef.current);
+        clickTimeoutRef.current = null;
       }
-    },
-    [callback, delay, lastClickTime],
-  );
+    } else {
+      setLastClickTime(now);
+      if (clickTimeoutRef.current) {
+        clearTimeout(clickTimeoutRef.current);
+      }
+      clickTimeoutRef.current = setTimeout(() => {
+        setLastClickTime(0);
+        clickTimeoutRef.current = null;
+      }, delay);
+    }
+  }, [callback, delay, lastClickTime]);
 }
 
 export interface IPropOneLog {
@@ -243,12 +240,12 @@ class OneLogInner extends React.PureComponent<IPropOneLog, {}> {
         log.mode === 'nextturn' || !log.name
           ? null
           : log.mode === 'monologue' || log.mode === 'heavenmonologue'
-            ? t('log.monologue', { name: log.name }) + ':'
-            : log.mode === 'will'
-              ? t('log.will', { name: log.name }) + ':'
-              : log.mode === 'streaming'
-                ? t('log.streaming', { name: log.name }) + ':'
-                : log.name + ':';
+          ? t('log.monologue', { name: log.name }) + ':'
+          : log.mode === 'will'
+          ? t('log.will', { name: log.name }) + ':'
+          : log.mode === 'streaming'
+          ? t('log.streaming', { name: log.name }) + ':'
+          : log.name + ':';
       // Auto-link URLs and room numbers in it.
       const noName = icon == null && !nameText;
       const props = {
@@ -637,6 +634,7 @@ const NameInner = ({
       logStyle={logStyle}
       className={className}
       data-userid={dataUserid}
+      data-shortid={shortId}
       onClick={handleDoubleClick}
       style={{ cursor: shortId && onShortIdClick ? 'pointer' : 'default' }}
     >
@@ -690,8 +688,8 @@ const getFontSize = (size: 'big' | 'small' | undefined) =>
   size === 'big'
     ? 'calc(1.07 * var(--base-font-size))'
     : size === 'small'
-      ? 'calc(1.25 * var(--base-font-size))'
-      : 'var(--base-font-size)';
+    ? 'calc(1.25 * var(--base-font-size))'
+    : 'var(--base-font-size)';
 
 /**
  * Log comment box.
@@ -704,8 +702,8 @@ const Comment = styled(Main)<IPropComment>`
     size === 'big'
       ? 'font-weight: bold; line-height: 1.2;'
       : size === 'small'
-        ? 'text-decoration: underline; font-weight: bold; line-height: 1.2;'
-        : 'line-height: 1.27'};
+      ? 'text-decoration: underline; font-weight: bold; line-height: 1.2;'
+      : 'line-height: 1.27'};
 `;
 
 /**
