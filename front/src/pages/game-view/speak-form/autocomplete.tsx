@@ -62,6 +62,63 @@ export const AutocompleteDropdown: React.FC<AutocompleteProps> = ({
 }) => {
   const dropdownRef = React.useRef<HTMLDivElement>(null);
   const itemRefs = React.useRef<(HTMLDivElement | null)[]>([]);
+  const [currentPosition, setCurrentPosition] = React.useState(position);
+
+  // Update position when prop changes (initial open)
+  React.useEffect(() => {
+    setCurrentPosition(position);
+  }, [position]);
+
+  // Update position on scroll or resize - keeps dropdown aligned with input
+  React.useEffect(() => {
+    if (items.length === 0) return;
+
+    let rafId: number | null = null;
+
+    const updatePosition = () => {
+      if (rafId !== null) return;
+
+      rafId = requestAnimationFrame(() => {
+        // Find the input element and recalculate its position
+        const input = document.querySelector(
+          'textarea[data-ml-comment="true"]',
+        ) as HTMLTextAreaElement;
+        if (input) {
+          const rect = input.getBoundingClientRect();
+          setCurrentPosition({
+            top: rect.bottom + 4,
+            left: rect.left,
+          });
+        }
+        rafId = null;
+      });
+    };
+
+    // Listen to scroll events on all elements (capture phase)
+    window.addEventListener('scroll', updatePosition, true);
+    // Listen to window resize
+    window.addEventListener('resize', updatePosition);
+
+    // Use ResizeObserver to detect when the input's parent resizes
+    const input = document.querySelector('textarea[data-ml-comment="true"]');
+    if (input && input.parentElement) {
+      const resizeObserver = new (window as any).ResizeObserver(updatePosition);
+      resizeObserver.observe(input.parentElement);
+      // Cleanup observer on unmount
+      return () => {
+        window.removeEventListener('scroll', updatePosition, true);
+        window.removeEventListener('resize', updatePosition);
+        if (rafId !== null) cancelAnimationFrame(rafId);
+        resizeObserver.disconnect();
+      };
+    }
+
+    return () => {
+      window.removeEventListener('scroll', updatePosition, true);
+      window.removeEventListener('resize', updatePosition);
+      if (rafId !== null) cancelAnimationFrame(rafId);
+    };
+  }, [items.length]);
 
   // Scroll to selected item when selectedIndex changes
   React.useEffect(() => {
@@ -99,8 +156,8 @@ export const AutocompleteDropdown: React.FC<AutocompleteProps> = ({
     <DropdownStyle
       ref={dropdownRef}
       style={{
-        top: `${position.top}px`,
-        left: `${position.left}px`,
+        top: `${currentPosition.top}px`,
+        left: `${currentPosition.left}px`,
       }}
       role="listbox"
     >

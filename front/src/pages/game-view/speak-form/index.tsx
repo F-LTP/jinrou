@@ -636,6 +636,7 @@ export class SpeakForm extends React.PureComponent<
 
   /**
    * Calculate dropdown position based on input element.
+   * Returns viewport coordinates (for position: fixed).
    */
   @bind
   protected calculateDropdownPosition(
@@ -647,21 +648,18 @@ export class SpeakForm extends React.PureComponent<
     // On mobile with virtual keyboard, use visualViewport API
     if (vv) {
       const keyboardHeight = window.innerHeight - vv.height;
-      const dropdownTop = rect.bottom - keyboardHeight + vv.pageTop + 4;
+      const dropdownTop = rect.bottom - keyboardHeight + 4;
       return {
         top: dropdownTop,
-        left: rect.left + vv.pageLeft,
+        left: rect.left,
       };
     }
 
-    // Desktop fallback
-    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-    const scrollLeft =
-      window.pageXOffset || document.documentElement.scrollLeft;
-
+    // Desktop: getBoundingClientRect() already returns viewport coordinates
+    // Just add a small gap (4px) below the input
     return {
-      top: rect.bottom + scrollTop + 4,
-      left: rect.left + scrollLeft,
+      top: rect.bottom + 4,
+      left: rect.left,
     };
   }
 
