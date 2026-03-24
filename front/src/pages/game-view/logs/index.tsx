@@ -174,6 +174,7 @@ export class Logs extends React.Component<IPropLogs, IStateLogs> {
         logClass={this.logClass}
         fixedSize={fixedSize}
         onClick={this.handleLogWrapperClick}
+        data-has-filter={logPickup != null ? 'true' : 'false'}
       >
         {mapReverse(logs.chunks, (chunk, i) => {
           // Decide whether this chunk should be shown.

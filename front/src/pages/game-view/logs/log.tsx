@@ -116,7 +116,7 @@ class OneLogInner extends React.PureComponent<IPropOneLog, {}> {
     const baseClassName = logClass;
 
     // Build props for log line wrapper
-    const LogLineWrapper = fixedSize ? FixedSizeLogRow : React.Fragment;
+    const LogLineWrapper = fixedSize ? FixedSizeLogRow : LogLineWrapperStyled;
     const logLineProps: Record<string, any> = {};
 
     // For system messages, mark them so they can be filtered
@@ -132,9 +132,9 @@ class OneLogInner extends React.PureComponent<IPropOneLog, {}> {
 
       return (
         <LogLineWrapper {...logLineProps}>
-          <Icon noName logStyle={logStyle} className={baseClassName} />
-          <Name noName logStyle={logStyle} className={baseClassName} />
-          <Main noName logStyle={logStyle} className={baseClassName}>
+          <Icon noName logStyle={logStyle} className={logClass} />
+          <Name noName logStyle={logStyle} className={logClass} />
+          <Main noName logStyle={logStyle} className={logClass}>
             <LogTable>
               {/* Vote result caption */}
               <caption>{t('log.voteResult.caption')}</caption>
@@ -159,7 +159,7 @@ class OneLogInner extends React.PureComponent<IPropOneLog, {}> {
             noName
             time={new Date(log.time)}
             logStyle={logStyle}
-            className={baseClassName}
+            className={logClass}
           />
         </LogLineWrapper>
       );
@@ -168,9 +168,9 @@ class OneLogInner extends React.PureComponent<IPropOneLog, {}> {
       const logStyle = computeLogStyle('probability_table', theme);
       return (
         <LogLineWrapper {...logLineProps}>
-          <Icon noName logStyle={logStyle} className={baseClassName} />
-          <Name noName logStyle={logStyle} className={baseClassName} />
-          <Main noName logStyle={logStyle} className={baseClassName}>
+          <Icon noName logStyle={logStyle} className={logClass} />
+          <Name noName logStyle={logStyle} className={logClass} />
+          <Main noName logStyle={logStyle} className={logClass}>
             <LogTable>
               {/* Probability table caption */}
               <caption>{t('log.probabilityTable.caption')}</caption>
@@ -224,7 +224,7 @@ class OneLogInner extends React.PureComponent<IPropOneLog, {}> {
             noName
             time={new Date(log.time)}
             logStyle={logStyle}
-            className={baseClassName}
+            className={logClass}
           />
         </LogLineWrapper>
       );
@@ -232,21 +232,11 @@ class OneLogInner extends React.PureComponent<IPropOneLog, {}> {
       const logStyle = computeLogStyle(log.mode, theme);
       const icon = icons[log.userid];
       const noName = icon == null;
-      const commonProps = {
-        logStyle,
-        className: baseClassName,
-        'data-userid': log.userid,
-      };
       return (
         <LogLineWrapper {...logLineProps}>
-          <Icon noName={noName} {...commonProps} />
-          <Name
-            noName={noName}
-            logStyle={logStyle}
-            className={baseClassName}
-            data-userid={log.userid}
-          />
-          <Comment noName={noName} {...commonProps}>
+          <Icon noName={noName} logStyle={logStyle} className={logClass} />
+          <Name noName={noName} logStyle={logStyle} className={logClass} />
+          <Comment noName={noName} logStyle={logStyle} className={logClass}>
             <I18nInterp ns="game_client" k="log.poem.description">
               {{
                 name: <b>{log.name}</b>,
@@ -255,7 +245,12 @@ class OneLogInner extends React.PureComponent<IPropOneLog, {}> {
             </I18nInterp>
             <PoemWrapper>{log.comment}</PoemWrapper>
           </Comment>
-          <Time noName={noName} time={new Date(log.time)} {...commonProps} />
+          <Time
+            noName={noName}
+            time={new Date(log.time)}
+            logStyle={logStyle}
+            className={logClass}
+          />
         </LogLineWrapper>
       );
     } else {
@@ -276,7 +271,7 @@ class OneLogInner extends React.PureComponent<IPropOneLog, {}> {
       const noName = icon == null && !nameText;
       const props = {
         logStyle,
-        className: baseClassName,
+        className: logClass,
         'data-userid': 'userid' in log ? log.userid : undefined,
       };
       const commentProps = {
@@ -325,63 +320,7 @@ class OneLogInner extends React.PureComponent<IPropOneLog, {}> {
   }
 }
 
-/**
- * Memoized OneLog component with custom comparison to prevent unnecessary re-renders
- * when logPickup changes. Only re-renders if this specific log's display would change.
- */
-const OneLogWithTheme = withTheme(OneLogInner);
-
-export const OneLog = React.memo(OneLogWithTheme, (prevProps, nextProps) => {
-  // Always re-render if the log content changed
-  if (prevProps.log !== nextProps.log) {
-    return false;
-  }
-
-  // Check if this log has a userid (for filtering purposes)
-  const prevHasUserid = 'userid' in prevProps.log;
-  const nextHasUserid = 'userid' in nextProps.log;
-  const prevUserid = prevHasUserid ? (prevProps.log as any).userid : null;
-  const nextUserid = nextHasUserid ? (nextProps.log as any).userid : null;
-
-  // Check if filtering exemption status would change
-  // A log is exempt if: logPickup is not null AND log's userid matches logPickup
-  const prevExempt =
-    prevProps.logPickup != null &&
-    prevHasUserid &&
-    prevUserid === prevProps.logPickup;
-  const nextExempt =
-    nextProps.logPickup != null &&
-    nextHasUserid &&
-    nextUserid === nextProps.logPickup;
-
-  // If exemption status changed, re-render
-  if (prevExempt !== nextExempt) {
-    return false;
-  }
-
-  // If logPickup changed but this log's exemption status didn't change,
-  // AND other props are the same, skip re-render
-  const logPickupChanged = prevProps.logPickup !== nextProps.logPickup;
-  const otherPropsChanged =
-    prevProps.logClass !== nextProps.logClass ||
-    prevProps.fixedSize !== nextProps.fixedSize ||
-    prevProps.icons !== nextProps.icons ||
-    prevProps.rule !== nextProps.rule ||
-    prevProps.resolveLogById !== nextProps.resolveLogById ||
-    prevProps.onShortIdClick !== nextProps.onShortIdClick ||
-    prevProps.t !== nextProps.t;
-
-  // Skip re-render only if logPickup is the ONLY thing that changed
-  // and it doesn't affect this log's exemption status
-  if (logPickupChanged && !otherPropsChanged) {
-    return true; // Skip re-render
-  }
-
-  // For any other prop changes, re-render
-  return otherPropsChanged;
-});
-
-OneLog.displayName = 'OneLog';
+export const OneLog = withTheme(OneLogInner);
 
 interface IPropProbabilityTr {
   dead: boolean;

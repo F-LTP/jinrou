@@ -636,31 +636,19 @@ export class SpeakForm extends React.PureComponent<
 
   /**
    * Calculate dropdown position based on input element.
-   * For mobile, uses visualViewport to account for virtual keyboard.
    */
   @bind
   protected calculateDropdownPosition(
     input: HTMLInputElement | HTMLTextAreaElement,
   ): { top: number; left: number } {
     const rect = input.getBoundingClientRect();
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    const scrollLeft =
+      window.pageXOffset || document.documentElement.scrollLeft;
 
-    // Check if visualViewport API is available (better for mobile with virtual keyboard)
-    const vv = (window as any).visualViewport;
-    if (vv) {
-      // Position relative to visual viewport (the visible part of the page)
-      // Calculate top position considering virtual keyboard
-      const keyboardHeight = window.innerHeight - vv.height;
-      const dropdownTop = rect.bottom - keyboardHeight + vv.pageTop + 4;
-      return {
-        top: dropdownTop,
-        left: rect.left + vv.pageLeft,
-      };
-    }
-
-    // Fallback: use fixed positioning relative to viewport
     return {
-      top: rect.bottom + 4,
-      left: rect.left,
+      top: rect.bottom + scrollTop + 4,
+      left: rect.left + scrollLeft,
     };
   }
 
@@ -727,10 +715,9 @@ export class SpeakForm extends React.PureComponent<
   @bind
   protected getQuickInputShortcuts(t: TranslationFunction): AutocompleteItem[] {
     // Default shortcuts: black dot and white circle
-    // Support multiple search keywords for each symbol
     const defaultShortcuts: AutocompleteItem[] = [
-      { label: '●', value: '●', type: 'shortcut', searchKey: '黑球' },
-      { label: '○', value: '○', type: 'shortcut', searchKey: '白球' },
+      { label: '●', value: '●', type: 'shortcut', searchKey: '黑' },
+      { label: '○', value: '○', type: 'shortcut', searchKey: '白' },
     ];
     return defaultShortcuts;
   }
