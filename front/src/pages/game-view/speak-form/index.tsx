@@ -636,19 +636,16 @@ export class SpeakForm extends React.PureComponent<
 
   /**
    * Calculate dropdown position based on input element.
-   * For mobile, uses visualViewport to account for virtual keyboard.
    */
   @bind
   protected calculateDropdownPosition(
     input: HTMLInputElement | HTMLTextAreaElement,
   ): { top: number; left: number } {
     const rect = input.getBoundingClientRect();
-
-    // Check if visualViewport API is available (better for mobile with virtual keyboard)
     const vv = (window as any).visualViewport;
+
+    // On mobile with virtual keyboard, use visualViewport API
     if (vv) {
-      // Position relative to visual viewport (the visible part of the page)
-      // Calculate top position considering virtual keyboard
       const keyboardHeight = window.innerHeight - vv.height;
       const dropdownTop = rect.bottom - keyboardHeight + vv.pageTop + 4;
       return {
@@ -657,10 +654,14 @@ export class SpeakForm extends React.PureComponent<
       };
     }
 
-    // Fallback: use fixed positioning relative to viewport
+    // Desktop fallback
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    const scrollLeft =
+      window.pageXOffset || document.documentElement.scrollLeft;
+
     return {
-      top: rect.bottom + 4,
-      left: rect.left,
+      top: rect.bottom + scrollTop + 4,
+      left: rect.left + scrollLeft,
     };
   }
 

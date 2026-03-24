@@ -63,21 +63,18 @@ export const AutocompleteDropdown: React.FC<AutocompleteProps> = ({
   const dropdownRef = React.useRef<HTMLDivElement>(null);
   const itemRefs = React.useRef<(HTMLDivElement | null)[]>([]);
 
-  // Close on click outside
+  // Scroll to selected item when selectedIndex changes
   React.useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(e.target as Node)
-      ) {
-        onClose();
+    if (selectedIndex >= 0 && selectedIndex < items.length) {
+      const selectedItem = itemRefs.current[selectedIndex];
+      if (selectedItem && dropdownRef.current) {
+        selectedItem.scrollIntoView({
+          block: 'nearest',
+          behavior: 'smooth',
+        });
       }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [onClose]);
+    }
+  }, [selectedIndex, items.length]);
 
   // Scroll to selected item when selectedIndex changes
   React.useEffect(() => {

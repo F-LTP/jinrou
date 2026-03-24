@@ -234,9 +234,9 @@ export class Game extends React.Component<IPropGame, {}> {
                     state === 'unmounted';
                   return (
                     <>
-                      <RuleWrapper closed={closed}>
+                      <RuleWrapper className={closed ? 'closed' : ''}>
                         {rule != null ? (
-                          <RuleStickyWrapper closed={closed}>
+                          <RuleStickyWrapper className={closed ? 'closed' : ''}>
                             <RuleInnerWrapper ref={this.ruleElement}>
                               <Swipeable
                                 onSwipingLeft={this.handleRuleSwipeToLeft}
@@ -253,7 +253,7 @@ export class Game extends React.Component<IPropGame, {}> {
                         ) : null}
                       </RuleWrapper>
                       {/* Logs. */}
-                      <LogsWrapper ruleOpen={!closed}>
+                      <LogsWrapper className={closed ? '' : 'rule-open'}>
                         <Logs
                           logs={store.logs}
                           visibility={store.logVisibility}
@@ -318,7 +318,7 @@ export class Game extends React.Component<IPropGame, {}> {
   @bind
   protected handleSpeak(query: SpeakQuery): void {
     const { onSpeak } = this.props;
-    // Keep multiline mode as is (don't reset to single line)
+    // Keep multiline mode as is after sending
     onSpeak(query);
   }
   /**
@@ -565,17 +565,15 @@ const MainWrapper = styled.div`
 /**
  * Wrapper of logs.
  */
-const LogsWrapper = styled.div<{
-  /**
-   * Whether the rule pane is open.
-   */
-  ruleOpen?: boolean;
-}>`
+const LogsWrapper = styled.div`
   flex: auto 1 1;
   order: 1;
   ${phone`
     transition: margin-left 250ms ease-out;
-    margin-left: ${({ ruleOpen }) => (ruleOpen ? '-20em' : '0)')};
+    margin-left: 0;
+    &.rule-open {
+      margin-left: -20em;
+    }
   `};
 `;
 
@@ -587,36 +585,38 @@ const RoomFooterPart = styled.div`
   padding: 0 8px;
 `;
 
-interface IPropsRuleWrapper {
-  /**
-   * Whether this is in closed state.
-   */
-  closed?: boolean;
-}
 /**
  * Wrapper of rule.
  */
-const RuleWrapper = styled.div<IPropsRuleWrapper>`
+const RuleWrapper = styled.div`
   transition: width 250ms ease-out;
   flex: auto 0 0;
-  width: ${({ closed }) => (closed ? '0' : '20em')};
+  width: 20em;
   order: 2;
 
   z-index: ${ruleZIndex};
   background-color: #ffd1f2;
   color: black;
 
+  &.closed {
+    width: 0;
+  }
+
   a {
     ${lightA};
   }
 `;
 
-const RuleStickyWrapper = styled.div<IPropsRuleWrapper>`
+const RuleStickyWrapper = styled.div`
   transition: width 250ms ease-out;
-  width: ${({ closed }) => (closed ? '0' : '20em')};
+  width: 20em;
   position: sticky;
   top: 0;
   overflow-x: hidden;
+
+  &.closed {
+    width: 0;
+  }
 `;
 
 const RuleInnerWrapper = styled.div`

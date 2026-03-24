@@ -169,48 +169,55 @@ export class Logs extends React.Component<IPropLogs, IStateLogs> {
 
     let renderedLogCount = 0;
     return (
-      <LogWrapper
-        logPickup={logPickup}
-        logClass={this.logClass}
-        fixedSize={fixedSize}
-        onClick={this.handleLogWrapperClick}
-      >
-        {mapReverse(logs.chunks, (chunk, i) => {
-          // Decide whether this chunk should be shown.
-          const visible =
-            visibility.type === 'all' ||
-            (visibility.type === 'today'
-              ? i === logs.chunks.length - 1
-              : chunk.day === visibility.day);
+      <>
+        {/* Dynamic filter styles - avoids styled-components re-generation */}
+        {logPickup != null && (
+          <style>
+            {`.${this.logClass}:not([data-userid="${logPickup}"]) { opacity: 0.3; }`}
+          </style>
+        )}
+        <LogWrapper
+          logClass={this.logClass}
+          className={fixedSize ? 'fixed-size' : ''}
+          onClick={this.handleLogWrapperClick}
+        >
+          {mapReverse(logs.chunks, (chunk, i) => {
+            // Decide whether this chunk should be shown.
+            const visible =
+              visibility.type === 'all' ||
+              (visibility.type === 'today'
+                ? i === logs.chunks.length - 1
+                : chunk.day === visibility.day);
 
-          // number of logs in this chunk
-          // which should be rendered.
-          const chunkRenderedLogs = Math.max(
-            0,
-            Math.min(chunk.logs.length, renderedLogs - renderedLogCount),
-          );
-          renderedLogCount += chunk.logs.length;
-          return (
-            <LogChunk
-              key={chunk.day}
-              logClass={this.logClass}
-              logs={chunk.logs}
-              version={chunk.version}
-              renderedNumber={chunkRenderedLogs}
-              visible={visible}
-              fixedSize={fixedSize}
-              icons={icons}
-              rule={rule}
-              resolveLogById={this.resolveLogById}
-              onShortIdClick={onShortIdClick}
-              logPickup={logPickup}
-            />
-          );
-        })}
-        {renderingState.pendingLogNumber > 0 ? (
-          <PendingLogMessage>正在读取...</PendingLogMessage>
-        ) : null}
-      </LogWrapper>
+            // number of logs in this chunk
+            // which should be rendered.
+            const chunkRenderedLogs = Math.max(
+              0,
+              Math.min(chunk.logs.length, renderedLogs - renderedLogCount),
+            );
+            renderedLogCount += chunk.logs.length;
+            return (
+              <LogChunk
+                key={chunk.day}
+                logClass={this.logClass}
+                logs={chunk.logs}
+                version={chunk.version}
+                renderedNumber={chunkRenderedLogs}
+                visible={visible}
+                fixedSize={fixedSize}
+                icons={icons}
+                rule={rule}
+                resolveLogById={this.resolveLogById}
+                onShortIdClick={onShortIdClick}
+                logPickup={logPickup}
+              />
+            );
+          })}
+          {renderingState.pendingLogNumber > 0 ? (
+            <PendingLogMessage>正在读取...</PendingLogMessage>
+          ) : null}
+        </LogWrapper>
+      </>
     );
   }
 }
@@ -410,7 +417,7 @@ const LogChunk = React.memo<ILogChunkProps>(
 
     if (fixedSize) {
       return (
-        <FixedSizeChunkWrapper visible={visible}>
+        <FixedSizeChunkWrapper className={visible ? '' : 'hidden'}>
           {content}
         </FixedSizeChunkWrapper>
       );
