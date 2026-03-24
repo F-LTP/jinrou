@@ -819,14 +819,22 @@ export class SpeakForm extends React.PureComponent<
 
     // Original keyboard handling
     if (e.key === 'Enter' && (e.shiftKey || e.ctrlKey || e.metaKey)) {
-      // this keyboard input switches to the multiline mode.
-      e.preventDefault();
-      this.commentString += '\n';
-      this.setState({ charCount: this.commentString.length });
-      this.focus = true;
-      this.props.onUpdate({
-        multiline: true,
-      });
+      // Check if already in multiline mode
+      if (this.props.multiline) {
+        // In multiline mode, Shift+Enter sends the message
+        e.preventDefault();
+        this.handleSubmit(e as any);
+        return;
+      } else {
+        // In single-line mode, this switches to multiline mode
+        e.preventDefault();
+        this.commentString += '\n';
+        this.setState({ charCount: this.commentString.length });
+        this.focus = true;
+        this.props.onUpdate({
+          multiline: true,
+        });
+      }
     }
   }
   /**
