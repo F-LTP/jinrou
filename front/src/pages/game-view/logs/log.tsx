@@ -5,7 +5,10 @@ import { Rule } from '../../../defs';
 import { TranslationFunction, I18nInterp } from '../../../i18n';
 import { phone, notPhone } from '../../../common/media';
 import { Theme } from '../../../theme';
-import { FixedSizeLogRow } from './elements';
+import {
+  FixedSizeLogRow,
+  LogLineWrapper as LogLineWrapperStyled,
+} from './elements';
 import { CommentContent } from './comment';
 import { StoredLog } from './log-store';
 import { useState, useRef, useCallback } from 'react';
@@ -76,6 +79,11 @@ export interface IPropOneLog {
    * Callback for shortId click.
    */
   onShortIdClick?: (shortId: string) => void;
+  /**
+   * ID of user currently picked up for filtering.
+   * Logs not matching this ID will be displayed with reduced opacity.
+   */
+  logPickup?: string | null;
 }
 
 /**
@@ -101,16 +109,36 @@ class OneLogInner extends React.PureComponent<IPropOneLog, {}> {
       icons,
       resolveLogById,
       onShortIdClick,
+      logPickup,
     } = this.props;
 
-    const LogLineWrapper = fixedSize ? FixedSizeLogRow : React.Fragment;
+    // Calculate opacity based on filter - only reduce opacity if logPickup is set
+    // and this log's userid doesn't match
+    //
+    // Cases where a log should be filtered (made transparent):
+    // 1. Log is a system/phase message (mode: 'system' or 'nextturn')
+    // 2. Log has no userid property (e.g., VoteResultLog, ProbabilityTableLog)
+    // 3. Log's userid doesn't match logPickup
+    const isFiltered =
+      logPickup != null &&
+      (log.mode === 'system' ||
+        log.mode === 'nextturn' ||
+        !('userid' in log) ||
+        log.userid !== logPickup);
+
+    // Apply className for filtered logs
+    // CSS will apply opacity: 0.3 to children
+    const LogLineWrapper = fixedSize ? FixedSizeLogRow : LogLineWrapperStyled;
+    const logLineProps = {
+      className: isFiltered ? 'jf-log-filtered' : undefined,
+    };
 
     if (log.mode === 'voteresult') {
       // log of vote result table
       const logStyle = computeLogStyle('voteresult', theme);
 
       return (
-        <LogLineWrapper>
+        <LogLineWrapper {...logLineProps}>
           <Icon noName logStyle={logStyle} className={logClass} />
           <Name noName logStyle={logStyle} className={logClass} />
           <Main noName logStyle={logStyle} className={logClass}>
@@ -146,7 +174,7 @@ class OneLogInner extends React.PureComponent<IPropOneLog, {}> {
       // log of probability table for Quantum Werewwolf
       const logStyle = computeLogStyle('probability_table', theme);
       return (
-        <LogLineWrapper>
+        <LogLineWrapper {...logLineProps}>
           <Icon noName logStyle={logStyle} className={logClass} />
           <Name noName logStyle={logStyle} className={logClass} />
           <Main noName logStyle={logStyle} className={logClass}>
@@ -212,7 +240,7 @@ class OneLogInner extends React.PureComponent<IPropOneLog, {}> {
       const icon = icons[log.userid];
       const noName = icon == null;
       return (
-        <LogLineWrapper>
+        <LogLineWrapper {...logLineProps}>
           <Icon noName={noName} logStyle={logStyle} className={logClass} />
           <Name noName={noName} logStyle={logStyle} className={logClass} />
           <Comment noName={noName} logStyle={logStyle} className={logClass}>
@@ -271,7 +299,7 @@ class OneLogInner extends React.PureComponent<IPropOneLog, {}> {
         <Comment {...commentProps}>{sanitizeLog(log.comment)}</Comment>
       );
       return (
-        <LogLineWrapper>
+        <LogLineWrapper {...logLineProps}>
           {/* icon */}
           <Icon noName={noName} {...props}>
             {icon != null ? <img src={icon} alt="" /> : null}

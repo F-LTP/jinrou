@@ -174,6 +174,7 @@ export class Logs extends React.Component<IPropLogs, IStateLogs> {
         logClass={this.logClass}
         fixedSize={fixedSize}
         onClick={this.handleLogWrapperClick}
+        data-has-filter={logPickup != null ? 'true' : 'false'}
       >
         {mapReverse(logs.chunks, (chunk, i) => {
           // Decide whether this chunk should be shown.
@@ -203,6 +204,7 @@ export class Logs extends React.Component<IPropLogs, IStateLogs> {
               rule={rule}
               resolveLogById={this.resolveLogById}
               onShortIdClick={onShortIdClick}
+              logPickup={logPickup}
             />
           );
         })}
@@ -260,6 +262,10 @@ interface ILogChunkProps {
    * Callback for shortId click.
    */
   onShortIdClick?: (shortId: string) => void;
+  /**
+   * ID of user currently picked up for filtering.
+   */
+  logPickup?: string | null;
 }
 
 const LogChunkContent = React.memo<
@@ -276,6 +282,7 @@ const LogChunkContent = React.memo<
     icons,
     resolveLogById,
     onShortIdClick,
+    logPickup,
   }) => {
     // Use useMemo to cache logsToRender calculation
     const logsToRender = React.useMemo(() => {
@@ -307,6 +314,7 @@ const LogChunkContent = React.memo<
               icons={icons}
               resolveLogById={resolveLogById}
               onShortIdClick={onShortIdClick}
+              logPickup={logPickup}
             />
           );
         })}
@@ -314,22 +322,42 @@ const LogChunkContent = React.memo<
     );
   },
   (prevProps, nextProps) => {
-    // Custom comparison for better performance
-    // Check if logs length changed (new log added)
-    const logsChanged = prevProps.logs.length !== nextProps.logs.length;
-    if (logsChanged) {
+    // Primary check: logs array length change (new log added)
+    if (prevProps.logs.length !== nextProps.logs.length) {
       return false; // Re-render when logs array length changes
     }
+
+    // Secondary check: renderedNumber changed AND affects what's shown
+    // Only re-render if renderedNumber actually changes the slice
+    const prevRendered = prevProps.renderedNumber;
+    const nextRendered = nextProps.renderedNumber;
+    const logsLength = nextProps.logs.length;
+
+    // If renderedNumber changed AND it affects the slice, re-render
+    // This handles the case where new messages arrive and rendering limits shift
+    if (prevRendered !== nextRendered) {
+      // Only re-render if the change affects what's displayed
+      // If both are >= logs length, no change in actual display
+      const prevExceeds = prevRendered >= logsLength;
+      const nextExceeds = nextRendered >= logsLength;
+      if (prevExceeds !== nextExceeds) {
+        return false; // One exceeds, other doesn't - re-render needed
+      }
+      if (!prevExceeds && !nextExceeds && prevRendered !== nextRendered) {
+        return false; // Both don't exceed - re-render for slice change
+      }
+    }
+
     // For other props, use shallow comparison
     return (
       prevProps.logClass === nextProps.logClass &&
       prevProps.visible === nextProps.visible &&
       prevProps.fixedSize === nextProps.fixedSize &&
-      prevProps.renderedNumber === nextProps.renderedNumber &&
       prevProps.rule === nextProps.rule &&
       prevProps.icons === nextProps.icons &&
       prevProps.resolveLogById === nextProps.resolveLogById &&
       prevProps.onShortIdClick === nextProps.onShortIdClick &&
+      prevProps.logPickup === nextProps.logPickup &&
       prevProps.t === nextProps.t
     );
   },
@@ -353,6 +381,7 @@ const LogChunk = React.memo<ILogChunkProps>(
       icons,
       resolveLogById,
       onShortIdClick,
+      logPickup,
     } = props;
 
     // Early return if not visible and not fixed size
@@ -374,6 +403,7 @@ const LogChunk = React.memo<ILogChunkProps>(
             icons={icons}
             resolveLogById={resolveLogById}
             onShortIdClick={onShortIdClick}
+            logPickup={logPickup}
           />
         )}
       </I18n>
@@ -390,19 +420,40 @@ const LogChunk = React.memo<ILogChunkProps>(
     }
   },
   (prevProps, nextProps) => {
-    // Custom comparison using version number
-    // If version changed, re-render (return false)
-    // If version same AND other props same, skip re-render (return true)
+    // Primary check: version changed (log added to this chunk)
+    if (prevProps.version !== nextProps.version) {
+      return false; // Re-render when version changes
+    }
+
+    // Secondary check: renderedNumber changed AND affects what's shown
+    // This is needed because renderedNumber changes for all chunks when new message arrives
+    const prevRendered = prevProps.renderedNumber;
+    const nextRendered = nextProps.renderedNumber;
+    const logsLength = nextProps.logs.length;
+
+    // If renderedNumber changed AND it affects the slice, re-render
+    if (prevRendered !== nextRendered) {
+      // Only re-render if the change affects what's displayed
+      const prevExceeds = prevRendered >= logsLength;
+      const nextExceeds = nextRendered >= logsLength;
+      if (prevExceeds !== nextExceeds) {
+        return false; // One exceeds, other doesn't - re-render needed
+      }
+      if (!prevExceeds && !nextExceeds && prevRendered !== nextRendered) {
+        return false; // Both don't exceed - re-render for slice change
+      }
+    }
+
+    // For other props, use shallow comparison
     return (
-      prevProps.version === nextProps.version &&
       prevProps.logClass === nextProps.logClass &&
       prevProps.visible === nextProps.visible &&
       prevProps.fixedSize === nextProps.fixedSize &&
-      prevProps.renderedNumber === nextProps.renderedNumber &&
       prevProps.rule === nextProps.rule &&
       prevProps.icons === nextProps.icons &&
       prevProps.resolveLogById === nextProps.resolveLogById &&
-      prevProps.onShortIdClick === nextProps.onShortIdClick
+      prevProps.onShortIdClick === nextProps.onShortIdClick &&
+      prevProps.logPickup === nextProps.logPickup
     );
   },
 );
