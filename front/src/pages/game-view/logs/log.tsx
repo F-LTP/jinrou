@@ -116,7 +116,7 @@ class OneLogInner extends React.PureComponent<IPropOneLog, {}> {
     const baseClassName = logClass;
 
     // Build props for log line wrapper
-    const LogLineWrapper = fixedSize ? FixedSizeLogRow : LogLineWrapperStyled;
+    const LogLineWrapper = fixedSize ? FixedSizeLogRow : React.Fragment;
     const logLineProps: Record<string, any> = {};
 
     // For system messages, mark them so they can be filtered
