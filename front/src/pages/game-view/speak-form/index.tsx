@@ -642,6 +642,19 @@ export class SpeakForm extends React.PureComponent<
     input: HTMLInputElement | HTMLTextAreaElement,
   ): { top: number; left: number } {
     const rect = input.getBoundingClientRect();
+    const vv = (window as any).visualViewport;
+
+    // On mobile with virtual keyboard, use visualViewport API
+    if (vv) {
+      const keyboardHeight = window.innerHeight - vv.height;
+      const dropdownTop = rect.bottom - keyboardHeight + vv.pageTop + 4;
+      return {
+        top: dropdownTop,
+        left: rect.left + vv.pageLeft,
+      };
+    }
+
+    // Desktop fallback
     const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
     const scrollLeft =
       window.pageXOffset || document.documentElement.scrollLeft;

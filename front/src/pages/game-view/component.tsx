@@ -321,7 +321,7 @@ export class Game extends React.Component<IPropGame, {}> {
     // Back to the single line mode.
     store.update({
       speakState: {
-        multiline: false,
+        multiline: true,
       },
     });
     onSpeak(query);
