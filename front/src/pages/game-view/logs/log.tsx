@@ -5,10 +5,7 @@ import { Rule } from '../../../defs';
 import { TranslationFunction, I18nInterp } from '../../../i18n';
 import { phone, notPhone } from '../../../common/media';
 import { Theme } from '../../../theme';
-import {
-  FixedSizeLogRow,
-  LogLineWrapper as LogLineWrapperStyled,
-} from './elements';
+import { FixedSizeLogRow } from './elements';
 import { CommentContent } from './comment';
 import { StoredLog } from './log-store';
 import { useState, useRef, useCallback } from 'react';
@@ -79,11 +76,6 @@ export interface IPropOneLog {
    * Callback for shortId click.
    */
   onShortIdClick?: (shortId: string) => void;
-  /**
-   * ID of user currently picked up for filtering.
-   * Logs not matching this ID will be displayed with reduced opacity.
-   */
-  logPickup?: string | null;
 }
 
 /**
@@ -109,14 +101,12 @@ class OneLogInner extends React.PureComponent<IPropOneLog, {}> {
       icons,
       resolveLogById,
       onShortIdClick,
-      logPickup,
     } = this.props;
-
     // Build className for child elements
     const baseClassName = logClass;
 
     // Build props for log line wrapper
-    const LogLineWrapper = fixedSize ? FixedSizeLogRow : LogLineWrapperStyled;
+    const LogLineWrapper = fixedSize ? FixedSizeLogRow : React.Fragment;
     const logLineProps: Record<string, any> = {};
 
     // For system messages, mark them so they can be filtered
@@ -131,7 +121,7 @@ class OneLogInner extends React.PureComponent<IPropOneLog, {}> {
       const logStyle = computeLogStyle('voteresult', theme);
 
       return (
-        <LogLineWrapper {...logLineProps}>
+        <LogLineWrapper>
           <Icon noName logStyle={logStyle} className={logClass} />
           <Name noName logStyle={logStyle} className={logClass} />
           <Main noName logStyle={logStyle} className={logClass}>
@@ -167,7 +157,7 @@ class OneLogInner extends React.PureComponent<IPropOneLog, {}> {
       // log of probability table for Quantum Werewwolf
       const logStyle = computeLogStyle('probability_table', theme);
       return (
-        <LogLineWrapper {...logLineProps}>
+        <LogLineWrapper>
           <Icon noName logStyle={logStyle} className={logClass} />
           <Name noName logStyle={logStyle} className={logClass} />
           <Main noName logStyle={logStyle} className={logClass}>
@@ -233,7 +223,7 @@ class OneLogInner extends React.PureComponent<IPropOneLog, {}> {
       const icon = icons[log.userid];
       const noName = icon == null;
       return (
-        <LogLineWrapper {...logLineProps}>
+        <LogLineWrapper>
           <Icon noName={noName} logStyle={logStyle} className={logClass} />
           <Name noName={noName} logStyle={logStyle} className={logClass} />
           <Comment noName={noName} logStyle={logStyle} className={logClass}>
@@ -292,7 +282,7 @@ class OneLogInner extends React.PureComponent<IPropOneLog, {}> {
         <Comment {...commentProps}>{sanitizeLog(log.comment)}</Comment>
       );
       return (
-        <LogLineWrapper {...logLineProps}>
+        <LogLineWrapper>
           {/* icon */}
           <Icon noName={noName} {...props}>
             {icon != null ? <img src={icon} alt="" /> : null}
