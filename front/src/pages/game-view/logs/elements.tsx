@@ -2,18 +2,11 @@ import styled, { css } from '../../../util/styled';
 import { phone } from '../../../common/media';
 
 /**
- * CSS for filtered logs (reduced opacity)
- * Applied to elements with data-filtered attribute
- */
-const filteredStyle = css`
-  opacity: 0.3;
-`;
-
-/**
  * Columns definition of fixed-size log layout.
  */
 const fixedSizeGridColumnsPC = '16px 10em 1fr auto';
 const fixedSizeGridColumnsPhone = '16px 1fr auto';
+
 /**
  * Wrapper of whole logs.
  */
@@ -34,12 +27,9 @@ export const LogWrapper = styled.div<{
    * Callback for click to reset log pickup filter (double-click detection).
    */
   onClick?: (e: React.MouseEvent) => void;
-  /**
-   * Whether there is an active filter (used for CSS styling).
-   */
-  'data-has-filter'?: string;
 }>`
   width: 100%;
+  contain: layout style;
   display: ${props => (props.fixedSize ? 'block' : 'grid')};
   grid-template-columns:
     minmax(8px, max-content)
@@ -54,10 +44,15 @@ export const LogWrapper = styled.div<{
     grid-auto-flow: row dense;
   `};
 
-  /* Apply opacity to filtered logs (non-fixedSize mode) */
-  &[data-has-filter='true'] [data-filtered='true'] {
-    opacity: 0.3;
-  }
+  /* Original filter implementation using data-userid attribute */
+  ${({ logClass, logPickup }) =>
+    logPickup != null
+      ? css`
+          .${logClass}:not([data-userid="${logPickup}"]) {
+            opacity: 0.3;
+          }
+        `
+      : ''}
 `;
 
 /**
@@ -66,6 +61,7 @@ export const LogWrapper = styled.div<{
 export const FixedSizeChunkWrapper = styled.div<{
   visible: boolean;
 }>`
+  contain: layout style;
   display: ${({ visible }) => (visible ? 'block' : 'none')};
 `;
 
@@ -73,7 +69,7 @@ export const FixedSizeChunkWrapper = styled.div<{
  * Wrapper of one log line in non-fixedSize mode.
  * Uses grid to match parent LogWrapper's layout.
  */
-export const LogLineWrapper = styled.div<{ className?: string }>`
+export const LogLineWrapper = styled.div`
   display: grid;
   grid-template-columns:
     minmax(8px, max-content)
@@ -88,23 +84,16 @@ export const LogLineWrapper = styled.div<{ className?: string }>`
       auto;
     grid-auto-flow: row dense;
   `};
-  /* Apply opacity when filtered class is present */
-  &.jf-log-filtered > * {
-    opacity: 0.3 !important;
-  }
 `;
 
 /**
  * Wrapper of one log line, used in fixed-size layout.
  */
-export const FixedSizeLogRow = styled.div<{ className?: string }>`
+export const FixedSizeLogRow = styled.div`
   display: grid;
   grid-template-columns: ${fixedSizeGridColumnsPC};
+  contain: layout style;
   margin-bottom: -0.35px;
-  /* Apply opacity when filtered class is present */
-  &.jf-log-filtered > * {
-    opacity: 0.3 !important;
-  }
   ${phone`
     grid-template-columns: ${fixedSizeGridColumnsPhone};
     grid-auto-flow: row dense;

@@ -61,6 +61,7 @@ export const AutocompleteDropdown: React.FC<AutocompleteProps> = ({
   onClose,
 }) => {
   const dropdownRef = React.useRef<HTMLDivElement>(null);
+  const itemRefs = React.useRef<(HTMLDivElement | null)[]>([]);
 
   // Close on click outside
   React.useEffect(() => {
@@ -78,6 +79,19 @@ export const AutocompleteDropdown: React.FC<AutocompleteProps> = ({
     };
   }, [onClose]);
 
+  // Scroll to selected item when selectedIndex changes
+  React.useEffect(() => {
+    if (selectedIndex >= 0 && selectedIndex < items.length) {
+      const selectedItem = itemRefs.current[selectedIndex];
+      if (selectedItem && dropdownRef.current) {
+        selectedItem.scrollIntoView({
+          block: 'nearest',
+          behavior: 'smooth',
+        });
+      }
+    }
+  }, [selectedIndex, items.length]);
+
   if (items.length === 0) {
     return null;
   }
@@ -94,6 +108,9 @@ export const AutocompleteDropdown: React.FC<AutocompleteProps> = ({
       {items.map((item, index) => (
         <ItemStyle
           key={`${item.type}-${item.value}`}
+          ref={el => {
+            itemRefs.current[index] = el;
+          }}
           role="option"
           aria-selected={index === selectedIndex}
           selected={index === selectedIndex}
