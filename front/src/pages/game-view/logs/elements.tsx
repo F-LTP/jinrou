@@ -16,13 +16,21 @@ export const LogWrapper = styled.div<{
    */
   logClass: string;
   /**
+   * ID of user currently picked up.
+   */
+  logPickup: string | null;
+  /**
+   * Whether the UI is in "fixed-size mode".
+   */
+  fixedSize: boolean;
+  /**
    * Callback for click to reset log pickup filter (double-click detection).
    */
   onClick?: (e: React.MouseEvent) => void;
 }>`
   width: 100%;
   contain: layout style;
-  display: grid;
+  display: ${props => (props.fixedSize ? 'block' : 'grid')};
   grid-template-columns:
     minmax(8px, max-content)
     fit-content(10em)
@@ -36,22 +44,25 @@ export const LogWrapper = styled.div<{
     grid-auto-flow: row dense;
   `};
 
-  /* Fixed-size mode overrides display */
-  &.fixed-size {
-    display: block;
-  }
+  /* Original filter implementation using data-userid attribute */
+  ${({ logClass, logPickup }) =>
+    logPickup != null
+      ? css`
+          .${logClass}:not([data-userid="${logPickup}"]) {
+            opacity: 0.3;
+          }
+        `
+      : ''}
 `;
 
 /**
  * Wrapper of chunk, used in fixed-size mode.
  */
-export const FixedSizeChunkWrapper = styled.div`
+export const FixedSizeChunkWrapper = styled.div<{
+  visible: boolean;
+}>`
   contain: layout style;
-  display: block;
-
-  &.hidden {
-    display: none;
-  }
+  display: ${({ visible }) => (visible ? 'block' : 'none')};
 `;
 
 /**
