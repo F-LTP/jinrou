@@ -687,8 +687,8 @@ const Name = styled(NameInner)<IPropName>`
   text-align: right;
   ${({ size }) =>
     size === 'big' || size === 'small'
-      ? 'line-height: 1.2;'
-      : 'line-height: 1.27;'} ${phone<IPropLogPart>`
+      ? 'line-height: 1.3;'
+      : 'line-height: 1.3;'} ${phone<IPropLogPart>`
     ${({ noName }) => (noName ? 'display: none;' : '')}
     max-width: none;
     text-align: left;
@@ -835,10 +835,10 @@ const Comment = styled(Main)<IPropComment>`
   }}
   ${({ size }) =>
     size === 'big'
-      ? 'font-weight: bold; line-height: 1.2;'
+      ? 'font-weight: bold; line-height: 1.3;'
       : size === 'small'
-      ? 'text-decoration: underline; font-weight: bold; line-height: 1.2;'
-      : 'line-height: 1.27'};
+      ? 'text-decoration: underline; font-weight: bold; line-height: 3;'
+      : 'line-height: 1.3'};
 `;
 
 /**
