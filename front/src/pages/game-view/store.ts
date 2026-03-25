@@ -81,7 +81,7 @@ export class GameStore {
   speakState: SpeakState = {
     size: 'normal',
     kind: '',
-    multiline: true,
+    multiline: false,
     willOpen: false,
     noteOpen: false,
     widePage: JSON.parse(

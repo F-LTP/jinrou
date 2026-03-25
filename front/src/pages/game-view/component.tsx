@@ -318,12 +318,7 @@ export class Game extends React.Component<IPropGame, {}> {
   @bind
   protected handleSpeak(query: SpeakQuery): void {
     const { store, onSpeak } = this.props;
-    // Back to the single line mode.
-    store.update({
-      speakState: {
-        multiline: true,
-      },
-    });
+    // Don't reset multiline state, keep current state
     onSpeak(query);
   }
   /**
