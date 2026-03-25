@@ -846,7 +846,36 @@ export class SpeakForm extends React.PureComponent<
       if (this.props.multiline) {
         // In multiline mode, Shift+Enter sends the message
         e.preventDefault();
-        this.handleSubmit(e as any);
+
+        // Check if speak button is disabled (禁言时间)
+        const { roleInfo, gameInfo, timer } = this.props;
+        const speakAllowed = !(roleInfo == null && !gameInfo.watchspeak);
+
+        // Calculate nsecondSilent exactly as in render
+        let nsecondSilent = true;
+        if (roleInfo == null) {
+          nsecondSilent = true;
+        } else {
+          const jobname = (roleInfo as any).jobname;
+          const dead = (roleInfo as any).dead;
+          const phase = (timer as any).name;
+
+          // rule1 gamemaster
+          if (jobname === '游戏管理员') {
+            nsecondSilent = true;
+          }
+          // rule2 silentphase
+          else if (dead == false && phase == '禁止发言') {
+            nsecondSilent = false;
+          } else {
+            nsecondSilent = true;
+          }
+        }
+
+        // Only submit if speak is allowed
+        if (speakAllowed && nsecondSilent) {
+          this.handleSubmit(e as any);
+        }
         return;
       } else {
         // In single-line mode, this switches to multiline mode
