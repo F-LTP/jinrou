@@ -8,3 +8,4 @@ node_modules/
 /client/static/front-assets
 /language/*/*.missing.json
 /.vs
+CLAUDE.md
