@@ -59,7 +59,6 @@ export const LogWrapper = styled.div<{
 export const FixedSizeChunkWrapper = styled.div<{
   visible: boolean;
 }>`
-  contain: layout style;
   display: ${({ visible }) => (visible ? 'block' : 'none')};
 `;
 
@@ -69,7 +68,6 @@ export const FixedSizeChunkWrapper = styled.div<{
 export const FixedSizeLogRow = styled.div`
   display: grid;
   grid-template-columns: ${fixedSizeGridColumnsPC};
-  contain: layout style;
   margin-bottom: -0.35px;
   ${phone`
     grid-template-columns: ${fixedSizeGridColumnsPhone};
