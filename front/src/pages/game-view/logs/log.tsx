@@ -380,7 +380,7 @@ export function computeLogStyle(mode: Log['mode'], theme: Theme): LogStyle {
       return {
         background: theme.user.day.bg,
         color: theme.user.day.color,
-        borderColor: null,
+        borderColor: 'rgba(0, 0, 0, 0.2)',
       };
     }
     case 'fox': {
