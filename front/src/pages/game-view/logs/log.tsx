@@ -820,15 +820,15 @@ const Comment = styled(Main)<IPropComment>`
   ${({ size, mode }) => {
     if (mode === 'day' || mode === 'gm') {
       if (size === 'skyblue') {
-        return `color: #00BFFF !important;`;
+        return `color: rgb(199, 21, 133) !important;  font-weight: bold;`;
       } else if (size === 'darkblue') {
-        return `color: #0000CD !important;`;
+        return `color: #0000CD !important; font-weight: bold;`;
       } else if (size === 'purple') {
-        return `color: #9400D3 !important;`;
+        return `color: #9400D3 !important; font-weight: bold;`;
       } else if (size === 'green') {
-        return `color: #00C957 !important;`;
+        return `color: #04682f !important; font-weight: bold;`;
       } else if (size === 'brown') {
-        return `color: #A0522D !important;`;
+        return `color: #A0522D !important; font-weight: bold;`;
       }
     }
     return '';
