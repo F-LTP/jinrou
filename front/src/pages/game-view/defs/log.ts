@@ -65,7 +65,14 @@ export interface NormalLog extends LogBase {
   /**
    * Size of comment.
    */
-  size?: 'big' | 'small';
+  size?:
+    | 'big'
+    | 'small'
+    | 'skyblue'
+    | 'darkblue'
+    | 'purple'
+    | 'green'
+    | 'brown';
   /**
    * Supplement to log.
    */

@@ -244,7 +244,7 @@ class OneLogInner extends React.PureComponent<IPropOneLog, {}> {
         </LogLineWrapper>
       );
     } else {
-      const logStyle = computeLogStyle(log.mode, theme);
+      let logStyle = computeLogStyle(log.mode, theme);
       const size = log.mode === 'nextturn' ? undefined : log.size;
       const icon = log.mode === 'nextturn' ? undefined : icons[log.userid];
       const nameText =
@@ -266,6 +266,7 @@ class OneLogInner extends React.PureComponent<IPropOneLog, {}> {
       };
       const commentProps = {
         size,
+        mode: log.mode,
         noName,
         ...props,
       };
@@ -616,7 +617,14 @@ const Icon = styled(LogPart)<IPropLogPart>`
  * Username box.
  */
 interface IPropName extends IPropLogPart {
-  size?: 'big' | 'small';
+  size?:
+    | 'big'
+    | 'small'
+    | 'skyblue'
+    | 'darkblue'
+    | 'purple'
+    | 'green'
+    | 'brown';
   shortId?: string;
   onShortIdClick?: (shortId: string) => void;
 }
@@ -714,15 +722,93 @@ interface IPropComment {
   /**
    * Changed size of comment.
    */
-  size?: 'big' | 'small';
+  size?:
+    | 'big'
+    | 'small'
+    | 'skyblue'
+    | 'darkblue'
+    | 'purple'
+    | 'green'
+    | 'brown';
+  /**
+   * Log mode for color application.
+   */
+  mode?: Log['mode'];
 }
 
-const getFontSize = (size: 'big' | 'small' | undefined) =>
+const getFontSize = (
+  size?:
+    | 'big'
+    | 'small'
+    | 'skyblue'
+    | 'darkblue'
+    | 'purple'
+    | 'green'
+    | 'brown',
+) =>
   size === 'big'
     ? 'calc(1.07 * var(--base-font-size))'
     : size === 'small'
     ? 'calc(1.25 * var(--base-font-size))'
     : 'var(--base-font-size)';
+
+/**
+ * Get font color based on size.
+ */
+const getFontColor = (
+  size?:
+    | 'big'
+    | 'small'
+    | 'skyblue'
+    | 'darkblue'
+    | 'purple'
+    | 'green'
+    | 'brown',
+): string => {
+  switch (size) {
+    case 'skyblue':
+      return '#00008B';
+    case 'darkblue':
+      return '#FFFFFF';
+    case 'purple':
+      return '#FFFFFF';
+    case 'green':
+      return '#FFFFFF';
+    case 'brown':
+      return '#FFFFFF';
+    default:
+      return 'inherit';
+  }
+};
+
+/**
+ * Get background color based on size.
+ */
+const getBackgroundColor = (
+  size?:
+    | 'big'
+    | 'small'
+    | 'skyblue'
+    | 'darkblue'
+    | 'purple'
+    | 'green'
+    | 'brown',
+): string => {
+  switch (size) {
+    case 'skyblue':
+      return '#87CEEB';
+    case 'darkblue':
+      return '#00008B';
+    case 'purple':
+      return '#800080';
+    case 'green':
+      return '#228B22';
+    case 'brown':
+      return '#8B4513';
+    default:
+      return 'inherit';
+  }
+};
 
 /**
  * Log comment box.
@@ -731,6 +817,22 @@ const Comment = styled(Main)<IPropComment>`
   white-space: pre-wrap;
   font-size: ${({ size }) => getFontSize(size)};
   letter-spacing: 0.02em;
+  ${({ size, mode }) => {
+    if (mode === 'day' || mode === 'gm') {
+      if (size === 'skyblue') {
+        return `color: #00BFFF !important;`;
+      } else if (size === 'darkblue') {
+        return `color: #0000CD !important;`;
+      } else if (size === 'purple') {
+        return `color: #9400D3 !important;`;
+      } else if (size === 'green') {
+        return `color: #00C957 !important;`;
+      } else if (size === 'brown') {
+        return `color: #A0522D !important;`;
+      }
+    }
+    return '';
+  }}
   ${({ size }) =>
     size === 'big'
       ? 'font-weight: bold; line-height: 1.2;'

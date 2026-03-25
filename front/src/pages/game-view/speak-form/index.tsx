@@ -325,11 +325,26 @@ export class SpeakForm extends React.PureComponent<
                                 value={size}
                                 onChange={this.handleSizeChange}
                               >
-                                <option value="small">
-                                  {t('game_client:speak.size.small')}
-                                </option>
                                 <option value="normal">
                                   {t('game_client:speak.size.normal')}
+                                </option>
+                                <option value="skyblue">
+                                  {t('game_client:speak.size.skyblue')}
+                                </option>
+                                <option value="darkblue">
+                                  {t('game_client:speak.size.darkblue')}
+                                </option>
+                                <option value="brown">
+                                  {t('game_client:speak.size.brown')}
+                                </option>
+                                <option value="green">
+                                  {t('game_client:speak.size.green')}
+                                </option>
+                                <option value="purple">
+                                  {t('game_client:speak.size.purple')}
+                                </option>
+                                <option value="small">
+                                  {t('game_client:speak.size.small')}
                                 </option>
                                 <option value="big">
                                   {t('game_client:speak.size.big')}
@@ -502,8 +517,18 @@ export class SpeakForm extends React.PureComponent<
     const query: SpeakQuery = {
       comment: this.commentString,
       mode: kind,
-      // XXX compatibility!
-      size: size === 'normal' ? '' : size,
+      // XXX compatibility! normal is represented as empty string.
+      size:
+        size === 'normal'
+          ? ''
+          : (size as
+              | 'big'
+              | 'small'
+              | 'skyblue'
+              | 'darkblue'
+              | 'purple'
+              | 'green'
+              | 'brown'),
     };
     this.props.onSpeak(query);
     // reset the comment form.
@@ -841,7 +866,15 @@ export class SpeakForm extends React.PureComponent<
   @bind
   protected handleSizeChange(e: React.SyntheticEvent<HTMLSelectElement>): void {
     this.props.onUpdate({
-      size: e.currentTarget.value as 'small' | 'normal' | 'big',
+      size: e.currentTarget.value as
+        | 'small'
+        | 'normal'
+        | 'big'
+        | 'skyblue'
+        | 'darkblue'
+        | 'purple'
+        | 'green'
+        | 'brown',
     });
   }
   /**
