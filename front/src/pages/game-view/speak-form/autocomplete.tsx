@@ -101,24 +101,23 @@ export const AutocompleteDropdown: React.FC<AutocompleteProps> = ({
 
     // Use ResizeObserver to detect when the input's parent resizes
     const input = document.querySelector('textarea[data-ml-comment="true"]');
+    let resizeObserver: any = null;
+
     if (input && input.parentElement) {
-      const resizeObserver = new (window as any).ResizeObserver(updatePosition);
+      resizeObserver = new (window as any).ResizeObserver(updatePosition);
       resizeObserver.observe(input.parentElement);
-      // Cleanup observer on unmount
-      return () => {
-        window.removeEventListener('scroll', updatePosition, true);
-        window.removeEventListener('resize', updatePosition);
-        if (rafId !== null) cancelAnimationFrame(rafId);
-        resizeObserver.disconnect();
-      };
     }
 
+    // Cleanup function - ALWAYS executed
     return () => {
       window.removeEventListener('scroll', updatePosition, true);
       window.removeEventListener('resize', updatePosition);
       if (rafId !== null) cancelAnimationFrame(rafId);
+      if (resizeObserver) {
+        resizeObserver.disconnect();
+      }
     };
-  }, [items.length]);
+  }, [items.length, position]); // Add position as dependency
 
   // Scroll to selected item when selectedIndex changes
   React.useEffect(() => {
