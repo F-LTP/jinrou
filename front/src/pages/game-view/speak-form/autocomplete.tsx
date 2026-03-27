@@ -204,6 +204,7 @@ const DropdownStyle = styled.div`
   position: fixed;
   z-index: 9999;
   background: white;
+  color: black;
   border: 1px solid #ccc;
   border-radius: 4px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -220,6 +221,7 @@ const ItemStyle = styled.div<{ selected: boolean }>`
   align-items: center;
   gap: 8px;
   border-bottom: 1px solid #f0f0f0;
+  color: black;
 
   &:last-child {
     border-bottom: none;
@@ -241,11 +243,13 @@ const ItemStyle = styled.div<{ selected: boolean }>`
 
 const ItemLabel = styled.span`
   flex: 1;
+  color: black;
 `;
 
 const Highlight = styled.span`
   font-weight: bold;
   background-color: #ffeb3b;
+  color: black;
   border-radius: 2px;
   padding: 0 2px;
 `;
