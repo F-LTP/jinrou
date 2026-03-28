@@ -126,9 +126,6 @@ export class Game extends React.Component<IPropGame, {}> {
     teamColors,
   }));
   public render() {
-    if (typeof performance !== 'undefined' && typeof window !== 'undefined') {
-      performance.mark('Game.render-start');
-    }
     const {
       i18n,
       roomid,
@@ -239,7 +236,7 @@ export class Game extends React.Component<IPropGame, {}> {
                     <>
                       <RuleWrapper closed={closed}>
                         {rule != null ? (
-                          <RuleStickyWrapper>
+                          <RuleStickyWrapper closed={closed}>
                             <RuleInnerWrapper ref={this.ruleElement}>
                               <Swipeable
                                 onSwipingLeft={this.handleRuleSwipeToLeft}
@@ -256,7 +253,7 @@ export class Game extends React.Component<IPropGame, {}> {
                         ) : null}
                       </RuleWrapper>
                       {/* Logs. */}
-                      <LogsWrapper>
+                      <LogsWrapper ruleOpen={!closed}>
                         <Logs
                           logs={store.logs}
                           visibility={store.logVisibility}
@@ -296,14 +293,6 @@ export class Game extends React.Component<IPropGame, {}> {
         </I18nProvider>
       </ThemeProvider>
     );
-    if (typeof performance !== 'undefined' && typeof window !== 'undefined') {
-      performance.mark('Game.render-end');
-      performance.measure(
-        'Game.render',
-        'Game.render-start',
-        'Game.render-end',
-      );
-    }
   }
   /**
    * Handle an update to the store.
@@ -363,19 +352,12 @@ export class Game extends React.Component<IPropGame, {}> {
    */
   @bind
   protected handleRuleOpen(scroll: boolean): void {
-    performance.mark('handleRuleOpen-start');
     const { store } = this.props;
     // toggle the rule pane.
     const prevOpen = store.ruleOpen;
     store.update({
       ruleOpen: !prevOpen,
     });
-    performance.mark('handleRuleOpen-end');
-    performance.measure(
-      'handleRuleOpen',
-      'handleRuleOpen-start',
-      'handleRuleOpen-end',
-    );
     if (!prevOpen && scroll && this.ruleElement.current != null) {
       // if scroll request is positive,
       // scroll to the rule pane.
@@ -578,15 +560,23 @@ const JobInfoPart = styled(RoomHeaderPart)`
 const MainWrapper = styled.div`
   display: flex;
   flex-flow: row nowrap;
-  position: relative;
 `;
 
 /**
  * Wrapper of logs.
  */
-const LogsWrapper = styled.div`
+const LogsWrapper = styled.div<{
+  /**
+   * Whether the rule pane is open.
+   */
+  ruleOpen?: boolean;
+}>`
   flex: auto 1 1;
   order: 1;
+  ${phone`
+    transition: margin-left 250ms ease-out;
+    margin-left: ${({ ruleOpen }) => (ruleOpen ? '-20em' : '0)')};
+  `};
 `;
 
 /**
@@ -605,16 +595,13 @@ interface IPropsRuleWrapper {
 }
 /**
  * Wrapper of rule.
- * Uses position: absolute to overlay on top of logs,
- * avoiding expensive reflow of 30000+ log nodes.
  */
 const RuleWrapper = styled.div<IPropsRuleWrapper>`
-  position: absolute;
-  right: 0;
-  top: 0;
-  bottom: 0;
+  transition: width 250ms ease-out;
+  flex: auto 0 0;
   width: ${({ closed }) => (closed ? '0' : '20em')};
-  overflow: hidden;
+  order: 2;
+
   z-index: ${ruleZIndex};
   background-color: #ffd1f2;
   color: black;
@@ -624,12 +611,12 @@ const RuleWrapper = styled.div<IPropsRuleWrapper>`
   }
 `;
 
-const RuleStickyWrapper = styled.div`
-  width: 20em;
+const RuleStickyWrapper = styled.div<IPropsRuleWrapper>`
+  transition: width 250ms ease-out;
+  width: ${({ closed }) => (closed ? '0' : '20em')};
   position: sticky;
   top: 0;
   overflow-x: hidden;
-  max-height: 100vh;
 `;
 
 const RuleInnerWrapper = styled.div`

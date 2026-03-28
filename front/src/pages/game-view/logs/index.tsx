@@ -145,7 +145,6 @@ export class Logs extends React.Component<IPropLogs, IStateLogs> {
   };
 
   public render() {
-    performance.mark('Logs.render-start');
     const {
       logs,
       rule,
@@ -276,8 +275,8 @@ class LogChunk extends React.Component<
       renderedNumber >= logs.length
         ? logs
         : renderedNumber > 0
-        ? logs.slice(-renderedNumber)
-        : [];
+          ? logs.slice(-renderedNumber)
+          : [];
 
     const chunkContent = (
       <I18n namespace="game_client">
