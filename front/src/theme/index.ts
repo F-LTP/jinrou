@@ -39,6 +39,8 @@ const defaultPhoneUISettings: PhoneUISettings = {
   use: true,
   fontSize: 'normal',
   speakFormPosition: 'normal',
+  autocompleteTrigger: { comma: true, slash: true, at: false },
+  multiline: { defaultEnabled: false, keepAfterSend: true },
 };
 
 /**

@@ -837,7 +837,7 @@ const Comment = styled(Main)<IPropComment>`
     size === 'big'
       ? 'font-weight: bold; line-height: 1.3;'
       : size === 'small'
-      ? 'text-decoration: underline; font-weight: bold; line-height: 3;'
+      ? 'text-decoration: underline; font-weight: bold; line-height: 1.3;'
       : 'line-height: 1.3'};
 `;
 

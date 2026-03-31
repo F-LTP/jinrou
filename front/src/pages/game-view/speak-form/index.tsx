@@ -71,7 +71,7 @@ import { IsPhone } from '../../../common/media';
 import { FontAwesomeIcon } from '../../../util/icon';
 import { SensitiveButton } from '../../../util/sensitive-button';
 import { withTheme } from '../../../util/styled';
-import { Theme } from '../../../theme';
+import { Theme, themeStore } from '../../../theme';
 
 export interface IPropSpeakForm extends SpeakState {
   /**
@@ -539,6 +539,13 @@ export class SpeakForm extends React.PureComponent<
     }
     // Clear draft from localStorage after sending.
     clearSpeakDraftFromStorage();
+    // Reset multiline state if not configured to keep.
+    const multilineSettings = themeStore.savedTheme.phoneUI.multiline;
+    if (multilineSettings && !multilineSettings.keepAfterSend) {
+      this.props.onUpdate({
+        multiline: false,
+      });
+    }
   }
   /**
    * Handle a change of comment input.
@@ -569,8 +576,16 @@ export class SpeakForm extends React.PureComponent<
     const cursorPos = input.selectionStart || value.length;
     const shortcuts = this.state.autocomplete.shortcuts;
 
-    // Supported trigger characters
-    const triggers = ['、', '/'];
+    // Supported trigger characters (user-configurable via settings)
+    const triggerConfig = themeStore.savedTheme.phoneUI.autocompleteTrigger || {
+      comma: true,
+      slash: true,
+      at: false,
+    };
+    const triggers: string[] = [];
+    if (triggerConfig.comma) triggers.push('、');
+    if (triggerConfig.slash) triggers.push('/');
+    if (triggerConfig.at) triggers.push('@');
 
     // Find the last occurrence of any trigger character before cursor
     let lastTriggerIndex = -1;
