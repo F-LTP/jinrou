@@ -6,7 +6,7 @@ import { Rule } from '../../../defs';
 import { OneLog } from './log';
 import { StoredLog, LogStore } from './log-store';
 import { mapReverse } from '../../../util/map-reverse';
-import { I18n } from '../../../i18n';
+import { I18n, TranslationFunction } from '../../../i18n';
 import {
   LogWrapper,
   FixedSizeChunkWrapper,
@@ -214,8 +214,10 @@ export class Logs extends React.Component<IPropLogs, IStateLogs> {
 
 /**
  * Show chunk of logs.
+ * PureComponent: when a new message arrives in the last chunk,
+ * all other chunks skip re-rendering entirely.
  */
-class LogChunk extends React.Component<
+class LogChunk extends React.PureComponent<
   {
     /**
      * Class attached to each log.
@@ -275,28 +277,23 @@ class LogChunk extends React.Component<
       renderedNumber >= logs.length
         ? logs
         : renderedNumber > 0
-          ? logs.slice(-renderedNumber)
-          : [];
+        ? logs.slice(-renderedNumber)
+        : [];
 
     const chunkContent = (
       <I18n namespace="game_client">
-        {t =>
-          mapReverse(logsToRender, log => {
-            return (
-              <OneLog
-                key={log.logid}
-                t={t}
-                logClass={logClass}
-                fixedSize={fixedSize}
-                log={log}
-                rule={rule}
-                icons={icons}
-                resolveLogById={resolveLogById}
-                onShortIdClick={onShortIdClick}
-              />
-            );
-          })
-        }
+        {t => (
+          <LogChunkInner
+            logsToRender={logsToRender}
+            t={t}
+            logClass={logClass}
+            fixedSize={fixedSize}
+            rule={rule}
+            icons={icons}
+            resolveLogById={resolveLogById}
+            onShortIdClick={onShortIdClick}
+          />
+        )}
       </I18n>
     );
     if (fixedSize) {
@@ -308,5 +305,165 @@ class LogChunk extends React.Component<
     } else {
       return chunkContent;
     }
+  }
+}
+
+/**
+ * Sub-chunk size for content-visibility rendering.
+ */
+const SUB_CHUNK_SIZE = 100;
+
+/**
+ * Inner content of LogChunk.
+ * Splits large log arrays into sub-chunks with content-visibility.
+ */
+class LogChunkInner extends React.Component<{
+  logsToRender: StoredLog[];
+  t: TranslationFunction;
+  logClass: string;
+  fixedSize: boolean;
+  rule: Rule | undefined;
+  icons: Record<string, string | undefined>;
+  resolveLogById: ((shortId: string) => StoredLog | null) | undefined;
+  onShortIdClick: ((shortId: string) => void) | undefined;
+}> {
+  public render() {
+    const {
+      logsToRender,
+      t,
+      logClass,
+      fixedSize,
+      rule,
+      icons,
+      resolveLogById,
+      onShortIdClick,
+    } = this.props;
+
+    // Small chunks: render directly without sub-chunking
+    if (logsToRender.length <= SUB_CHUNK_SIZE) {
+      return (
+        <>
+          {mapReverse(logsToRender, log => (
+            <OneLog
+              key={log.logid}
+              t={t}
+              logClass={logClass}
+              fixedSize={fixedSize}
+              log={log}
+              rule={rule}
+              icons={icons}
+              resolveLogById={resolveLogById}
+              onShortIdClick={onShortIdClick}
+            />
+          ))}
+        </>
+      );
+    }
+
+    // Build sub-chunks in original order for stable keys, then reverse
+    const subChunks: { logs: StoredLog[]; key: number }[] = [];
+    for (let i = 0; i < logsToRender.length; i += SUB_CHUNK_SIZE) {
+      const sub = logsToRender.slice(i, i + SUB_CHUNK_SIZE);
+      subChunks.push({ logs: sub, key: sub[0].logid });
+    }
+    const reversed = subChunks.slice().reverse();
+
+    return (
+      <>
+        {reversed.map(({ logs: subLogs, key }) => (
+          <LogSubChunk
+            key={key}
+            logs={subLogs}
+            t={t}
+            logClass={logClass}
+            fixedSize={fixedSize}
+            rule={rule}
+            icons={icons}
+            resolveLogById={resolveLogById}
+            onShortIdClick={onShortIdClick}
+          />
+        ))}
+      </>
+    );
+  }
+}
+
+/**
+ * Sub-chunk with CSS content-visibility.
+ * Browser skips layout/paint for off-screen sub-chunks.
+ * shouldComponentUpdate skips t comparison (functionally identical).
+ */
+class LogSubChunk extends React.PureComponent<{
+  logs: StoredLog[];
+  t: TranslationFunction;
+  logClass: string;
+  fixedSize: boolean;
+  icons: Record<string, string | undefined>;
+  rule: Rule | undefined;
+  resolveLogById?: (shortId: string) => StoredLog | null;
+  onShortIdClick?: (shortId: string) => void;
+}> {
+  public shouldComponentUpdate(nextProps: LogSubChunk['props']) {
+    const cur = this.props;
+    const next = nextProps;
+    // Skip t — same namespace, functionally identical
+    if (
+      cur.logClass !== next.logClass ||
+      cur.fixedSize !== next.fixedSize ||
+      cur.rule !== next.rule ||
+      cur.icons !== next.icons ||
+      cur.resolveLogById !== next.resolveLogById ||
+      cur.onShortIdClick !== next.onShortIdClick
+    ) {
+      return true;
+    }
+    if (cur.logs === next.logs) {
+      return false;
+    }
+    if (cur.logs.length !== next.logs.length) {
+      return true;
+    }
+    return (
+      cur.logs[0] !== next.logs[0] ||
+      cur.logs[cur.logs.length - 1] !== next.logs[next.logs.length - 1]
+    );
+  }
+
+  public render() {
+    const {
+      logs,
+      t,
+      logClass,
+      fixedSize,
+      rule,
+      icons,
+      resolveLogById,
+      onShortIdClick,
+    } = this.props;
+    const estimatedHeight = Math.max(100, logs.length * 30);
+    return (
+      <div
+        style={
+          {
+            contentVisibility: 'auto',
+            containIntrinsicSize: `0 ${estimatedHeight}px`,
+          } as React.CSSProperties
+        }
+      >
+        {mapReverse(logs, log => (
+          <OneLog
+            key={log.logid}
+            t={t}
+            logClass={logClass}
+            fixedSize={fixedSize}
+            log={log}
+            rule={rule}
+            icons={icons}
+            resolveLogById={resolveLogById}
+            onShortIdClick={onShortIdClick}
+          />
+        ))}
+      </div>
+    );
   }
 }
