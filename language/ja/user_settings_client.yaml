@@ -118,5 +118,5 @@ customize:
     keepAfterSend: '发言后保持当前勾选状态'
   coloredFontBold:
     title: '彩色字体粗体'
-    description: '选择是否为彩色字体（天蓝、深蓝、紫色、绿色、棕色）应用粗体效果。'
+    description: '选择是否为彩色字体（粉紫、深蓝、紫色、绿色、棕色）应用粗体效果。'
     label: '彩色字体应用粗体'
