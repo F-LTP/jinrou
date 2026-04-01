@@ -3061,6 +3061,16 @@ class VotingBox
             to:player.id
             comment: @game.i18n.t "system.votingbox.voted", {name: player.name, target: pl.name}
         splashlog @game.id,@game,log
+        # GM用：未投票のプレイヤーを通知
+        votedIds = @votes.map (x)->x.player.id
+        unvoted = @game.players.filter (x)->!x.dead && x.id not in votedIds
+        if unvoted.length > 0
+            unvotedNames = unvoted.map((x)->x.name).join("、")
+            hiddenLog =
+                mode:"hidden"
+                to:-1
+                comment: @game.i18n.t "system.votingbox.unvoted", {names: unvotedNames, count: unvoted.length}
+            splashlog @game.id,@game,hiddenLog
         null
     # その人の投票オブジェクトを得る
     getHisVote:(player)->
