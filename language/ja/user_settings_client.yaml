@@ -116,3 +116,7 @@ customize:
     description: '设置发言框多行模式的默认行为。'
     defaultEnabled: '默认开启多行模式'
     keepAfterSend: '发言后保持当前勾选状态'
+  coloredFontBold:
+    title: '彩色字体粗体'
+    description: '选择是否为彩色字体（天蓝、深蓝、紫色、绿色、棕色）应用粗体效果。'
+    label: '彩色字体应用粗体'

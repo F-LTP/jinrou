@@ -23,6 +23,7 @@ interface IPropCustomizeDispInner {
   themeStore: ThemeStore;
   onTriggerToggle: (key: keyof AutocompleteTriggerConfig) => void;
   onMultilineChange: (key: keyof MultilineSettings) => void;
+  onColoredFontBoldToggle: () => void;
 }
 
 const defaultTrigger: AutocompleteTriggerConfig = {
@@ -65,6 +66,16 @@ const addProps = withProps(({ store }: IPropCustomizeDisp) => ({
     });
     themeStore.saveToStorage();
   },
+  onColoredFontBoldToggle: () => {
+    const current = themeStore.savedTheme.phoneUI.coloredFontBold !== false;
+    themeStore.update({
+      phoneUI: {
+        ...themeStore.savedTheme.phoneUI,
+        coloredFontBold: !current,
+      },
+    });
+    themeStore.saveToStorage();
+  },
 }));
 
 const CustomizeDispInner = observer(
@@ -72,12 +83,15 @@ const CustomizeDispInner = observer(
     t,
     onTriggerToggle,
     onMultilineChange,
+    onColoredFontBoldToggle,
     themeStore,
   }: IPropCustomizeDispInner) => {
     const trigger =
       themeStore.savedTheme.phoneUI.autocompleteTrigger || defaultTrigger;
     const multiline =
       themeStore.savedTheme.phoneUI.multiline || defaultMultiline;
+    const coloredFontBold =
+      themeStore.savedTheme.phoneUI.coloredFontBold !== false;
     return (
       <Wrapper>
         <Controls
@@ -109,6 +123,17 @@ const CustomizeDispInner = observer(
             onChange={() => onMultilineChange('keepAfterSend')}
           >
             {t('customize.multiline.keepAfterSend')}
+          </CheckButton>
+        </Controls>
+        <Controls
+          title={t('customize.coloredFontBold.title')}
+          description={t('customize.coloredFontBold.description')}
+        >
+          <CheckButton
+            checked={coloredFontBold}
+            onChange={onColoredFontBoldToggle}
+          >
+            {t('customize.coloredFontBold.label')}
           </CheckButton>
         </Controls>
       </Wrapper>

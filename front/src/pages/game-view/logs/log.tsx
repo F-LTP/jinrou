@@ -9,6 +9,7 @@ import { FixedSizeLogRow } from './elements';
 import { CommentContent } from './comment';
 import { StoredLog } from './log-store';
 import { useState, useRef, useCallback } from 'react';
+import { themeStore } from '../../../theme';
 
 /**
  * 兼容移动端和桌面端的双击检测 Hook
@@ -268,6 +269,7 @@ class OneLogInner extends React.PureComponent<IPropOneLog, {}> {
         size,
         mode: log.mode,
         noName,
+        coloredBold: themeStore.savedTheme.phoneUI.coloredFontBold !== false,
         ...props,
       };
       // Server's bug? comment may actually be null
@@ -734,6 +736,10 @@ interface IPropComment {
    * Log mode for color application.
    */
   mode?: Log['mode'];
+  /**
+   * Whether colored font should apply bold.
+   */
+  coloredBold?: boolean;
 }
 
 const getFontSize = (
@@ -817,18 +823,19 @@ const Comment = styled(Main)<IPropComment>`
   white-space: pre-wrap;
   font-size: ${({ size }) => getFontSize(size)};
   letter-spacing: 0.02em;
-  ${({ size, mode }) => {
+  ${({ size, mode, coloredBold }) => {
     if (mode === 'day' || mode === 'gm') {
+      const boldStyle = coloredBold !== false ? ' font-weight: bold;' : '';
       if (size === 'skyblue') {
-        return `color: rgb(199, 21, 133) !important;  font-weight: bold;`;
+        return `color: rgb(199, 21, 133) !important;${boldStyle}`;
       } else if (size === 'darkblue') {
-        return `color: #0000CD !important; font-weight: bold;`;
+        return `color: #0000CD !important;${boldStyle}`;
       } else if (size === 'purple') {
-        return `color: #9400D3 !important; font-weight: bold;`;
+        return `color: #9400D3 !important;${boldStyle}`;
       } else if (size === 'green') {
-        return `color: #04682f !important; font-weight: bold;`;
+        return `color: #04682f !important;${boldStyle}`;
       } else if (size === 'brown') {
-        return `color: #A0522D !important; font-weight: bold;`;
+        return `color: #A0522D !important;${boldStyle}`;
       }
     }
     return '';

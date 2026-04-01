@@ -27,4 +27,6 @@ export interface PhoneUISettings {
   speakFormPosition: SpeakFormPosition;
   autocompleteTrigger: AutocompleteTriggerConfig;
   multiline: MultilineSettings;
+  /** Whether colored font (skyblue/darkblue/purple/green/brown) applies bold. */
+  coloredFontBold: boolean;
 }
