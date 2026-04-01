@@ -180,16 +180,6 @@ module.exports=
              name: "药师堂诗衣"
              prize: []
              
-        amane:
-             avatar: "https://s2.loli.net/2025/10/24/wcILKrESJgZpqFD.jpg"
-             name: "药师堂天音"
-             prize: []
-             
-        kira:
-             avatar: "https://s2.loli.net/2025/10/24/98bwE7F5PxgSaDy.jpg"
-             name: "碧羽星罗"
-             prize: []
-             
         itori:
              avatar: "https://s41.ax1x.com/2026/01/03/pZUTyrj.png"
              name: "墨垣丝鸟"
@@ -247,7 +237,38 @@ module.exports=
         #     avatar: "https://s41.ax1x.com/2026/01/27/pZRj9Gn.jpg"
         #     name: "大魔女"
         #     prize: []
-            
+        # 罗马字名 ，只允许半角英数字和下划线，数字和下划线不允许是首位
+        # 不可以重复
+        Rizu:
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s41.ax1x.com/2026/03/28/pe1QuQ0.png"
+            name:"御影利兹"
+            prize:""
+        Maria:
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s41.ax1x.com/2026/03/28/pe1Qkdg.png"
+            name:"黑山羊玛利亚"
+            prize:""
+        Yumemi:
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s41.ax1x.com/2026/03/28/pe1QMLT.png"
+            name:"沐轮梦见"
+            prize:""
+        kira:
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s41.ax1x.com/2026/03/27/pel4g76.png"
+            name:"碧羽星罗"
+            prize:""
+        amane:
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s41.ax1x.com/2026/03/27/pel4fhD.png"
+            name:"药师堂天音"
+            prize:""
           
             
             
