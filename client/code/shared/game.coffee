@@ -5,7 +5,7 @@ Shared=
 exports.SAFETY_EXCLUDED_JOBS = SAFETY_EXCLUDED_JOBS = ["QueenSpectator","Spy2","Poisoner","Cat","Cupid","BloodyMary","Noble", "Lover", "Twin","Hunter","MadHunter","Idol","SnowLover","Raven","LunaticLover","HooliganGuard","HooliganAttacker","SantaClaus","Hanami","Duelist"]
 # ------ 役職一覧
 # 基本役職
-exports.jobs=["Human","Werewolf","Diviner","Psychic","MindPsychic","Madman","Guard","Couple","Fox",
+exports.jobs=["Human","Werewolf","Diviner","Psychic","MindPsychic","Madman","Guard","OldGuard","Couple","Fox",
 # ミラーズホロウの人狼
 "Hunter","Cupid","MumouDiviner",
 # 特殊役職?
@@ -118,7 +118,7 @@ exports.blacks=["Werewolf","WolfDiviner","NormalWolfDiviner","MadWolf","Lycan","
 
 # チームたち
 exports.teams=teams=
-    Human:["Human","Diviner","SuperDiviner","MumouDiviner","Psychic","MindPsychic","Guard","SuperGuard","Paladin","Couple","Poisoner","ToughGuy","Noble","Slave","Magician","Fugitive","Merchant","QueenSpectator","MadWolf","Liar","Light","Cursed","ApprenticeSeer","Diseased","Spellcaster","Lycan","Priest","Prince","PI","Cat","Witch","Oldman","OccultMania","Dog","Dictator","SeersMama","Trapper","RedHood","Counselor","Miko","HolyMarked","WanderingGuard","TroubleMaker","FrankensteinsMonster","BloodyMary","King","SantaClaus","Phantom","DrawGirl","Pyrotechnist","Baker","SpiritPossessed","GotChocolate","Forensic","Cosplayer","TinyGhost","Ninja","Twin","Hunter","Emma","Idol","HomeComer","Illusionist","DragonKnight","Samurai","Elementaler","Poet","Sacrifice","Oracle","GachaAddicted","Fate","Synesthete","Reindeer","Streamer","Tarzan","Hitokotonushinokami","RemoteWorker","Gambler","Sleepwalker","Disguised","Saint","SpaceWerewolfCrew","SpaceWerewolfObserver","SpaceWerewolfGuard","Hanami","Reincarnator","MementoDisposer","Interpreter","Dreamer","Assassin","StraySheep","Secretary","HouseKeeper","DarkPsychic","Itako"]
+    Human:["Human","Diviner","SuperDiviner","MumouDiviner","Psychic","MindPsychic","Guard","OldGuard","SuperGuard","Paladin","Couple","Poisoner","ToughGuy","Noble","Slave","Magician","Fugitive","Merchant","QueenSpectator","MadWolf","Liar","Light","Cursed","ApprenticeSeer","Diseased","Spellcaster","Lycan","Priest","Prince","PI","Cat","Witch","Oldman","OccultMania","Dog","Dictator","SeersMama","Trapper","RedHood","Counselor","Miko","HolyMarked","WanderingGuard","TroubleMaker","FrankensteinsMonster","BloodyMary","King","SantaClaus","Phantom","DrawGirl","Pyrotechnist","Baker","SpiritPossessed","GotChocolate","Forensic","Cosplayer","TinyGhost","Ninja","Twin","Hunter","Emma","Idol","HomeComer","Illusionist","DragonKnight","Samurai","Elementaler","Poet","Sacrifice","Oracle","GachaAddicted","Fate","Synesthete","Reindeer","Streamer","Tarzan","Hitokotonushinokami","RemoteWorker","Gambler","Sleepwalker","Disguised","Saint","SpaceWerewolfCrew","SpaceWerewolfObserver","SpaceWerewolfGuard","Hanami","Reincarnator","MementoDisposer","Interpreter","Dreamer","Assassin","StraySheep","Secretary","HouseKeeper","DarkPsychic","Itako"]
     Werewolf:["Werewolf","Madman","BigWolf","Fanatic","HearMadman","Spy","WolfDiviner","NormalWolfDiviner","Spy2","Sorcerer","LoneWolf","MinionSelector","WolfCub","WhisperingMad","WolfBoy","GreedyWolf","SuperWerewolf","FascinatingWolf","SolitudeWolf","ToughWolf","ThreateningWolf","ObstructiveMad","PsychoKiller","CautiousWolf","Bomber","Ushinotokimairi","MadDog","Hypnotist","CraftyWolf","Pumpkin","MadScientist","MadHunter","MadCouple","EyesWolf","TongueWolf","BlackCat","LurkingMad","DecoyWolf","Satori","AbsoluteWolf","QueenOfNight","CurseWolf","IntuitionWolf","Faker","SealWolf","CynthiaWolf","NetherWolf","DarkWolf","SpaceWerewolfImposter","Acrobat","BloodWolf","Shadow","AttractiveWoman","DestroyCraziest","RainyBoy"]
     Fox:["Fox","SuperFox","TinyFox","Immoral","Perfidious","Heretic","Blasphemy","XianFox","NightRabbit","Trickster","VariationFox","Actress","HimeFox"]
     Devil:["Devil"]
@@ -1317,6 +1317,8 @@ exports.jobinfo=
             color:"#dd66ff"
         Guard:
             color:"#969ad4"
+        OldGuard:
+            color:"#8a7f6a"
         Paladin:
             color:"#969bc4"
         SuperGuard:
@@ -2242,7 +2244,7 @@ exports.new_rules=[
             id: 'guard'
             visible:(rule)->
                 return true if isAllJobsMode rule
-                for job in ["Guard","Trapper","WanderingGuard","Cosplayer","SuperGuard","Paladin"]
+                for job in ["Guard","OldGuard","Trapper","WanderingGuard","Cosplayer","SuperGuard","Paladin"]
                     if rule.jobNumbers[job]>0
                         return true
                 return false

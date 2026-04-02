@@ -29,7 +29,7 @@ LOG_PEEKING_JOBS = ["NightRabbit"]
 # 村人だと思い込む役職
 HUMAN_DISP_JOBS = ["Oracle","Fate","Sleepwalker","Dreamer"]
 # 狩人仲間の役職
-GUARD_JOBS = ["Guard", "Cosplayer", "WanderingGuard", "Samurai", "Trapper", "DragonKnight", "Elementaler"]
+GUARD_JOBS = ["Guard", "OldGuard", "Cosplayer", "WanderingGuard", "Samurai", "Trapper", "DragonKnight", "Elementaler"]
 
 # 配信者が獲得できる役職
 STREAMER_AVAILABLE_JOBS = [
@@ -3640,6 +3640,7 @@ class Player
     # 占われたとき（結果は別にとられる player:占い元）
     divined:(game,player)->
     whenguarded:(game,player)->
+    successfulGuard:(game)->
     # ちょっかいを出されたとき(jobのとき)
     touched:(game,from)->
     # 選択肢を返す
@@ -4491,6 +4492,72 @@ class Guard extends Player
         pl.transform game,newpl,true
         newpl.touched game,@id
         null
+
+class OldGuard extends Guard
+    type:"OldGuard"
+    getGuardState: ->
+        if @flag? && "object" == typeof @flag && !Array.isArray(@flag)
+            @flag
+        else
+            {
+                lastGuard: @flag ? null
+                agedDay: null
+            }
+    sunset:(game)->
+        state = @getGuardState()
+        @setTarget null
+
+        if game.day==1 && game.rule.scapegoat != "off"
+            # 狩人は一日目護衛しない
+            @setTarget ""  # 誰も守らない
+            return
+        # 護衛可能対象
+        pls = game.players.filter (pl)=>
+            if game.rule.guardmyself!="ok" && pl.id == @id
+                return false
+            if game.rule.consecutiveguard=="no" && pl.id == state.lastGuard
+                return false
+            return !pl.dead
+
+        if pls.length == 0
+            @setTarget ""
+            return
+    job:(game,playerid)->
+        state = @getGuardState()
+        if playerid==@id && game.rule.guardmyself!="ok"
+            return game.i18n.t "error.common.noSelectSelf"
+        else if playerid==state.lastGuard && game.rule.consecutiveguard=="no"
+            return game.i18n.t "roles:Guard.noGuardSame"
+        else
+            @setTarget playerid
+            @setFlag Object.assign {}, state, {
+                lastGuard: playerid
+            }
+
+            pl=game.getPlayer(playerid)
+            log=
+                mode:"skill"
+                to:@id
+                comment: game.i18n.t "roles:Guard.select", {name: @name, target: pl.name}
+            splashlog game.id,game,log
+            null
+    successfulGuard:(game)->
+        state = @getGuardState()
+        return if state.agedDay?
+        @setFlag Object.assign {}, state, {
+            agedDay: game.day + 1
+        }
+    beforebury:(game, type)->
+        return false if @dead
+        return false unless type == "day"
+        state = @getGuardState()
+        return false unless state.agedDay == game.day
+
+        @die game, "infirm"
+        @setFlag Object.assign {}, state, {
+            agedDay: null
+        }
+        return false
 
 
 class Paladin extends Guard
@@ -13291,6 +13358,9 @@ class Complex
     # complexのJobTypeを調べる
     isCmplType:(type)->
         type == @cmplType || @main.isCmplType(type) || @sub?.isCmplType(type)
+    successfulGuard:(game)->
+        @mcall game,@main.successfulGuard,game
+        @sub?.successfulGuard? game
     sunset:(game)->
         @mcall game,@main.sunset,game
         @sub?.sunset? game
@@ -13936,6 +14006,7 @@ class Guarded extends Complex
         else
             # 狼に噛まれた場合は耐える
             if guard?
+                guard.successfulGuard game
                 guard.addGamelog game,"GJ",null,@id
                 if game.rule.gjmessage
                     log=
@@ -15343,6 +15414,7 @@ jobs=
     Cat:Cat
     Witch:Witch
     Oldman:Oldman
+    OldGuard:OldGuard
     Tanner:Tanner
     Teruteru:Teruteru
     ButaOtoko:ButaOtoko
@@ -15588,6 +15660,7 @@ jobStrength=
     MindPsychic:15
     Madman:10
     Guard:23
+    OldGuard:18
     Paladin:20
     Couple:10
     Fox:25
