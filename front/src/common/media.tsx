@@ -37,13 +37,15 @@ type MediaFunction = <P extends object>(
   ...interpolations: Array<Interpolation<ThemedStyledProps<P, Theme>>>
 ) => FlattenInterpolation<ThemedStyledProps<P, Theme>>;
 
+const applyCss = css as (...args: any[]) => ReturnType<typeof css>;
+
 /**
  * Media query for smartphones.
  */
 export const phone: MediaFunction = (...args) =>
   css`
     @media (${phoneQuery}) {
-      ${css(...args)};
+      ${applyCss(...args)};
     }
   `;
 
@@ -52,7 +54,7 @@ export const phone: MediaFunction = (...args) =>
  */
 export const notPhone: MediaFunction = (...args) => css`
   @media (${notPhoneQuery}) {
-    ${css(...args)};
+    ${applyCss(...args)};
   }
 `;
 

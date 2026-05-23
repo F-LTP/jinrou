@@ -896,7 +896,13 @@ const TimeInner = ({
         }}
         onClick={handleDoubleClick}
       >
-        {shortId && <span style={{ opacity: 0.6 }}>>{shortId}</span>} {str}
+        {shortId && (
+          <span style={{ opacity: 0.6 }}>
+            {'>'}
+            {shortId}
+          </span>
+        )}{' '}
+        {str}
       </time>
     </LogPart>
   );

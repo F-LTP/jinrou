@@ -50,6 +50,7 @@ const DialogWrapper = styled(AppStyling)<IPropDialogWrapper>`
 
 interface IPropDialogBase {
   className?: string;
+  children?: React.ReactNode;
   title?: string;
   icon?: IconProp;
   /**
