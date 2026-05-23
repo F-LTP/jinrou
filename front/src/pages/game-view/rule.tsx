@@ -25,7 +25,6 @@ export interface IPropShowRule {
 export class ShowRule extends React.PureComponent<IPropShowRule, {}> {
   public render() {
     const { categories, rule, ruleDefs } = this.props;
-    console.log('rule!', rule);
     return (
       <I18n>
         {t => (
@@ -68,16 +67,15 @@ class JobNumbers extends React.PureComponent<
       <p>
         {categories.map(({ id, roles }) => (
           <React.Fragment key={id}>
-            {roles.map(
-              role =>
-                jobs[role] > 0 ? (
-                  <React.Fragment key={role}>
-                    <a href={`/manual/job/${role}`}>
-                      {t(`roles:jobname.${role}`)}
-                      {jobs[role]}
-                    </a>{' '}
-                  </React.Fragment>
-                ) : null,
+            {roles.map(role =>
+              jobs[role] > 0 ? (
+                <React.Fragment key={role}>
+                  <a href={`/manual/job/${role}`}>
+                    {t(`roles:jobname.${role}`)}
+                    {jobs[role]}
+                  </a>{' '}
+                </React.Fragment>
+              ) : null,
             )}
           </React.Fragment>
         ))}

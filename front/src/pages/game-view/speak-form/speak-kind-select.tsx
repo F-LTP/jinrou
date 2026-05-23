@@ -5,7 +5,7 @@ import { PlayerInfo } from '../defs';
 /**
  * Speak kind select control.
  */
-export const SpeakKindSelect: React.StatelessComponent<{
+export const SpeakKindSelect: React.FC<{
   /**
    * List of available speak kind.
    */
@@ -14,6 +14,8 @@ export const SpeakKindSelect: React.StatelessComponent<{
    * Currently selected speak kind.
    */
   current: string;
+  id?: string;
+  name?: string;
   /**
    * i18n function.
    */
@@ -26,9 +28,14 @@ export const SpeakKindSelect: React.StatelessComponent<{
    * Callback for change.
    */
   onChange: (kind: string) => void;
-}> = ({ kinds, current, playersMap, t, onChange }) => {
+}> = ({ kinds, current, id, name, playersMap, t, onChange }) => {
   return (
-    <select value={current} onChange={e => onChange(e.currentTarget.value)}>
+    <select
+      id={id}
+      name={name}
+      value={current}
+      onChange={e => onChange(e.currentTarget.value)}
+    >
       {kinds.map(value => (
         <option key={value} value={value}>
           {speakKindLabel(t, playersMap, value)}

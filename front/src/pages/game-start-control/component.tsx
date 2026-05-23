@@ -157,6 +157,7 @@ export class Casting extends React.Component<IPropCasting, {}> {
 
                     <p>
                       <SLG
+                        name="castingDefinition"
                         items={castings}
                         value={currentCasting.id}
                         getGroupLabel={(x: string) => ({

@@ -1,5 +1,4 @@
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
 
 import {
   IMessageDialog,
@@ -31,6 +30,7 @@ import { PromptDialog } from './components/prompt';
 import { LoginDialog } from './components/login';
 import { RoleDescDialog } from './components/role-desc';
 import { OpenAvatarDialog } from './components/openavatar';
+import { createMountedRoot } from '../util/react-root';
 
 /**
  * ID of area to place dialogs.
@@ -232,6 +232,7 @@ function showDialog<T>(
     // Add an area for showing dialog.
     const area = document.createElement('div');
     dialogOverlayArea.appendChild(area);
+    const root = createMountedRoot(area);
 
     // show a dialog.
     const open = (dialog: React.ReactElement<any>) => {
@@ -242,11 +243,11 @@ function showDialog<T>(
         ) : (
           dialog
         );
-      ReactDOM.render(dialogElm, area);
+      root.render(dialogElm);
     };
     // clean up dialog.
     const close = ((result: T) => {
-      ReactDOM.unmountComponentAtNode(area);
+      root.unmount();
       dialogOverlayArea.removeChild(area);
       resolve(result);
     }) as BoundFunc<T, void>;

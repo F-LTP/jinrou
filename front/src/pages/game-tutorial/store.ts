@@ -89,7 +89,6 @@ export class GameTutorialStore {
       if (next != null) {
         this.setPhase(next);
         const nextPhase = phases[next];
-        console.log('next', next, nextPhase);
         if (nextPhase != null && nextPhase.init != null) {
           nextPhase.init(driver);
         }

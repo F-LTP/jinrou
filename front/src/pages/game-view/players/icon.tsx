@@ -43,7 +43,9 @@ const IconWrapper = styled.div`
   height: 48px;
 `;
 
-const IconImg = styled.img<{ dead?: boolean }>`
+const IconImg = styled.img.attrs({
+  referrerPolicy: 'no-referrer',
+})<{ dead?: boolean }>`
   position: absolute;
   left: 0;
   top: 0;

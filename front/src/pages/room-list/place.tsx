@@ -1,11 +1,11 @@
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
 
 import { RoomListStore } from './store';
 import { RoomList } from './component';
 import { i18n } from '../../i18n';
 import { RoomListMode } from './defs';
 import { GetJobColorProvider, GetJobColorFunction } from './get-job-color';
+import { mountReact } from '../../util/react-root';
 
 /**
  * Options to place.
@@ -68,10 +68,10 @@ export function place({
     </GetJobColorProvider>
   );
 
-  ReactDOM.render(com, node);
+  const root = mountReact(node, com);
 
   const unmount = () => {
-    ReactDOM.unmountComponentAtNode(node);
+    root.unmount();
   };
 
   return { unmount, store };

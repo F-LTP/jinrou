@@ -288,7 +288,9 @@ class OneLogInner extends React.PureComponent<IPropOneLog, {}> {
         <LogLineWrapper>
           {/* icon */}
           <Icon noName={noName} {...props}>
-            {icon != null ? <img src={icon} alt="" /> : null}
+            {icon != null ? (
+              <img src={icon} alt="" referrerPolicy="no-referrer" />
+            ) : null}
           </Icon>
           <Name
             noName={noName}

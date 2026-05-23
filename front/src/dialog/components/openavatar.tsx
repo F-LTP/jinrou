@@ -175,6 +175,8 @@ export class OpenAvatarDialog extends React.PureComponent<
                     <div style={styles.selectGroup}>
                       <label style={styles.label}>搜索主题</label>
                       <input
+                        id="avatar-theme-filter"
+                        name="themeFilter"
                         type="text"
                         value={themeFilter}
                         onChange={this.handleThemeFilterChange}
@@ -245,6 +247,8 @@ export class OpenAvatarDialog extends React.PureComponent<
                       <div style={styles.selectGroup}>
                         <label style={styles.label}>选择角色</label>
                         <select
+                          id="avatar-role-select"
+                          name="selectedRole"
                           value={selectedSkinKey}
                           onChange={this.handleRoleChange}
                           style={styles.select}
@@ -277,6 +281,7 @@ export class OpenAvatarDialog extends React.PureComponent<
                               : selectedRole.avatar
                           }
                           alt={selectedRole.name}
+                          referrerPolicy="no-referrer"
                           style={styles.previewAvatar}
                         />
                         <div style={styles.previewInfo}>
@@ -303,6 +308,8 @@ export class OpenAvatarDialog extends React.PureComponent<
                     <div style={styles.selectGroup}>
                       <label style={styles.label}>自定义名字</label>
                       <input
+                        id="avatar-custom-name"
+                        name="customName"
                         type="text"
                         value={customName}
                         onChange={this.handleCustomNameChange}
@@ -315,6 +322,8 @@ export class OpenAvatarDialog extends React.PureComponent<
                     <div style={styles.selectGroup}>
                       <label style={styles.label}>自定义头像URL</label>
                       <input
+                        id="avatar-custom-icon"
+                        name="customIcon"
                         type="text"
                         value={customIcon}
                         onChange={this.handleCustomIconChange}
@@ -328,6 +337,7 @@ export class OpenAvatarDialog extends React.PureComponent<
                         <img
                           src={customIcon}
                           alt="预览"
+                          referrerPolicy="no-referrer"
                           style={styles.previewAvatar}
                           onError={e => {
                             (e.target as HTMLImageElement).style.display =

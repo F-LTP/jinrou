@@ -19,7 +19,6 @@ export function getAllThemesSkins(): Promise<ThemeSkin[]> {
       return;
     }
     ss.rpc('game.themes.getAllThemesSkins', (result: any) => {
-      console.log('getAllThemesSkins result:', result);
       if (result && result.error) {
         reject(result.error);
         return;

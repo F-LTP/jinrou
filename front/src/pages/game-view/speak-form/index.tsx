@@ -150,6 +150,11 @@ interface AutocompleteState {
   selectedIndex: number; // Currently selected item index
 }
 
+const defaultQuickInputShortcuts: AutocompleteItem[] = [
+  { label: '●', value: '●', type: 'shortcut', searchKey: '黑' },
+  { label: '○', value: '○', type: 'shortcut', searchKey: '白' },
+];
+
 export class SpeakForm extends React.PureComponent<
   IPropSpeakForm,
   {
@@ -178,12 +183,11 @@ export class SpeakForm extends React.PureComponent<
       items: [],
       triggerStart: 0,
       triggerChar: '',
-      shortcuts: [],
+      shortcuts: defaultQuickInputShortcuts,
       selectedIndex: 0,
     },
   };
   protected comment: HTMLInputElement | HTMLTextAreaElement | null = null;
-  protected shortcutsLoaded = false;
   /**
    * Temporally saved comment.
    */
@@ -237,8 +241,6 @@ export class SpeakForm extends React.PureComponent<
     return (
       <I18n>
         {t => {
-          // Load shortcuts on first render
-          this.loadShortcutsIfNeeded(t);
           return (
             <IsPhone>
               {isPhone => {
@@ -263,6 +265,8 @@ export class SpeakForm extends React.PureComponent<
                             <SpeakTextArea
                               key="allowed-speakinput-multiline"
                               ref={e => (this.comment = e)}
+                              id="speak-comment-multiline"
+                              name="comment"
                               cols={50}
                               rows={4}
                               required
@@ -282,6 +286,8 @@ export class SpeakForm extends React.PureComponent<
                             <SpeakInput
                               key="allowed-speakinput"
                               ref={e => (this.comment = e)}
+                              id="speak-comment"
+                              name="comment"
                               type="text"
                               size={50}
                               required
@@ -301,6 +307,7 @@ export class SpeakForm extends React.PureComponent<
                       {/* Speak button. */}
                       <SpeakButtonArea>
                         <input
+                          name="submitSpeak"
                           type="submit"
                           value={t('game_client:speak.say')}
                           disabled={!speakAllowed || !nsecondSilent}
@@ -322,6 +329,8 @@ export class SpeakForm extends React.PureComponent<
                               label={t('game_client:speak.size.description')}
                             >
                               <select
+                                id="speak-size"
+                                name="speakSize"
                                 value={size}
                                 onChange={this.handleSizeChange}
                               >
@@ -358,6 +367,8 @@ export class SpeakForm extends React.PureComponent<
                               <SpeakKindSelect
                                 kinds={speaks}
                                 current={kind}
+                                id="speak-kind"
+                                name="speakKind"
                                 t={t}
                                 playersMap={playersMap}
                                 onChange={this.handleKindChange}
@@ -367,6 +378,7 @@ export class SpeakForm extends React.PureComponent<
                             <label>
                               <input
                                 type="checkbox"
+                                id="multilinecheck"
                                 name="multilinecheck"
                                 checked={multiline}
                                 onChange={this.handleMultilineChange}
@@ -406,6 +418,8 @@ export class SpeakForm extends React.PureComponent<
                           <LogVisibilityControl
                             visibility={logVisibility}
                             day={gameInfo.day}
+                            id="log-visibility"
+                            name="logVisibility"
                             onUpdate={this.handleVisibilityUpdate}
                           />
                         </LabeledControl>
@@ -425,6 +439,7 @@ export class SpeakForm extends React.PureComponent<
                             <input
                               type="checkbox"
                               id="widepagecheck"
+                              name="widepagecheck"
                               checked={widePage}
                               onChange={this.handleWidepageChange}
                             />
@@ -475,9 +490,7 @@ export class SpeakForm extends React.PureComponent<
       </I18n>
     );
   }
-  public componentDidMount() {
-    // Shortcuts will be loaded during first render
-  }
+  public componentDidMount() {}
   public componentDidUpdate() {
     // process the temporal flag to focus.
     if (this.focus && this.comment != null) {
@@ -764,37 +777,8 @@ export class SpeakForm extends React.PureComponent<
    * Get quick input shortcuts.
    */
   @bind
-  protected getQuickInputShortcuts(t: TranslationFunction): AutocompleteItem[] {
-    // Default shortcuts: black dot and white circle
-    const defaultShortcuts: AutocompleteItem[] = [
-      { label: '●', value: '●', type: 'shortcut', searchKey: '黑' },
-      { label: '○', value: '○', type: 'shortcut', searchKey: '白' },
-    ];
-    return defaultShortcuts;
-  }
-
-  /**
-   * Load shortcuts from casting config into state (called during render).
-   */
-  @bind
-  protected loadShortcutsIfNeeded(t: TranslationFunction): void {
-    if (this.shortcutsLoaded) {
-      return;
-    }
-    const shortcuts = this.getQuickInputShortcuts(t);
-    this.shortcutsLoaded = true;
-
-    // Use setTimeout to avoid updating state during render
-    if (shortcuts.length > 0) {
-      setTimeout(() => {
-        this.setState({
-          autocomplete: {
-            ...this.state.autocomplete,
-            shortcuts,
-          },
-        });
-      }, 0);
-    }
+  protected getQuickInputShortcuts(): AutocompleteItem[] {
+    return defaultQuickInputShortcuts;
   }
   /**
    * Handle a keydown event of comment input.

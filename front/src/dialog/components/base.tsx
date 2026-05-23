@@ -13,6 +13,14 @@ interface IPropDialogWrapper {
   modal?: boolean;
 }
 
+const DraggableContainer = (Draggable as unknown) as React.ComponentType<
+  React.PropsWithChildren<{
+    bounds?: string;
+    handle?: string;
+    nodeRef?: React.RefObject<HTMLDivElement>;
+  }>
+>;
+
 /**
  * Keyframes for dialogs.
  */
@@ -228,28 +236,35 @@ export function Dialog({
   contents,
   afterButtons,
 }: IPropDialog) {
+  const draggableNodeRef = React.useRef<HTMLDivElement>(null);
   return (
     <WithRandomIds names={['titleClassName']}>
       {({ titleClassName }) => (
         <DialogWrapper modal={modal}>
-          <Draggable bounds="body" handle={`.${titleClassName}`}>
-            <DialogBase
-              title={title}
-              titleClassName={titleClassName}
-              icon={icon}
-              onCancel={onCancel}
-              form={form}
-              formRef={formRef}
-              onSubmit={onSubmit}
-            >
-              {message != null ? <p>{message}</p> : null}
-              {contents ? (
-                <DialogMainContents>{contents()}</DialogMainContents>
-              ) : null}
-              <Buttons>{buttons()}</Buttons>
-              {afterButtons ? afterButtons() : null}
-            </DialogBase>
-          </Draggable>
+          <DraggableContainer
+            bounds="body"
+            handle={`.${titleClassName}`}
+            nodeRef={draggableNodeRef}
+          >
+            <div ref={draggableNodeRef}>
+              <DialogBase
+                title={title}
+                titleClassName={titleClassName}
+                icon={icon}
+                onCancel={onCancel}
+                form={form}
+                formRef={formRef}
+                onSubmit={onSubmit}
+              >
+                {message != null ? <p>{message}</p> : null}
+                {contents ? (
+                  <DialogMainContents>{contents()}</DialogMainContents>
+                ) : null}
+                <Buttons>{buttons()}</Buttons>
+                {afterButtons ? afterButtons() : null}
+              </DialogBase>
+            </div>
+          </DraggableContainer>
         </DialogWrapper>
       )}
     </WithRandomIds>

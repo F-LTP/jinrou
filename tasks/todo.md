@@ -1,10 +1,112 @@
+# 当前任务（2026-05-24 全站回归测试）
+
+- [ ] 逐页检查首页、休息室、房间一览、个人页、设置页、手册页、新房间页、游戏房间页的控制台运行时报错
+- [ ] 重点点击常用按钮并观察是否触发新的 React/webpack/runtime 异常
+- [ ] 记录发现的残留问题，若真有问题再单独开修复任务
+
+## Check-in
+
+- 本轮以“新开页面 + DevTools 观察控制台”为准，不沿用旧标签页，避免缓存坏 chunk 影响结论。
+- 优先覆盖高频入口与高风险交互：进入页面、展开/收起面板、提交表单、弹窗打开关闭、房间内发言与规则按钮。
+
+# 当前任务（2026-05-24 watch 模式 Pug 依赖断裂修复与覆盖）
+
+- [x] 复现并定位 `npm run watch` 下 manual/jade 相关的 webpack 编译报错
+- [x] 修复 `front` 本地 Pug 运行时依赖断裂，确保 watch/build 使用同一套可解析依赖
+- [x] 增加可执行校验，覆盖 manual/jade 这条编译链路的回归风险
+- [x] 在本文末尾补充 Review，并同步 `tasks/lessons.md`
+
+## 规格
+
+- 目标不是临时压住报错，而是修掉 `front` 自身依赖图里导致 `pug-runtime` 丢失的根因。
+- 修复后需要兼顾 `build` 与 `watch`，避免只让生产构建通过、开发时仍在页面跳转后炸掉。
+- 测试覆盖优先选“当前仓库里可稳定执行的构建级校验”，不要引入一套空壳测试框架。
+
+## Check-in
+
+- 执行顺序固定为：先复现并确认依赖缺口，再补依赖/配置，最后追加校验脚本并验证。
+
+## Review
+
+- 已确认 `npm run watch` 下 manual/jade 报错的根因是 `front` 自己缺少 `pug` 这条 `pug-loader` 的 peer 依赖，导致开发态编译在解析 `manual/**/*.jade` 时会落到不存在的 `front/node_modules/pug-runtime/index.js`。
+- 已在 `front/package.json` 显式补上 `pug@2.0.3`，并保留 `pug-loader`；这样 `front` 目录单独执行的 `watch`、`build` 与 `production-build` 终于共用同一套可解析依赖，不再依赖根目录偶然 hoist 的结果。
+- 已补充 `build:bundle:dev-check`、`watch:bundle:dev-check`、`clean:tmp-webpack-check` 与 `test:manual-build`，让 manual/jade 这条链路可以在不占用真实输出目录的情况下做稳定回归检查。
+- `front/npm run test:manual-build` 与 `front/npm run production-build` 已通过，说明源码与构建链本身已可用。
+- 随后在手册页继续暴露出的 `react-draggable` 兼容问题，已通过升级到 `react-draggable@4.5.0` 并在对话框基座接入 `nodeRef` 一并修掉。
+- 最关键的复测结论是：旧标签页里确实可能继续引用先前那份损坏的 dev chunk，例如 `dialog-dist-esm_dialog_index_js.e321a9198d453d3c9ebc.bundle.js`；但在新建隔离页后，页面已改为加载新的 `vendor_react_draggable-node_modules_react-draggable_build_cjs_cjs_js.*.bundle.js` 与 `dialog-dist-esm_dialog_index_js.645cef47445f135ff285.bundle.js`，控制台只剩 React DevTools 提示，没有再出现 `Cannot find module 'react-draggable'`、`componentWillReceiveProps` 或 `findDOMNode` 警告。
+- 这一轮因此收敛为“两层问题都已解决”：源码/依赖层已经修通，浏览器侧剩余异常来自旧页面缓存旧 chunk；后续验证必须新开页面或至少硬刷新后再下结论。
+
+# 当前任务（2026-05-24 React18 运行时警告清理与生产级复查）
+
+- [x] 复核当前前端运行时警告，区分业务代码问题与三方库兼容问题
+- [x] 清理可直接修复的 React18 运行时风险，并收敛剩余第三方升级项
+- [x] 以前端运行时、后端启动链、公共兼容层为重点做三轮代码复查
+- [x] 在 Node `v24.13.0` 下回归 `front/npm run build:tsc`、`front/npm run production-build` 与根目录 `node app.js`
+- [x] 在本文末尾补充 Review，并同步 `tasks/lessons.md`
+
+## 规格
+
+- 这轮目标不是只压住控制台输出，而是尽量消除 React18 升级后“能编译但浏览器运行时报错/告警”的高风险点。
+- 必须区分三类问题：会阻塞运行的异常、由项目代码触发的 React18 不当用法、仅来自旧第三方库的兼容警告。
+- 复查范围包含前端与后端，但优先级以真实运行链路和公共基础设施为先，不做无效大扫除。
+- 若某个警告只能通过升级旧依赖消除，需要先确认与当前代码的兼容边界，再决定是否在本轮直接升级。
+
+## Check-in
+
+- 执行顺序固定为：先定位现有警告来源，再修项目内可控问题，最后对前后端做三轮复查并验证。
+- 最终结论必须明确列出“已消除的问题”“剩余非阻塞警告”“仍需单独升级的依赖项”。
+
+## Review
+
+- 运行时浏览器告警已经进一步收敛到只剩两类：`React DevTools` 提示，以及一条由外链头像源触发的 `CORB/ORB` issue；此前 React18 相关的 `translator` 异常、`FontAwesome defaultProps` 警告、`react-transition-group legacy context` 警告都已不再出现。
+- 已补齐游戏页发言区、遗言/笔记、开房配置、踢人弹窗、头像弹窗等一批真实表单字段的 `name/id`，浏览器里原先的 `A form field element should have an id or name attribute` issue 已消失。
+- 已把微博 SDK 从模板层的“全站无条件注入”改为仅在 `Config.weibo.enable` 为真时加载，开发环境下不再因为未绑定域名的第三方脚本制造额外控制台噪音。
+- 已为日志头像、玩家头像、个人资料头像与头像预览统一补上 `referrerPolicy=\"no-referrer\"`；这能收敛一部分外链图床的 Referer 拦截，但当前 `img.picgo.net` 这条资源即便不带 Referer 仍返回会被 Chromium `ORB` 拦截的响应，因此它被确认是外部资源质量问题，不是 React18 运行时兼容问题。
+- 三轮复查结果如下：
+- 第一轮前端运行时：通过 Chrome DevTools 直接复查 `http://127.0.0.1:8800/room/418`，确认项目内 React18 运行时异常与表单 issue 已清空。
+- 第二轮前端构建链：`front/npm run build:tsc` 与 `front/npm run production-build` 在 Node `v24.13.0` 下再次实际通过。
+- 第三轮后端启动链：通过 `node -e \"require('./server/node24-compat'); require('./app')...\"` 复查时，Mongo 连接成功，启动流程已走到监听端口；当前退出原因是已有实例占用 `8800`（`EADDRINUSE`），不是新的 Node24 兼容崩溃。
+- 当前仍需单独排期的风险有两项：
+- `mobx-react@5.4.4` 仍与 React18 存在旧 peer 关系，这轮虽未再触发页面异常，但长期看仍建议再做一轮 MobX 线升级评估。
+- 后端旧 SocketStream / Connect 依赖在 Node24 下仍会输出 circular dependency warning；它不阻塞当前运行，但属于老链路技术债。
+
+# 当前任务（2026-05-24 React18 迁移落地）
+
+- [x] 盘点 `react / react-dom / mobx / mobx-react / styled-components` 当前版本与升级边界
+- [x] 收敛 React18 迁移的公共兼容点（入口挂载、`children`、`i18n`、旧 HOC 类型）
+- [x] 修复 React18 下的运行时崩溃点与首屏挂载时序问题
+- [x] 在 Node `v24.13.0` 下回归 `front/npm run build:tsc` 与 `front/npm run production-build`
+- [x] 在本文末尾补充 Review，并同步 `tasks/lessons.md`
+
+## 规格
+
+- 本轮目标从“升级评估”切换为“React18 包与现有前端代码实际跑通”。
+- 保持 Node `v24.13.0` 运行前提，不回退 Node8。
+- 允许对旧公共封装做最小兼容改写，但不顺手重写大块业务逻辑。
+- 若仍有旧三方库只剩开发期警告，需要与“会阻塞页面运行的异常”明确区分。
+
+## Check-in
+
+- 执行顺序固定为：先清 React18 类型阻塞，再修运行时挂载兼容，最后做构建回归。
+- 若升级收益主要体现在“为后续性能排查提供更健康的 React 运行时”，需要在 Review 中明确写清，不把它夸大成已直接解决 418 卡顿。
+
+## Review
+
+- 前端依赖现已切到 React `18.3.1` / ReactDOM `18.3.1`，并保留当前仓库可工作的 webpack5 + styled-components5 组合。
+- 已补齐 React18 下不再隐式注入的 `children` 类型，并把旧的 `withTranslationFunction` 从 `recompose/fromRenderProps` 改成显式 HOC，消除了主要的 TypeScript 迁移阻塞。
+- 已修复 `i18n` 运行时崩溃根因：此前自定义翻译函数直接透传 `i18n.t`，丢失 `this` 绑定后会在页面里触发 `Cannot read properties of undefined (reading 'translator')`；现已改为绑定实例后再包装。
+- 已把 `mountReact` 首次挂载改为 `flushSync`，避免旧页面初始化链路在 `createRoot` 并发挂载尚未完成时就收到 store/socket 更新，减少 `setState on component that hasn't mounted yet` 这类启动期警告。
+- 已移除 `SpeakForm` 在 render 期间通过 `setTimeout` 回写快捷输入状态的模式，避免 React18 下再次触发“未挂载先更新”的开发期警告。
+- `front/npm run build:tsc` 与 `front/npm run production-build` 已在 Node `v24.13.0` 下实际通过。
+- 当前剩余控制台输出主要是旧三方库的开发期警告：`@fortawesome/react-fontawesome@0.1.x` 的 `defaultProps` 提示，以及 `react-transition-group@2.x` 的 legacy context 提示；它们不再是阻塞页面运行的异常，但若要彻底清掉，需要单独再做一轮依赖升级与回归。
+
 # 当前任务（2026-05-23 Node24 运行时与构建链升级收尾）
 
-- [ ] 收敛当前工作树，只保留 Node24 跑通所需的构建链升级改动
-- [ ] 修复 `front` 在 Node `v24.13.0` 下的 TypeScript 编译阻塞
-- [ ] 在 Node `v24.13.0` 下跑通 `front/npm run production-build`
-- [ ] 在 Node `v24.13.0` 下跑通根目录 `node app.js`
-- [ ] 在本文末尾补充 Review，并同步 `tasks/lessons.md`
+- [x] 收敛当前工作树，只保留 Node24 跑通所需的构建链升级改动
+- [x] 修复 `front` 在 Node `v24.13.0` 下的 TypeScript 编译阻塞
+- [x] 在 Node `v24.13.0` 下跑通 `front/npm run production-build`
+- [x] 在 Node `v24.13.0` 下跑通根目录 `node app.js`
+- [x] 在本文末尾补充 Review，并同步 `tasks/lessons.md`
 
 ## 规格
 
@@ -17,6 +119,13 @@
 
 - 执行顺序固定为：先修 `front` 的 `tsc`，再验证前端生产构建，最后处理根目录启动。
 - 每一步都记录实际命令结果与剩余阻塞，不跳过验证直接下结论。
+
+## Review
+
+- 已在 Node `v24.13.0` 下把前端构建链升级到可运行组合：webpack 5、webpack-cli 5、新版 Manifest/Copy 插件、React 16.14、styled-components 5。
+- `front/npm run production-build` 已实际跑通；webpack5 额外兼容修复包括 YAML 资源按 JSON 模块处理、旧 `splitChunks` 命名规则改写，以及若干旧版 `styled-components` 类型兼容修复。
+- 根目录 `node app.js` 的 Node24 阻塞点收敛到老 `connect` 静态链依赖 `res._headers`；已通过仓库内兼容层补回旧响应头接口，并确认服务可启动。
+- 当前工作树已恢复干净，可在此基础上继续做下一轮依赖升级或性能相关验证。
 
 # 当前任务（2026-05-11 Node24 正式现代化升级）
 

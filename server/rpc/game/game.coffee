@@ -435,7 +435,6 @@ module.exports=
             return null
         # Get the punishment data for this game
         sdp = game.suddenDeathPunishment
-        console.log "suddenDeathPunish", roomid, voter, targets, sdp
         unless sdp?
             return null
         # Am I a valid voter?
@@ -15941,8 +15940,6 @@ module.exports.actions=(req,res,ss)->
 
             ruleinfo_str="" # 開始告知
 
-            console.log "query.jobrule is ", query.jobrule
-
             if query.jobrule in ["特殊规则.自由配置","特殊规则.手调黑暗火锅"]   # 自由のときはクエリを参考にする
                 for job in Shared.game.jobs
                     joblist[job]=parseInt(query[job]) || 0    # 仕事の数
@@ -17441,7 +17438,6 @@ module.exports.actions=(req,res,ss)->
                     return
                 # Other error message caused by the job
                 if ret=plobj.job game,query.target,query
-                    console.log "job err!",ret
                     res {error:ret}
                     return
 

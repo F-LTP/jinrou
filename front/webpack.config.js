@@ -33,6 +33,10 @@ let systemLanguage;
 let publicPath;
 // whether to use legacy builds.
 let legacyBuilds;
+// optional output path override, useful for local verification.
+const outputPathOverride = process.env.OUTPUT_PATH
+  ? path.resolve(__dirname, process.env.OUTPUT_PATH)
+  : null;
 try {
   const config = require('../config/app.coffee');
 
@@ -53,7 +57,11 @@ const makeConfig = (isProduction, isLegacyBuild) => ({
   entry: './dist-esm/index.js',
   output: {
     library: 'JinrouFront',
-    path: !isLegacyBuild
+    path: outputPathOverride
+      ? !isLegacyBuild
+        ? outputPathOverride
+        : path.join(outputPathOverride, 'legacy')
+      : !isLegacyBuild
       ? path.join(__dirname, '..', 'client/static/front-assets/')
       : path.join(__dirname, '..', 'client/static/front-assets/legacy/'),
     publicPath: !isLegacyBuild ? publicPath : addPathSeg(publicPath, 'legacy'),

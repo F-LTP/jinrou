@@ -14,7 +14,6 @@ export const BanAlert: React.FunctionComponent<Props> = ({ store }) => {
   if (ban == null) {
     return null;
   }
-  console.log(ban);
   return (
     <BanSectionWrapper>
       <div>
@@ -56,10 +55,14 @@ const ExpiryMessage: React.FunctionComponent<{
       days++;
       hours = 0;
     }
-    return t('ban.periodDayHour', {
-      days,
-      hours,
-    });
+    return (
+      <>
+        {t('ban.periodDayHour', {
+          days,
+          hours,
+        })}
+      </>
+    );
   } else if (diff >= 3600) {
     // more than 1 hour
     let hours = Math.floor(diff / 3600);
@@ -68,14 +71,18 @@ const ExpiryMessage: React.FunctionComponent<{
       hours++;
       minutes = 0;
     }
-    return t('ban.periodHourMinute', {
-      hours,
-      minutes,
-    });
+    return (
+      <>
+        {t('ban.periodHourMinute', {
+          hours,
+          minutes,
+        })}
+      </>
+    );
   } else if (diff >= 60) {
     const minutes = Math.ceil(diff / 60);
-    return t('ban.periodMinute', { minutes });
+    return <>{t('ban.periodMinute', { minutes })}</>;
   } else {
-    return t('ban.periodLessThanMinute');
+    return <>{t('ban.periodLessThanMinute')}</>;
   }
 };

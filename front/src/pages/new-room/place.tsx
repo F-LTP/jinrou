@@ -1,9 +1,9 @@
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
 import { i18n, I18nProvider } from '../../i18n';
 import { NewRoom, ThemeDoc } from './component';
 import { NewRoomStore } from './store';
 import { showErrorDialog } from '../../dialog';
+import { mountReact } from '../../util/react-root';
 
 export interface IPlaceOptions {
   i18n: i18n;
@@ -48,10 +48,10 @@ export function place({
     </I18nProvider>
   );
 
-  ReactDOM.render(com, node);
+  const root = mountReact(node, com);
 
   const unmount = () => {
-    ReactDOM.unmountComponentAtNode(node);
+    root.unmount();
   };
   return { store, unmount };
 }

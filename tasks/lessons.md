@@ -35,3 +35,15 @@
 - 针对这个仓库的大日志场景，历史日志回填需要与用户交互解耦；至少要在 `visibilitychange`/点击/按键后暂停一段时间，并避免继续用固定 `100` 条的大批量回填。
 - 当发送 trace 更像 React 渲染问题时，先检查顶层 `observer` 是否把巨大的日志子树包在一起；如果 `getjobinfo` 一类更新会替换 `rule/icons/roleInfo/gameInfo` 引用，优先把日志区抽成带自定义比较的 `React.memo` 子树，先切断“无关 store 更新拖整片日志一起 render”这条链。
 - 在 watch/dev 模式下，trace 里如果还出现 `/_serveDev/system?...` 的后续长任务，先结合交互 `INP` 判断它是否真的落在用户可感知窗口里；不要把 dev runtime 噪音直接误判成这次页面卡顿根因。
+
+## 2026-05-24
+
+- 这个仓库从 React16/17 迁到 React18 时，`i18n.t` 一类依赖实例 `this` 的旧方法不能直接当普通函数透传；一旦在自定义 HOC/Hook 里丢了绑定，运行时会在页面里报 `translator` 为 `undefined`。
+- `createRoot` 会把旧页面初始化链路里的时序问题放大出来；如果页面在首次 commit 之前就会收到 MobX/socket 更新，优先让首次挂载走同步提交，再继续收缩真正的 render 副作用。
+- React18 下要重点排查“render 里调 `setTimeout` 再 `setState`”这类旧写法；即使过去能跑，也很容易在并发挂载阶段变成 “Can't perform a React state update on a component that hasn't mounted yet”。
+- 迁移阶段要先区分“阻塞运行的异常”和“旧三方库开发期警告”；前者必须立即修，后者可以在页面重新可用后再单独排期。
+- 浏览器 `issue` 面板里如果只剩 `CORB/ORB`，要先定位它究竟是项目脚本、第三方 SDK 还是外链图片源；不要把所有控制台 issue 都误归因到 React 升级。
+- 像微博 SDK 这类第三方脚本，如果当前环境并未启用对应功能，就不要在模板层全站无条件注入；开发环境的无效第三方噪音会明显干扰真正的运行时排查。
+- 用户可配置头像这类跨站图片源，即使给 `img` 补 `referrerPolicy=\"no-referrer\"` 也不保证能绕过 Chromium `ORB`；如果源站本身返回了错误内容，根治方案应转向“图片代理”或“头像源白名单”，而不是继续在 React 渲染层兜圈子。
+- 这个仓库前端 `watch` 下的动态 chunk 很容易被旧标签页缓存住；如果刚修过 webpack 分包、peer 依赖或动态 import 相关问题，必须新开页面或用隔离上下文复测，不能只看原标签页，否则会把陈旧坏 chunk 误判成源码仍未修好。
+- `pug-loader` 在 `front` 目录执行时不能依赖根目录偶然 hoist 出来的 `pug`；凡是开发态 `watch` 也要走到的 peer 依赖，都要在 `front/package.json` 里显式声明并配套一条可独立运行的构建校验脚本。

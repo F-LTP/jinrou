@@ -19,7 +19,8 @@ html
 
     meta(property="wb:webmaster",content="429c879e40644052")
     meta(name="baidu-tc-verification",content="85f2a37978bcfa919b4270610f5f3e96")
-    script(src="https://tjs.sjs.sinajs.cn/open/api/js/wb.js?appkey=1128983570&debug=true",type="text/javascript",charset="utf-8")
+    if Config.weibo.enable
+      script(src="https://tjs.sjs.sinajs.cn/open/api/js/wb.js?appkey=1128983570&debug=true",type="text/javascript",charset="utf-8")
     if legacyBuilds || notSupportedPage
       script(src=featureCheckJs)
     if legacyBuilds

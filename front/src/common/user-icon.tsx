@@ -25,7 +25,9 @@ const BlankIcon = styled.span`
     #dddddd 20px
   );
 `;
-const IconImg = styled.img`
+const IconImg = styled.img.attrs({
+  referrerPolicy: 'no-referrer',
+})`
   display: inline-block;
   width: 48px;
   height: 48px;

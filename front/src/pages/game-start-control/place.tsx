@@ -1,5 +1,4 @@
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
 import { runInAction } from 'mobx';
 
 import { CastingStore } from './store';
@@ -12,6 +11,7 @@ import {
 } from '../../defs';
 import { i18n } from '../../i18n';
 import { findLabeledGroupItem } from '../../util/labeled-group';
+import { mountReact } from '../../util/react-root';
 
 /**
  * Key of session storage to temporally save rule.
@@ -119,7 +119,7 @@ export function place({
     />
   );
 
-  ReactDOM.render(com, node);
+  const root = mountReact(node, com);
 
   return {
     store,
@@ -129,7 +129,7 @@ export function place({
         // component is unmounted but setting is not saved.
         unloadHandler();
       }
-      ReactDOM.unmountComponentAtNode(node);
+      root.unmount();
     },
   };
 }

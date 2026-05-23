@@ -91,7 +91,12 @@ export class NoteForm extends React.PureComponent<IPropNoteForm> {
         <Content>
           <p>{t('game_client:speak.note.message')}</p>
           <p>
-            <textarea ref={this.textareaRef} onChange={this.handleChange} />
+            <textarea
+              ref={this.textareaRef}
+              id="note-content"
+              name="noteContent"
+              onChange={this.handleChange}
+            />
           </p>
           <PresetsSection>
             <PresetsTitle>{t('game_client:speak.note.insert')}</PresetsTitle>

@@ -90,12 +90,19 @@ export class IsPhone extends React.Component<
     // reflect current matching state of media query.
     this.eventHandler();
 
-    // mediaQueryList.addEventListener is not Typable yet! (TS 3.0.3)
-    mediaQueryList.addListener(this.eventHandler);
+    if ('addEventListener' in mediaQueryList) {
+      mediaQueryList.addEventListener('change', this.eventHandler);
+    } else {
+      mediaQueryList.addListener(this.eventHandler);
+    }
   }
   public componentWillUnmount() {
     if (this.eventHandler != null) {
-      this.mediaQueryList.removeListener(this.eventHandler);
+      if ('removeEventListener' in this.mediaQueryList) {
+        this.mediaQueryList.removeEventListener('change', this.eventHandler);
+      } else {
+        this.mediaQueryList.removeListener(this.eventHandler);
+      }
     }
   }
 }
