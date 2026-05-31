@@ -4507,6 +4507,7 @@ class Guard extends Player
 
 class OldGuard extends Guard
     type:"OldGuard"
+    midnightSort:79
     getGuardState: ->
         if @flag? && "object" == typeof @flag && !Array.isArray(@flag)
             @flag
@@ -4852,6 +4853,10 @@ class SuperFox extends Fox
             @flag?
         else
             super
+    sunrise:(game)->
+        super
+        # 一次性目标，防止每晚重复施加威吓
+        @setTarget null
     job:(game,playerid,query)->
         if @flag
             return game.i18n.t "error.common.alreadyUsed"
