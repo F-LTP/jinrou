@@ -7,13 +7,13 @@ module.exports=
     # 主题的作者
     author:"一只小逗比 每天睡不醒"
     # 修改时间
-    lastModified:"2021-08-21T10:46:33.917Z"
-    vote:"aaaa"
-    sunrise:"bbbbbb"
-    sunset:"cccccc"
+    lastModified:"2026-05-01T16:21:28.139Z"
+    vote:""
+    sunrise:""
+    sunset:""
     icon:""
     background_color:"black"
-    color:"rgb(255,0,166)"
+    color:"black"
     lockable:true
     isAvailable:->
         # 如果想要做成有某种限制条件
@@ -25,302 +25,450 @@ module.exports=
         Peashooter:
             # 头像链接 和 称号 可以是字符串数组，也可以是字符串
             # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
-            avatar:"https://tupian.li/images/2026/02/26/69a0057018b59.gif"
-            name:"豌豆射手" 
-            prize:"" # 称号是允许留空的
+            avatar:"https://s3.bmp.ovh/2026/04/30/VmdngEqa.gif"
+            name:"豌豆射手"
+            prize:""
         Sunflower:
-            avatar:"https://tupian.li/images/2026/02/26/69a005c2c5065.gif"
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s3.bmp.ovh/2026/04/30/HfFJS3TS.gif"
             name:"向日葵"
-            prize:"" # 称号是允许留空的
-        Cherry_Bomb:
-            avatar:"https://tupian.li/images/2026/02/26/69a00853e420c.gif"
-            name:"樱桃炸弹"
-            prize:"" # 称号是允许留空的
+            prize:""
         Wallnut:
-            avatar:"https://tupian.li/images/2026/02/26/69a007d560d90.gif"
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s3.bmp.ovh/2026/04/30/7QQrCSVU.gif"
             name:"坚果墙"
-            prize:"" # 称号是允许留空的
-        Patato_Mine:
-            avatar:"https://tupian.li/images/2026/02/26/69a008151b04c.gif"
-            name:"土豆地雷"
-            prize:"" # 称号是允许留空的
-        Snow_Pea:
-            avatar:"https://tupian.li/images/2026/02/26/69a003b0bef6b.gif"
-            name:"寒冰射手"
-            prize:"" # 称号是允许留空的
+            prize:""
         Chomper:
-            avatar:"https://tupian.li/images/2026/02/26/69a003602de57.gif"
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s3.bmp.ovh/2026/04/30/hpO3AvpW.gif"
             name:"大嘴花"
-            prize:"" # 称号是允许留空的
+            prize:""
         Repeater:
-            avatar:"https://tupian.li/images/2026/02/26/69a00576ebf6a.gif"
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s3.bmp.ovh/2026/04/30/UKCBsKu4.gif"
             name:"双发射手"
-            prize:"" # 称号是允许留空的
-        Puff_Shroom:
-            avatar:["https://tupian.li/images/2026/02/26/69a005e720098.gif","https://tupian.li/images/2026/02/26/69a010e6d51fb.gif"]
-            name:"小喷菇"
-            prize:"" # 称号是允许留空的
-        Sun_Shroom:
-            avatar:["https://tupian.li/images/2026/02/26/69a005e673ce3.gif","https://tupian.li/images/2026/02/26/69a016427aaae.gif"]
-            name:"阳光菇"
-            prize:"" # 称号是允许留空的
-        Fume_Shroom:
-            avatar:["https://tupian.li/images/2026/02/26/69a002afdbf98.gif","https://i.postimg.cc/FK6sdVF6/8dfdd26c5810099c3204b92a1d1a1ff5.gif"]
-            name:"大喷菇"
-            prize:"" # 称号是允许留空的
-        Grave_Buster:
-            avatar:"https://tupian.li/images/2026/02/26/69a008192bdb3.gif"
-            name:"墓碑吞噬者"
-            prize:"" # 称号是允许留空的
-        Hypno_Shroom:
-            avatar:["https://tupian.li/images/2026/02/26/69a0084388e8a.gif","https://tupian.li/images/2026/02/26/69a0113734a96.gif"]
-            name:"魅惑菇"
-            prize:"" # 称号是允许留空的
-        Scaredy_Shroom:
-            avatar:["https://tupian.li/images/2026/02/26/69a0034e80bd9.gif","https://tupian.li/images/2026/02/13/698df9cb1f48f.gif"]
-            name:"胆小菇"
-            prize:"" # 称号是允许留空的
-        Ice_Shroom:
-            avatar:["https://tupian.li/images/2026/02/26/69a00390a0127.gif","https://tupian.li/images/2026/02/26/69a010cea2f4e.gif"]
-            name:"寒冰菇"
-            prize:"" # 称号是允许留空的
-        Doom_Shroom:
-            avatar:["https://tupian.li/images/2026/02/26/69a003b74a602.gif","https://tupian.li/images/2026/02/26/69a013f363031.gif"]
-            name:"毁灭菇"
-            prize:"" # 称号是允许留空的
-        Lily_Pad:
-            avatar:"https://tupian.li/images/2026/02/26/69a0030ce8ca2.gif"
-            name:"睡莲"
-            prize:"" # 称号是允许留空的
+            prize:""
         Squash:
-            avatar:"https://tupian.li/images/2026/02/26/69a00570199a7.gif"
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s3.bmp.ovh/2026/04/30/tWDeO1BN.gif"
             name:"窝瓜"
-            prize:"" # 称号是允许留空的
+            prize:""
         Threepeater:
-            avatar:"https://tupian.li/images/2026/02/26/69a00e8f81550.gif"
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s3.bmp.ovh/2026/04/30/6iPjmRN8.gif"
             name:"三线射手"
-            prize:"" # 称号是允许留空的
-        Tangle_Kelp:
-            avatar:"https://tupian.li/images/2026/02/26/69a002ddb9828.gif"
-            name:"缠绕海草"
-            prize:"" # 称号是允许留空的
+            prize:""
         Jalapeno:
-            avatar:"https://tupian.li/images/2026/02/26/69a007215e3a4.gif"
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s3.bmp.ovh/2026/04/30/l2JOYBvl.gif"
             name:"火爆辣椒"
-            prize:"" # 称号是允许留空的
+            prize:""
         Spikeweed:
-            avatar:"https://tupian.li/images/2026/02/26/69a003602d586.gif"
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s3.bmp.ovh/2026/04/30/KjzYHuzH.gif"
             name:"地刺"
-            prize:"" # 称号是允许留空的
+            prize:""
         Torchwood:
-            avatar:"https://tupian.li/images/2026/02/26/69a007215b2f0.gif"
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s3.bmp.ovh/2026/04/30/uNTooUe4.gif"
             name:"火炬树桩"
-            prize:"" # 称号是允许留空的
-        Tall_nut:
-            avatar:"https://tupian.li/images/2026/02/26/69a00387517e0.gif"
-            name:"高坚果"
-            prize:"" # 称号是允许留空的
-        Sea_Shroom:
-            avatar:["https://tupian.li/images/2026/02/26/69a002f374add.gif","https://tupian.li/images/2026/02/26/69a016da8c309.gif"]
-            name:"海蘑菇"
-            prize:"" # 称号是允许留空的
+            prize:""
         Plantern:
-            avatar:"https://tupian.li/images/2026/02/26/69a007988f4cc.gif"
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s3.bmp.ovh/2026/04/30/YG1ZGkC2.gif"
             name:"路灯花"
-            prize:"" # 称号是允许留空的
+            prize:""
         Cactus:
-            avatar:"https://tupian.li/images/2026/02/26/69a005bf0a7a8.gif"
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s3.bmp.ovh/2026/04/30/atrTbE3X.gif"
             name:"仙人掌"
-            prize:"" # 称号是允许留空的
+            prize:""
         Blover:
-            avatar:"https://tupian.li/images/2026/02/26/69a00853e2ec8.gif"
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s3.bmp.ovh/2026/04/30/o8yx8XJz.gif"
             name:"三叶草"
-            prize:"" # 称号是允许留空的
-        Split_Pea:
-            avatar:"https://tupian.li/images/2026/02/26/69a007d55de11.gif"
-            name:"裂荚射手"
-            prize:"" # 称号是允许留空的
+            prize:""
         Starfruit:
-            avatar:"https://tupian.li/images/2026/02/26/69a005e7d38f3.gif"
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s3.bmp.ovh/2026/04/30/2a7fGoM3.gif"
             name:"杨桃"
-            prize:"" # 称号是允许留空的
+            prize:""
         Pumpkin:
-            avatar:"https://tupian.li/images/2026/02/26/69a0081777443.gif"
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s3.bmp.ovh/2026/04/30/iRBAViPf.gif"
             name:"南瓜头"
-            prize:"" # 称号是允许留空的
-        Magnet_Shroom:
-            avatar:["https://tupian.li/images/2026/02/26/69a006b4dcaf8.gif","https://tupian.li/images/2026/02/26/69a010c084bc4.gif"]
-            name:"磁力菇"
-            prize:"" # 称号是允许留空的
-        Cabbage_pult:
-            avatar:"https://tupian.li/images/2026/02/26/69a0096484933.gif"
-            name:"卷心菜投手"
-            prize:"" # 称号是允许留空的
-        Flower_Pot:
-            avatar:"https://tupian.li/images/2026/02/26/69a003b37b178.gif"
-            name:"花盆"
-            prize:"" # 称号是允许留空的
-        Kernel_Put:
-            avatar:"https://tupian.li/images/2026/02/26/69a002d823a69.gif"
-            name:"玉米投手"
-            prize:"" # 称号是允许留空的
-        Coffee_Bean:
-            avatar:"https://tupian.li/images/2026/02/26/69a0097e1c930.gif"
-            name:"咖啡豆"
-            prize:"" # 称号是允许留空的
+            prize:""
         Garlic:
-            avatar:"https://tupian.li/images/2026/02/26/69a0031f69493.gif"
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s3.bmp.ovh/2026/04/30/fHMvryfV.gif"
             name:"大蒜"
-            prize:"" # 称号是允许留空的
-        Umbrella_Leaf:
-            avatar:"https://tupian.li/images/2026/02/26/69a009a78ac19.gif"
-            name:"叶子保护伞"
-            prize:"" # 称号是允许留空的
+            prize:""
         Marigold:
-            avatar:"https://tupian.li/images/2026/02/26/69a007215d0d2.gif"
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s3.bmp.ovh/2026/04/30/osEZNfqI.gif"
             name:"金盏花"
-            prize:"" # 称号是允许留空的
-        Melon_Pult:
-            avatar:"https://tupian.li/images/2026/02/26/69a005bf0829d.gif"
-            name:"西瓜投手"
-            prize:"" # 称号是允许留空的
-        Gatling_Pea:
-            avatar:"https://tupian.li/images/2026/02/26/69a007989111e.gif"
-            name:"机枪射手"
-            prize:"" # 称号是允许留空的
-        Twin_Sunflower:
-            avatar:"https://tupian.li/images/2026/02/26/69a00a5b322ab.gif"
-            name:"双子向日葵"
-            prize:"" # 称号是允许留空的
-        Gloom_Shroom:
-            avatar:["https://tupian.li/images/2026/02/26/69a00abf124e5.gif","https://tupian.li/images/2026/02/26/69a0113736e63.gif"]
-            name:"忧郁菇"
-            prize:"" # 称号是允许留空的
+            prize:""
         Cattail:
-            avatar:"https://tupian.li/images/2026/02/26/69a0030d18966.gif"
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s3.bmp.ovh/2026/04/30/CR9rCRrV.gif"
             name:"猫尾草"
-            prize:"" # 称号是允许留空的
-        Winter_Melon:
-            avatar:"https://tupian.li/images/2026/02/26/69a006b4dc86f.gif"
-            name:"冰西瓜"
-            prize:"" # 称号是允许留空的
-        Gold_Magnet:
-            avatar:"https://tupian.li/images/2026/02/26/69a00f54096fe.gif"
-            name:"吸金磁"
-            prize:"" # 称号是允许留空的
+            prize:""
         Spikerock:
-            avatar:"https://tupian.li/images/2026/02/26/69a003827f3a0.gif"
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s3.bmp.ovh/2026/04/30/86AlyUsN.gif"
             name:"钢地刺"
-            prize:"" # 称号是允许留空的
-        Cob_Cannon:
-            avatar:"https://tupian.li/images/2026/02/26/69a002d340957.gif"
-            name:"玉米加农炮"
-            prize:"" # 称号是允许留空的
+            prize:""
         Imitater:
-            avatar:"https://tupian.li/images/2026/02/26/69a009ba35102.gif"
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s3.bmp.ovh/2026/05/01/rl8B37zY.gif"
             name:"模仿者"
-            prize:"" # 称号是允许留空的
+            prize:""
         Putong:
-            avatar:"https://tupian.li/images/2026/02/26/69a00f802cebb.gif"
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s3.bmp.ovh/2026/05/02/uNRzjRgl.gif"
             name:"普通僵尸"
-            prize:"" # 称号是允许留空的
+            prize:""
         Ban:
-            avatar:"https://tupian.li/images/2026/02/26/69a02300e9315.gif"
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s3.bmp.ovh/2026/05/02/3UyKxlHz.gif"
             name:"伴舞僵尸"
-            prize:"" # 称号是允许留空的
+            prize:""
         Che:
-            avatar:"https://tupian.li/images/2026/02/26/69a0216a1374b.gif"
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s3.bmp.ovh/2026/05/02/L8Zx7LzZ.gif"
             name:"冰车僵尸"
-            prize:"" # 称号是允许留空的
+            prize:""
         Cheng:
-            avatar:"https://tupian.li/images/2026/02/26/69a0216a11bac.gif"
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s3.bmp.ovh/2026/05/02/aE7CTRRM.gif"
             name:"撑杆跳僵尸"
-            prize:"" # 称号是允许留空的
+            prize:""
         Beng:
-            avatar:"https://tupian.li/images/2026/02/26/69a02300e9c85.gif"
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s3.bmp.ovh/2026/05/02/e1jTXpVi.gif"
             name:"蹦极僵尸"
-            prize:"" # 称号是允许留空的
+            prize:""
         Ti:
-            avatar:"https://tupian.li/images/2026/02/26/69a02191a40d0.gif"
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s3.bmp.ovh/2026/05/02/d1jLbsYd.gif"
             name:"扶梯僵尸"
-            prize:"" # 称号是允许留空的
+            prize:""
         Dui:
-            avatar:"https://tupian.li/images/2026/02/26/69a0234987f96.gif"
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s3.bmp.ovh/2026/05/02/AAY6QWrT.gif"
             name:"雪橇车小队"
-            prize:"" # 称号是允许留空的
+            prize:""
         Xue:
-            avatar:"https://tupian.li/images/2026/02/26/69a0234988e10.gif"
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s3.bmp.ovh/2026/05/02/s9D03Ks2.gif"
             name:"雪人僵尸"
-            prize:"" # 称号是允许留空的
+            prize:""
         Gan:
-            avatar:"https://tupian.li/images/2026/02/26/69a021a3e0afc.gif"
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s3.bmp.ovh/2026/05/01/iHHWCB4V.gif"
             name:"橄榄球僵尸"
-            prize:"" # 称号是允许留空的
+            prize:""
         Bao:
-            avatar:"https://tupian.li/images/2026/02/26/69a024c6134fa.gif"
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s3.bmp.ovh/2026/05/02/ELCQsTSK.gif"
             name:"读报僵尸"
-            prize:"" # 称号是允许留空的
+            prize:""
         Tun:
-            avatar:"https://tupian.li/images/2026/02/26/69a02406e7296.gif"
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s3.bmp.ovh/2026/05/02/Ku9DhQd8.gif"
             name:"海豚僵尸"
-            prize:"" # 称号是允许留空的
+            prize:""
         Ju:
-            avatar:"https://tupian.li/images/2026/02/26/69a021ab66ffa.gif"
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s3.bmp.ovh/2026/04/30/HfFJS3TS.gif"
             name:"伽刚特尔"
-            prize:"" # 称号是允许留空的
+            prize:""
         Ya:
-            avatar:"https://tupian.li/images/2026/02/26/69a021c0afa40.gif"
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s3.bmp.ovh/2026/05/01/4gUbIOQb.gif"
             name:"救生圈僵尸"
-            prize:"" # 称号是允许留空的
+            prize:""
         Kuang:
-            avatar:"https://tupian.li/images/2026/02/26/69a021d476600.gif"
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s3.bmp.ovh/2026/05/01/tTZtLEop.gif"
             name:"矿工僵尸"
-            prize:"" # 称号是允许留空的
+            prize:""
         Zhang:
-            avatar:"https://tupian.li/images/2026/02/26/69a021e851ac8.gif"
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s3.bmp.ovh/2026/05/01/C3l0IWY0.gif"
             name:"路障僵尸"
-            prize:"" # 称号是允许留空的
+            prize:""
         Qi:
-            avatar:"https://tupian.li/images/2026/02/26/69a021e851ac8.gif"
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s3.bmp.ovh/2026/05/01/ftFwlxOb.gif"
             name:"旗帜僵尸"
-            prize:"" # 称号是允许留空的
+            prize:""
         Fei:
-            avatar:"https://tupian.li/images/2026/02/26/69a022258a973.gif"
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s3.bmp.ovh/2026/05/01/MYcyvbWi.gif"
             name:"气球僵尸"
-            prize:"" # 称号是允许留空的
+            prize:""
         Qian:
-            avatar:"https://tupian.li/images/2026/02/26/69a023a5a1a61.gif"
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s3.bmp.ovh/2026/05/01/GBHcMZme.gif"
             name:"潜水僵尸"
-            prize:"" # 称号是允许留空的
-        Tiao_Tiao:
-            avatar:"https://tupian.li/images/2026/02/26/69a0260fba375.gif"
-            name:"跳跳僵尸"
-            prize:"" # 称号是允许留空的
+            prize:""
         Tong:
-            avatar:"https://tupian.li/images/2026/02/26/69a023d98e031.gif"
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s3.bmp.ovh/2026/05/01/RwLzx5CA.gif"
             name:"铁桶僵尸"
-            prize:"" # 称号是允许留空的
+            prize:""
         Men:
-            avatar:"https://tupian.li/images/2026/02/26/69a0250163b99.gif"
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s3.bmp.ovh/2026/05/01/ISPViVLh.gif"
             name:"铁网门僵尸"
-            prize:"" # 称号是允许留空的
-        Tou_Shi:
-            avatar:"https://tupian.li/images/2026/02/26/69a0250c03601.gif"
-            name:"投石车僵尸"
-            prize:"" # 称号是允许留空的
+            prize:""
         Wu:
-            avatar:"https://tupian.li/images/2026/02/26/69a022b16c932.gif"
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s3.bmp.ovh/2026/05/01/AiKzsAxd.gif"
             name:"舞王僵尸"
-            prize:"" # 称号是允许留空的
+            prize:""
         Chou:
-            avatar:"https://tupian.li/images/2026/02/26/69a022b16d58d.gif"
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s3.bmp.ovh/2026/05/01/DkFtGMyB.gif"
             name:"小丑僵尸"
-            prize:"" # 称号是允许留空的
+            prize:""
         Xiao:
-            avatar:"https://tupian.li/images/2026/02/26/69a02300e98ca.gif"
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s3.bmp.ovh/2026/05/01/iwMVvgWL.gif"
             name:"小鬼僵尸"
-            prize:"" # 称号是允许留空的
+            prize:""
         Bo:
-            avatar:"https://tupian.li/images/2026/02/26/69a0234be416f.gif"
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s3.bmp.ovh/2026/05/01/F0Re3oNB.gif"
             name:"僵王博士"
-            prize:"" # 称号是允许留空的
+            prize:""
+        he:
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s3.bmp.ovh/2026/04/30/gUEb7A37.gif"
+            name:"荷叶"
+            prize:""
+        xijin:
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s3.bmp.ovh/2026/04/30/mYPGf24u.gif"
+            name:"吸金磁"
+            prize:""
+        hai:
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:["https://s3.bmp.ovh/2026/04/30/fZPNAq8v.gif","https://s3.bmp.ovh/2026/02/26/Iyj70DkJ.gif"]
+            name:"海蘑菇"
+            prize:""
+        cherry:
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s3.bmp.ovh/2026/05/01/ulf73J63.gif"
+            name:"樱桃炸弹"
+            prize:""
+        dilei:
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s3.bmp.ovh/2026/05/01/YfUkaKAy.gif"
+            name:"土豆地雷"
+            prize:""
+        snow:
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s3.bmp.ovh/2026/04/30/VTzirqIT.gif"
+            name:"寒冰射手"
+            prize:""
+        small:
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:["https://s3.bmp.ovh/2026/05/01/BnsR4xfk.gif","https://s3.bmp.ovh/2026/05/02/6eocPWSD.gif"]
+            name:"小喷菇"
+            prize:""
+        big:
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:["https://s3.bmp.ovh/2026/04/30/OiJYXLG5.gif","https://s3.bmp.ovh/2026/05/02/PCoEw6Ej.gif"]
+            name:"大喷菇"
+            prize:""
+        sun:
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:["https://s3.bmp.ovh/2026/05/01/1nr6hyfJ.gif","https://s3.bmp.ovh/2026/02/26/RMbD1Ips.gif"]
+            name:"阳光菇"
+            prize:""
+        haipa:
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:["https://s3.bmp.ovh/2026/04/30/tmh87aee.gif","https://s3.bmp.ovh/2026/02/26/xHeLwJvf.gif"]
+            name:"胆小菇"
+            prize:""
+        mubei:
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s3.bmp.ovh/2026/05/01/oSdPnUc2.gif"
+            name:"墓碑吞噬者"
+            prize:""
+        mei:
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:["https://s3.bmp.ovh/2026/05/01/TmmzQvOs.gif","https://s3.bmp.ovh/2026/05/02/HfngkNVf.gif"]
+            name:"魅惑菇"
+            prize:""
+        han:
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:["https://s3.bmp.ovh/2026/04/30/lr87Qbox.gif","https://s3.bmp.ovh/2026/05/02/WQzrLBe0.gif"]
+            name:"寒冰菇"
+            prize:""
+        boom:
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:["https://s3.bmp.ovh/2026/05/01/jrk5j9sO.gif","https://s3.bmp.ovh/2026/05/02/EjwoyvWV.gif"]
+            name:"毁灭菇"
+            prize:""
+        grass:
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s3.bmp.ovh/2026/04/30/CjXlsyy1.gif"
+            name:"缠绕海草"
+            prize:""
+        big:
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s3.bmp.ovh/2026/04/30/ZEGCu8bu.gif"
+            name:"高坚果"
+            prize:""
+        lie:
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s3.bmp.ovh/2026/05/01/d0TmgvIb.gif"
+            name:"双向射手"
+            prize:""
+        ci:
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:["https://s3.bmp.ovh/2026/04/30/7DvVRKmS.gif","https://s3.bmp.ovh/2026/05/02/uAPouEKr.gif"]
+            name:"磁力菇"
+            prize:""
+        juan:
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s3.bmp.ovh/2026/05/01/utVSd8gG.gif"
+            name:"卷心菜投手"
+            prize:""
+        flower:
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s3.bmp.ovh/2026/04/30/7nt5oqN0.gif"
+            name:"花盆"
+            prize:""
+        yu:
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s3.bmp.ovh/2026/04/30/QoS5FCTU.gif"
+            name:"玉米投手"
+            prize:""
+        glra:
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s3.bmp.ovh/2026/05/01/0YcxV10j.gif"
+            name:"叶子保护伞"
+            prize:""
+        coffe:
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s3.bmp.ovh/2026/05/01/Vt6JkRis.gif"
+            name:"咖啡豆"
+            prize:""
+        gua:
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s3.bmp.ovh/2026/05/01/czw3lQLb.gif"
+            name:"西瓜投手"
+            prize:""
+        tutu:
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s3.bmp.ovh/2026/04/30/OaYRu7D0.gif"
+            name:"机枪射手"
+            prize:""
+        two:
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s3.bmp.ovh/2026/04/30/KaIvryi7.gif"
+            name:"双子向日葵"
+            prize:""
+        winter:
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s3.bmp.ovh/2026/04/30/XFhRDSk2.gif"
+            name:"冰瓜投手"
+            prize:""
+        pao:
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s3.bmp.ovh/2026/04/30/sCI1H360.gif"
+            name:"玉米加农炮"
+            prize:""
+        open:
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:["https://s3.bmp.ovh/2026/04/30/F0nBQskn.gif","https://s3.bmp.ovh/2026/05/02/oRIeUeHB.gif"]
+            name:"忧郁菇"
+            prize:""
+        shitou:
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s3.bmp.ovh/2026/05/01/7kZxMutQ.gif"
+            name:"投石车僵尸"
+            prize:""
+        jump:
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s3.bmp.ovh/2026/05/01/TGKpaTOJ.gif"
+            name:"跳跳僵尸"
+            prize:""
