@@ -12861,6 +12861,26 @@ class RainyBoy extends Madman
             []
         else super
 
+class WerewolfDescendant extends Madman
+    type: "WerewolfDescendant"
+    beforebury:(game, type)->
+        return false if @dead
+        wolves = game.players.filter (pl)-> pl.isWerewolf()
+        unless wolves.every((pl)-> pl.dead)
+            return false
+        newpl = Player.factory "Werewolf", game
+        @transProfile newpl
+        @transferData newpl, true
+        log =
+            mode:"skill"
+            to:@id
+            comment: game.i18n.t "roles:WerewolfDescendant.transform", {name: @name}
+        splashlog game.id, game, log
+        @transform game, newpl, false
+        newpl.sunset game
+        game.splashjobinfo [newpl]
+        false
+
 class DarkPsychic extends Psychic
     type: "DarkPsychic"
     hasDeadlyWeapon:-> true
@@ -15552,6 +15572,7 @@ jobs=
     ResidualHaunting:ResidualHaunting
     HouseKeeper: HouseKeeper
     RainyBoy:RainyBoy
+    WerewolfDescendant:WerewolfDescendant
     MindPsychic:MindPsychic
     DarkPsychic:DarkPsychic
     Itako:Itako
@@ -15843,6 +15864,7 @@ jobStrength=
     ResidualHaunting:10
     HouseKeeper: 15
     RainyBoy: 10
+    WerewolfDescendant: 10
     DarkPsychic: 8
     Itako: 15
 
