@@ -481,7 +481,7 @@ const AppWrapper = styled(AppStyling)`
         case 'very-small':
           return '0.6em';
       }
-    }}
+    }};
     padding-bottom: 2em;
   `};
 `;
