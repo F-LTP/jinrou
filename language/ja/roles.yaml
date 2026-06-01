@@ -301,9 +301,9 @@ Diviner:
 # SuperFox
 SuperFox:
     # Select a threatening.
-  select: '{{name}} 狐咒了 {{target}}。'
+  select: '{{name}} 诅咒了 {{target}}。'
   # Affected by threatening.
-  affected: '{{name}} 被狐咒影响，今夜无法发动能力。'
+  affected: '{{name}} 被诅咒影响，今夜无法发动能力。'
 
 SuperDiviner:
   # Divine result
