@@ -139,11 +139,6 @@ const ToolIcons = styled.span`
   display: flex;
   gap: 0.3em;
   opacity: 0.5;
-  transition: opacity 0.2s;
-
-  ${Wrapper}:hover & {
-    opacity: 1;
-  }
 
   ${phone`
     margin-left: 1em;
