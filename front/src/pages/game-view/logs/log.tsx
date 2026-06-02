@@ -8,38 +8,47 @@ import { Theme } from '../../../theme';
 import { FixedSizeLogRow } from './elements';
 import { CommentContent } from './comment';
 import { StoredLog } from './log-store';
-import { useState, useRef, useCallback } from 'react';
 import { themeStore } from '../../../theme';
 
-/**
- * 兼容移动端和桌面端的双击检测 Hook
- */
-function useDoubleClick(callback: () => void, delay = 300) {
-  const [lastClickTime, setLastClickTime] = useState(0);
-  const clickTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+const SHORT_ID_DOUBLE_CLICK_DELAY = 300;
+let currentShortIdClick: ((shortId: string) => void) | undefined;
+let lastShortIdClickTime = 0;
+let lastShortIdClick = '';
+let shortIdClickResetTimer: number | null = null;
 
-  return useCallback(() => {
-    const now = Date.now();
-    const timeDiff = now - lastClickTime;
+function handleShortIdDoubleClick(e: React.MouseEvent<HTMLElement>) {
+  const shortId = e.currentTarget.getAttribute('data-shortid');
+  if (!shortId || !currentShortIdClick) {
+    return;
+  }
 
-    if (timeDiff < delay && timeDiff > 0) {
-      callback();
-      setLastClickTime(0);
-      if (clickTimeoutRef.current) {
-        clearTimeout(clickTimeoutRef.current);
-        clickTimeoutRef.current = null;
-      }
-    } else {
-      setLastClickTime(now);
-      if (clickTimeoutRef.current) {
-        clearTimeout(clickTimeoutRef.current);
-      }
-      clickTimeoutRef.current = setTimeout(() => {
-        setLastClickTime(0);
-        clickTimeoutRef.current = null;
-      }, delay);
+  const now = Date.now();
+  const timeDiff = now - lastShortIdClickTime;
+  if (
+    lastShortIdClick === shortId &&
+    timeDiff < SHORT_ID_DOUBLE_CLICK_DELAY &&
+    timeDiff > 0
+  ) {
+    currentShortIdClick(shortId);
+    lastShortIdClickTime = 0;
+    lastShortIdClick = '';
+    if (shortIdClickResetTimer != null) {
+      window.clearTimeout(shortIdClickResetTimer);
+      shortIdClickResetTimer = null;
     }
-  }, [callback, delay, lastClickTime]);
+    return;
+  }
+
+  lastShortIdClickTime = now;
+  lastShortIdClick = shortId;
+  if (shortIdClickResetTimer != null) {
+    window.clearTimeout(shortIdClickResetTimer);
+  }
+  shortIdClickResetTimer = window.setTimeout(() => {
+    lastShortIdClickTime = 0;
+    lastShortIdClick = '';
+    shortIdClickResetTimer = null;
+  }, SHORT_ID_DOUBLE_CLICK_DELAY);
 }
 
 export interface IPropOneLog {
@@ -108,6 +117,7 @@ class OneLogInner extends React.PureComponent<IPropOneLog, {}> {
       onShortIdClick,
       dimmed,
     } = this.props;
+    currentShortIdClick = onShortIdClick;
     const baseClassName = dimmed ? `${logClass} is-dimmed` : logClass;
 
     // Build props for log line wrapper
@@ -651,17 +661,15 @@ const NameInner = ({
   className?: string;
   children?: React.ReactNode;
 }) => {
-  const handleDoubleClick = useDoubleClick(() => {
-    if (shortId && onShortIdClick) {
-      onShortIdClick(shortId);
-    }
-  });
-
   // 只在有 shortId 时显示名字文字的双击效果
   if (shortId && onShortIdClick) {
     return (
       <LogPart logStyle={logStyle} className={className} data-shortid={shortId}>
-        <NameText onClick={handleDoubleClick} style={{ cursor: 'pointer' }}>
+        <NameText
+          data-shortid={shortId}
+          onClick={handleShortIdDoubleClick}
+          style={{ cursor: 'pointer' }}
+        >
           {children}
         </NameText>
       </LogPart>
@@ -875,21 +883,18 @@ const TimeInner = ({
   const second = ('0' + time.getSeconds()).slice(-2);
   const str = `${year}-${month}-${day} ${hour}:${minute}:${second}`;
 
-  const handleDoubleClick = useDoubleClick(() => {
-    if (shortId && onShortIdClick) {
-      onShortIdClick(shortId);
-    }
-  });
-
   return (
     <LogPart logStyle={logStyle} className={className}>
       <time
+        data-shortid={shortId}
         style={{
           cursor: shortId && onShortIdClick ? 'pointer' : 'default',
           display: 'block',
           width: '100%',
         }}
-        onClick={handleDoubleClick}
+        onClick={
+          shortId && onShortIdClick ? handleShortIdDoubleClick : undefined
+        }
       >
         {shortId && (
           <span style={{ opacity: 0.6 }}>

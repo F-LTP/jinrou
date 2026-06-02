@@ -53,3 +53,10 @@
 - 针对日志区筛选和新发言卡顿，优先避免按用户 ID 生成动态 CSS 选择器；把筛选状态落到稳定 class 上，能减少 `styled-components` 动态规则和属性选择器匹配的放大风险。
 - 如果 trace 中出现 `StyleInvalidatorInvalidationTracking` 指向 `父:hover 子` 选择器，先把这类跨层级 hover 联动收缩掉，再评估是否还需要更大范围的渲染结构改造。
 - 当筛选状态已经能在 React 渲染层计算时，不要继续给日志每个子节点保留用于 CSS 筛选的 `data-userid`；冗余 DOM 属性会扩大样式匹配和节点更新面。
+
+## 2026-06-02
+
+- 新日志 trace 若最大耗时仍在 `Browser/CrBrowserMain` 的空 `RunTask` 或 `UpdateLayer`，且 renderer 主线程只有百毫秒级 `Layout/Commit/PrePaint`，不要继续把根因写成业务 JS 或 React 单次提交。
+- 对这个日志区问题，DOM 节点数和 JS listener 计数是关键指标；`71697` 节点、`16345` listener 级别已经足以让部分 Chromium/设备在输入、合成、截图或内部树维护上退化到秒级卡顿。
+- CSS pickup/hover 优化只能减少放大器；若新 trace 仍有秒级 Browser 主线程阻塞，后续方案必须优先降低日志区实际挂载 DOM/组件/交互对象规模，而不是继续堆样式隔离。
+- 在“不改变玩家可见样式”的约束下，优先把每个重复节点上的 hook/state/effect/portal 改成单例或模块级分发；这比直接合并 DOM 结构风险低，更适合作为第一轮深层优化。
