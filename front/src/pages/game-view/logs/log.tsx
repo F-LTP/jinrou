@@ -77,6 +77,10 @@ export interface IPropOneLog {
    * Callback for shortId click.
    */
   onShortIdClick?: (shortId: string) => void;
+  /**
+   * Whether this log should be rendered in dimmed style.
+   */
+  dimmed?: boolean;
 }
 
 /**
@@ -102,9 +106,9 @@ class OneLogInner extends React.PureComponent<IPropOneLog, {}> {
       icons,
       resolveLogById,
       onShortIdClick,
+      dimmed,
     } = this.props;
-    // Build className for child elements
-    const baseClassName = logClass;
+    const baseClassName = dimmed ? `${logClass} is-dimmed` : logClass;
 
     // Build props for log line wrapper
     const LogLineWrapper = fixedSize ? FixedSizeLogRow : React.Fragment;
@@ -123,9 +127,9 @@ class OneLogInner extends React.PureComponent<IPropOneLog, {}> {
 
       return (
         <LogLineWrapper>
-          <Icon noName logStyle={logStyle} className={logClass} />
-          <Name noName logStyle={logStyle} className={logClass} />
-          <Main noName logStyle={logStyle} className={logClass}>
+          <Icon noName logStyle={logStyle} className={baseClassName} />
+          <Name noName logStyle={logStyle} className={baseClassName} />
+          <Main noName logStyle={logStyle} className={baseClassName}>
             <LogTable>
               {/* Vote result caption */}
               <caption>{t('log.voteResult.caption')}</caption>
@@ -150,7 +154,7 @@ class OneLogInner extends React.PureComponent<IPropOneLog, {}> {
             noName
             time={new Date(log.time)}
             logStyle={logStyle}
-            className={logClass}
+            className={baseClassName}
           />
         </LogLineWrapper>
       );
@@ -159,9 +163,9 @@ class OneLogInner extends React.PureComponent<IPropOneLog, {}> {
       const logStyle = computeLogStyle('probability_table', theme);
       return (
         <LogLineWrapper>
-          <Icon noName logStyle={logStyle} className={logClass} />
-          <Name noName logStyle={logStyle} className={logClass} />
-          <Main noName logStyle={logStyle} className={logClass}>
+          <Icon noName logStyle={logStyle} className={baseClassName} />
+          <Name noName logStyle={logStyle} className={baseClassName} />
+          <Main noName logStyle={logStyle} className={baseClassName}>
             <LogTable>
               {/* Probability table caption */}
               <caption>{t('log.probabilityTable.caption')}</caption>
@@ -215,7 +219,7 @@ class OneLogInner extends React.PureComponent<IPropOneLog, {}> {
             noName
             time={new Date(log.time)}
             logStyle={logStyle}
-            className={logClass}
+            className={baseClassName}
           />
         </LogLineWrapper>
       );
@@ -225,9 +229,13 @@ class OneLogInner extends React.PureComponent<IPropOneLog, {}> {
       const noName = icon == null;
       return (
         <LogLineWrapper>
-          <Icon noName={noName} logStyle={logStyle} className={logClass} />
-          <Name noName={noName} logStyle={logStyle} className={logClass} />
-          <Comment noName={noName} logStyle={logStyle} className={logClass}>
+          <Icon noName={noName} logStyle={logStyle} className={baseClassName} />
+          <Name noName={noName} logStyle={logStyle} className={baseClassName} />
+          <Comment
+            noName={noName}
+            logStyle={logStyle}
+            className={baseClassName}
+          >
             <I18nInterp ns="game_client" k="log.poem.description">
               {{
                 name: <b>{log.name}</b>,
@@ -240,7 +248,7 @@ class OneLogInner extends React.PureComponent<IPropOneLog, {}> {
             noName={noName}
             time={new Date(log.time)}
             logStyle={logStyle}
-            className={logClass}
+            className={baseClassName}
           />
         </LogLineWrapper>
       );
@@ -262,7 +270,7 @@ class OneLogInner extends React.PureComponent<IPropOneLog, {}> {
       const noName = icon == null && !nameText;
       const props = {
         logStyle,
-        className: logClass,
+        className: baseClassName,
         'data-userid': 'userid' in log ? log.userid : undefined,
       };
       const commentProps = {

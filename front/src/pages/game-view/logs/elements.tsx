@@ -1,4 +1,4 @@
-import styled, { css } from '../../../util/styled';
+import styled from '../../../util/styled';
 import { phone } from '../../../common/media';
 
 /**
@@ -10,14 +10,6 @@ const fixedSizeGridColumnsPhone = '16px 1fr auto';
  * Wrapper of whole logs.
  */
 export const LogWrapper = styled.div<{
-  /**
-   * The class attached to each log.
-   */
-  logClass: string;
-  /**
-   * ID of user currently picked up.
-   */
-  logPickup: string | null;
   /**
    * Whether the UI is in "fixed-size mode".
    */
@@ -35,16 +27,10 @@ export const LogWrapper = styled.div<{
     fit-content(10em)
     1fr
     auto;
-  ${({ logClass, logPickup }) =>
-    // logPickup should not contain `"` because it is a user id.
-    // XXX safer solution?
-    logPickup != null
-      ? css`
-    .${logClass}:not([data-userid="${logPickup}"]) {
-      opacity: 0.3;
-    }
-  `
-      : ''} ${phone`
+  .jf-log.is-dimmed {
+    opacity: 0.3;
+  }
+  ${phone`
     grid-template-columns:
       minmax(8px, max-content)
       1fr

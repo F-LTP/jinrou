@@ -168,12 +168,7 @@ export class Logs extends React.Component<IPropLogs, IStateLogs> {
 
     let renderedLogCount = 0;
     return (
-      <LogWrapper
-        logPickup={logPickup}
-        logClass={this.logClass}
-        fixedSize={fixedSize}
-        onClick={this.handleLogWrapperClick}
-      >
+      <LogWrapper fixedSize={fixedSize} onClick={this.handleLogWrapperClick}>
         {mapReverse(logs.chunks, (chunk, i) => {
           // Decide whether this chunk should be shown.
           const visible =
@@ -199,6 +194,7 @@ export class Logs extends React.Component<IPropLogs, IStateLogs> {
               fixedSize={fixedSize}
               icons={icons}
               rule={rule}
+              logPickup={logPickup}
               resolveLogById={this.resolveLogById}
               onShortIdClick={onShortIdClick}
             />
@@ -246,6 +242,10 @@ class LogChunk extends React.Component<
      */
     rule: Rule | undefined;
     /**
+     * Picked-up user id.
+     */
+    logPickup: string | null;
+    /**
      * Function to resolve log by shortId for reply reference.
      */
     resolveLogById?: (shortId: string) => StoredLog | null;
@@ -267,6 +267,7 @@ class LogChunk extends React.Component<
       icons,
       resolveLogById,
       onShortIdClick,
+      logPickup,
     } = this.props;
     if (!visible && !fixedSize) {
       return null;
@@ -275,8 +276,8 @@ class LogChunk extends React.Component<
       renderedNumber >= logs.length
         ? logs
         : renderedNumber > 0
-          ? logs.slice(-renderedNumber)
-          : [];
+        ? logs.slice(-renderedNumber)
+        : [];
 
     const chunkContent = (
       <I18n namespace="game_client">
@@ -291,6 +292,11 @@ class LogChunk extends React.Component<
                 log={log}
                 rule={rule}
                 icons={icons}
+                dimmed={
+                  logPickup != null &&
+                  'userid' in log &&
+                  log.userid !== logPickup
+                }
                 resolveLogById={resolveLogById}
                 onShortIdClick={onShortIdClick}
               />
