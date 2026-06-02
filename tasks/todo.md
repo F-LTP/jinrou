@@ -3,14 +3,22 @@
 - [x] 方案一：将 `pickup` 从动态选择器过滤改为静态规则 + 节点增量标记
 - [x] 方案二：降低玩家区父子联动 `hover` 的样式失效传播范围
 - [x] 方案三：收缩日志节点上 `data-userid` 的冗余挂载，减少匹配面
-- [ ] 每个方案分别完成本地构建校验并单独提交（不 push）
-- [ ] 在本文末尾追加 Review，并同步 `tasks/lessons.md`
+- [x] 每个方案分别完成本地构建校验并单独提交（不 push）
+- [x] 在本文末尾追加 Review，并同步 `tasks/lessons.md`
 
 ## Check-in
 
 - 本轮只提交与三项方案直接相关的文件，保留并忽略现有 `AGENTS.md` 未提交改动。
 - 提交顺序固定为：方案一 -> 方案二 -> 方案三；每完成一项立即勾选并提交一次。
 - 每个提交后都执行 `front/npm run build:tsc` 验证，确保分提交可独立落地。
+
+## Review
+
+- 已将 `pickup` 的动态 `styled-components` 选择器替换为固定 `.jf-log.is-dimmed` 规则，避免按用户 ID 生成动态 CSS 与 `:not([data-userid=...])` 的大范围匹配。
+- 已移除玩家框工具图标的 `${Wrapper}:hover &` 父子联动选择器，消除 trace 中出现过的 hover 样式失效来源。
+- 已清理日志子节点上的冗余 `data-userid` 属性；当前筛选变暗由 React 计算 `dimmed` 后附加 class，不再依赖 DOM 属性选择器。
+- 三个方案均已分别运行 `front/npm run build:tsc` 并通过；提交过程中 husky 也对相关 TS/TSX 文件执行了 prettier。
+- 本轮只创建本地提交，没有 push；现有 `AGENTS.md` 仍是用户原有未提交改动，未纳入这些提交。
 
 # 当前任务（2026-05-24 全站回归测试）
 

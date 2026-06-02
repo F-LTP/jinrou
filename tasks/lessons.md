@@ -47,3 +47,9 @@
 - 用户可配置头像这类跨站图片源，即使给 `img` 补 `referrerPolicy=\"no-referrer\"` 也不保证能绕过 Chromium `ORB`；如果源站本身返回了错误内容，根治方案应转向“图片代理”或“头像源白名单”，而不是继续在 React 渲染层兜圈子。
 - 这个仓库前端 `watch` 下的动态 chunk 很容易被旧标签页缓存住；如果刚修过 webpack 分包、peer 依赖或动态 import 相关问题，必须新开页面或用隔离上下文复测，不能只看原标签页，否则会把陈旧坏 chunk 误判成源码仍未修好。
 - `pug-loader` 在 `front` 目录执行时不能依赖根目录偶然 hoist 出来的 `pug`；凡是开发态 `watch` 也要走到的 peer 依赖，都要在 `front/package.json` 里显式声明并配套一条可独立运行的构建校验脚本。
+
+## 2026-06-01
+
+- 针对日志区筛选和新发言卡顿，优先避免按用户 ID 生成动态 CSS 选择器；把筛选状态落到稳定 class 上，能减少 `styled-components` 动态规则和属性选择器匹配的放大风险。
+- 如果 trace 中出现 `StyleInvalidatorInvalidationTracking` 指向 `父:hover 子` 选择器，先把这类跨层级 hover 联动收缩掉，再评估是否还需要更大范围的渲染结构改造。
+- 当筛选状态已经能在 React 渲染层计算时，不要继续给日志每个子节点保留用于 CSS 筛选的 `data-userid`；冗余 DOM 属性会扩大样式匹配和节点更新面。
