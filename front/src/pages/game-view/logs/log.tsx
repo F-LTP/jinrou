@@ -271,7 +271,6 @@ class OneLogInner extends React.PureComponent<IPropOneLog, {}> {
       const props = {
         logStyle,
         className: baseClassName,
-        'data-userid': 'userid' in log ? log.userid : undefined,
       };
       const commentProps = {
         size,
@@ -647,12 +646,10 @@ const NameInner = ({
   onShortIdClick,
   logStyle,
   className,
-  'data-userid': dataUserid,
 }: IPropName & {
   logStyle: LogStyle;
   className?: string;
   children?: React.ReactNode;
-  'data-userid'?: string;
 }) => {
   const handleDoubleClick = useDoubleClick(() => {
     if (shortId && onShortIdClick) {
@@ -663,12 +660,7 @@ const NameInner = ({
   // 只在有 shortId 时显示名字文字的双击效果
   if (shortId && onShortIdClick) {
     return (
-      <LogPart
-        logStyle={logStyle}
-        className={className}
-        data-userid={dataUserid}
-        data-shortid={shortId}
-      >
+      <LogPart logStyle={logStyle} className={className} data-shortid={shortId}>
         <NameText onClick={handleDoubleClick} style={{ cursor: 'pointer' }}>
           {children}
         </NameText>
@@ -677,12 +669,7 @@ const NameInner = ({
   }
 
   return (
-    <LogPart
-      logStyle={logStyle}
-      className={className}
-      data-userid={dataUserid}
-      data-shortid={shortId}
-    >
+    <LogPart logStyle={logStyle} className={className} data-shortid={shortId}>
       {children}
     </LogPart>
   );
@@ -871,7 +858,6 @@ interface IPropTime extends IPropLogPart {
   logStyle: LogStyle;
   shortId?: string;
   onShortIdClick?: (shortId: string) => void;
-  'data-userid'?: string;
 }
 const TimeInner = ({
   time,
@@ -880,7 +866,6 @@ const TimeInner = ({
   logStyle,
   shortId,
   onShortIdClick,
-  'data-userid': dataUserid,
 }: IPropTime) => {
   const year = time.getFullYear();
   const month = ('0' + (time.getMonth() + 1)).slice(-2);
@@ -897,7 +882,7 @@ const TimeInner = ({
   });
 
   return (
-    <LogPart logStyle={logStyle} className={className} data-userid={dataUserid}>
+    <LogPart logStyle={logStyle} className={className}>
       <time
         style={{
           cursor: shortId && onShortIdClick ? 'pointer' : 'default',
