@@ -1,6 +1,5 @@
 import * as React from 'react';
 import styled from '../../util/styled';
-import { Transition } from 'react-transition-group';
 import Swipeable from 'react-swipeable';
 
 import { ThemeProvider } from '../../util/styled';
@@ -226,48 +225,36 @@ export class Game extends React.Component<IPropGame, {}> {
             {/* Main game screen. */}
             <MainWrapper>
               {/* Rule panel if open. */}
-              <Transition in={rule != null && ruleOpen} timeout={250}>
-                {(state: string) => {
-                  const closed =
-                    state === 'exiting' ||
-                    state === 'exited' ||
-                    state === 'unmounted';
-                  return (
-                    <>
-                      <RuleWrapper closed={closed}>
-                        {rule != null ? (
-                          <RuleStickyWrapper closed={closed}>
-                            <RuleInnerWrapper ref={this.ruleElement}>
-                              <Swipeable
-                                onSwipingLeft={this.handleRuleSwipeToLeft}
-                                onSwipingRight={this.handleRuleSwipeToRight}
-                              >
-                                <ShowRule
-                                  rule={rule}
-                                  categories={categories}
-                                  ruleDefs={ruleDefs}
-                                />
-                              </Swipeable>
-                            </RuleInnerWrapper>
-                          </RuleStickyWrapper>
-                        ) : null}
-                      </RuleWrapper>
-                      {/* Logs. */}
-                      <LogsWrapper ruleOpen={!closed}>
-                        <Logs
-                          logs={store.logs}
-                          visibility={store.logVisibility}
-                          icons={store.icons}
-                          rule={store.rule}
-                          logPickup={logPickup}
-                          onResetLogPickup={this.handleResetLogPickup}
-                          onShortIdClick={this.handleShortIdClick}
+              <RuleWrapper closed={rule == null || !ruleOpen}>
+                {rule != null ? (
+                  <RuleStickyWrapper closed={rule == null || !ruleOpen}>
+                    <RuleInnerWrapper ref={this.ruleElement}>
+                      <Swipeable
+                        onSwipingLeft={this.handleRuleSwipeToLeft}
+                        onSwipingRight={this.handleRuleSwipeToRight}
+                      >
+                        <ShowRule
+                          rule={rule}
+                          categories={categories}
+                          ruleDefs={ruleDefs}
                         />
-                      </LogsWrapper>
-                    </>
-                  );
-                }}
-              </Transition>
+                      </Swipeable>
+                    </RuleInnerWrapper>
+                  </RuleStickyWrapper>
+                ) : null}
+              </RuleWrapper>
+              {/* Logs. */}
+              <LogsWrapper>
+                <Logs
+                  logs={store.logs}
+                  visibility={store.logVisibility}
+                  icons={store.icons}
+                  rule={store.rule}
+                  logPickup={logPickup}
+                  onResetLogPickup={this.handleResetLogPickup}
+                  onShortIdClick={this.handleShortIdClick}
+                />
+              </LogsWrapper>
             </MainWrapper>
             <RoomFooterPart>
               <GameFooter
@@ -560,23 +547,16 @@ const JobInfoPart = styled(RoomHeaderPart)`
 const MainWrapper = styled.div`
   display: flex;
   flex-flow: row nowrap;
+  position: relative;
+  overflow-x: hidden;
 `;
 
 /**
  * Wrapper of logs.
  */
-const LogsWrapper = styled.div<{
-  /**
-   * Whether the rule pane is open.
-   */
-  ruleOpen?: boolean;
-}>`
+const LogsWrapper = styled.div`
   flex: auto 1 1;
   order: 1;
-  ${phone`
-    transition: margin-left 250ms ease-out;
-    margin-left: ${({ ruleOpen }) => (ruleOpen ? '-20em' : '0)')};
-  `};
 `;
 
 /**
@@ -597,9 +577,14 @@ interface IPropsRuleWrapper {
  * Wrapper of rule.
  */
 const RuleWrapper = styled.div<IPropsRuleWrapper>`
-  transition: width 250ms ease-out;
-  flex: auto 0 0;
-  width: ${({ closed }) => (closed ? '0' : '20em')};
+  position: absolute;
+  right: 0;
+  top: 0;
+  transition: transform 250ms ease-out;
+  transform: translateX(${({ closed }) => (closed ? '100%' : '0')});
+  pointer-events: ${({ closed }) => (closed ? 'none' : 'auto')};
+  width: 20em;
+  max-width: 100%;
   order: 2;
 
   z-index: ${ruleZIndex};
@@ -612,8 +597,8 @@ const RuleWrapper = styled.div<IPropsRuleWrapper>`
 `;
 
 const RuleStickyWrapper = styled.div<IPropsRuleWrapper>`
-  transition: width 250ms ease-out;
-  width: ${({ closed }) => (closed ? '0' : '20em')};
+  width: 20em;
+  max-width: 100%;
   position: sticky;
   top: 0;
   overflow-x: hidden;

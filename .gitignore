@@ -9,3 +9,5 @@ node_modules/
 /language/*/*.missing.json
 /.vs
 CLAUDE.md
+tasks/lessons.md
+tasks/todo.md

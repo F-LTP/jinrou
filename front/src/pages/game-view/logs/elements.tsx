@@ -20,16 +20,12 @@ export const LogWrapper = styled.div<{
   onClick?: (e: React.MouseEvent) => void;
 }>`
   width: 100%;
-  contain: layout style;
   display: ${props => (props.fixedSize ? 'block' : 'grid')};
   grid-template-columns:
     minmax(8px, max-content)
     fit-content(10em)
     1fr
     auto;
-  .jf-log.is-dimmed {
-    opacity: 0.3;
-  }
   ${phone`
     grid-template-columns:
       minmax(8px, max-content)
@@ -45,8 +41,20 @@ export const LogWrapper = styled.div<{
 export const FixedSizeChunkWrapper = styled.div<{
   visible: boolean;
 }>`
-  contain: layout style;
   display: ${({ visible }) => (visible ? 'block' : 'none')};
+`;
+
+/**
+ * React render boundary for a small group of logs.
+ */
+export const LogBlockWrapper = styled.div<{
+  /**
+   * Whether logs are rendered in fixed-size mode.
+   */
+  $fixedSize: boolean;
+}>`
+  display: ${({ $fixedSize }) => ($fixedSize ? 'block' : 'contents')};
+  ${({ $fixedSize }) => ($fixedSize ? 'contain: paint;' : '')}
 `;
 
 /**
@@ -55,7 +63,6 @@ export const FixedSizeChunkWrapper = styled.div<{
 export const FixedSizeLogRow = styled.div`
   display: grid;
   grid-template-columns: ${fixedSizeGridColumnsPC};
-  contain: layout style;
   margin-bottom: -0.35px;
   ${phone`
     grid-template-columns: ${fixedSizeGridColumnsPhone};

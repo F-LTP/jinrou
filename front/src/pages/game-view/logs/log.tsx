@@ -86,10 +86,6 @@ export interface IPropOneLog {
    * Callback for shortId click.
    */
   onShortIdClick?: (shortId: string) => void;
-  /**
-   * Whether this log should be rendered in dimmed style.
-   */
-  dimmed?: boolean;
 }
 
 /**
@@ -107,7 +103,6 @@ class OneLogInner extends React.PureComponent<IPropOneLog, {}> {
   public render() {
     const {
       t,
-      theme,
       logClass,
       fixedSize,
       log,
@@ -115,31 +110,43 @@ class OneLogInner extends React.PureComponent<IPropOneLog, {}> {
       icons,
       resolveLogById,
       onShortIdClick,
-      dimmed,
     } = this.props;
     currentShortIdClick = onShortIdClick;
-    const baseClassName = dimmed ? `${logClass} is-dimmed` : logClass;
-
-    // Build props for log line wrapper
-    const LogLineWrapper = fixedSize ? FixedSizeLogRow : React.Fragment;
-    const logLineProps: Record<string, any> = {};
-
-    // For system messages, mark them so they can be filtered
-    const isSystemMessage =
-      log.mode === 'system' || log.mode === 'nextturn' || !('userid' in log);
-    if (isSystemMessage) {
-      logLineProps['data-system-message'] = 'true';
-    }
+    const baseClassName = logClass;
+    const logUserid = 'userid' in log ? log.userid : undefined;
+    const logUserAttrs =
+      logUserid != null ? { 'data-log-userid': logUserid } : {};
+    const classNameForMode = (mode: Log['mode']) =>
+      `${baseClassName} ${logModeClass(mode)}`;
+    const lineAttrs = (mode: Log['mode']) =>
+      fixedSize
+        ? ({
+            className: classNameForMode(mode),
+            ...logUserAttrs,
+          } as Record<string, any>)
+        : {};
+    const partAttrs = (mode: Log['mode']) =>
+      fixedSize
+        ? {}
+        : ({
+            className: classNameForMode(mode),
+            ...logUserAttrs,
+          } as Record<string, any>);
+    const renderLine = (mode: Log['mode'], children: React.ReactNode) =>
+      fixedSize ? (
+        <FixedSizeLogRow {...lineAttrs(mode)}>{children}</FixedSizeLogRow>
+      ) : (
+        <>{children}</>
+      );
 
     if (log.mode === 'voteresult') {
       // log of vote result table
-      const logStyle = computeLogStyle('voteresult', theme);
-
-      return (
-        <LogLineWrapper>
-          <Icon noName logStyle={logStyle} className={baseClassName} />
-          <Name noName logStyle={logStyle} className={baseClassName} />
-          <Main noName logStyle={logStyle} className={baseClassName}>
+      return renderLine(
+        log.mode,
+        <>
+          <Icon noName {...partAttrs(log.mode)} />
+          <Name noName {...partAttrs(log.mode)} />
+          <Main noName {...partAttrs(log.mode)}>
             <LogTable>
               {/* Vote result caption */}
               <caption>{t('log.voteResult.caption')}</caption>
@@ -160,22 +167,17 @@ class OneLogInner extends React.PureComponent<IPropOneLog, {}> {
               </tbody>
             </LogTable>
           </Main>
-          <Time
-            noName
-            time={new Date(log.time)}
-            logStyle={logStyle}
-            className={baseClassName}
-          />
-        </LogLineWrapper>
+          <Time noName time={new Date(log.time)} {...partAttrs(log.mode)} />
+        </>,
       );
     } else if (log.mode === 'probability_table') {
       // log of probability table for Quantum Werewwolf
-      const logStyle = computeLogStyle('probability_table', theme);
-      return (
-        <LogLineWrapper>
-          <Icon noName logStyle={logStyle} className={baseClassName} />
-          <Name noName logStyle={logStyle} className={baseClassName} />
-          <Main noName logStyle={logStyle} className={baseClassName}>
+      return renderLine(
+        log.mode,
+        <>
+          <Icon noName {...partAttrs(log.mode)} />
+          <Name noName {...partAttrs(log.mode)} />
+          <Main noName {...partAttrs(log.mode)}>
             <LogTable>
               {/* Probability table caption */}
               <caption>{t('log.probabilityTable.caption')}</caption>
@@ -225,27 +227,18 @@ class OneLogInner extends React.PureComponent<IPropOneLog, {}> {
               </tbody>
             </LogTable>
           </Main>
-          <Time
-            noName
-            time={new Date(log.time)}
-            logStyle={logStyle}
-            className={baseClassName}
-          />
-        </LogLineWrapper>
+          <Time noName time={new Date(log.time)} {...partAttrs(log.mode)} />
+        </>,
       );
     } else if (log.mode === 'poem') {
-      const logStyle = computeLogStyle(log.mode, theme);
       const icon = icons[log.userid];
       const noName = icon == null;
-      return (
-        <LogLineWrapper>
-          <Icon noName={noName} logStyle={logStyle} className={baseClassName} />
-          <Name noName={noName} logStyle={logStyle} className={baseClassName} />
-          <Comment
-            noName={noName}
-            logStyle={logStyle}
-            className={baseClassName}
-          >
+      return renderLine(
+        log.mode,
+        <>
+          <Icon noName={noName} {...partAttrs(log.mode)} />
+          <Name noName={noName} {...partAttrs(log.mode)} />
+          <Comment noName={noName} {...partAttrs(log.mode)}>
             <I18nInterp ns="game_client" k="log.poem.description">
               {{
                 name: <b>{log.name}</b>,
@@ -257,13 +250,11 @@ class OneLogInner extends React.PureComponent<IPropOneLog, {}> {
           <Time
             noName={noName}
             time={new Date(log.time)}
-            logStyle={logStyle}
-            className={baseClassName}
+            {...partAttrs(log.mode)}
           />
-        </LogLineWrapper>
+        </>,
       );
     } else {
-      let logStyle = computeLogStyle(log.mode, theme);
       const size = log.mode === 'nextturn' ? undefined : log.size;
       const icon = log.mode === 'nextturn' ? undefined : icons[log.userid];
       const nameText =
@@ -278,16 +269,12 @@ class OneLogInner extends React.PureComponent<IPropOneLog, {}> {
           : log.name + ':';
       // Auto-link URLs and room numbers in it.
       const noName = icon == null && !nameText;
-      const props = {
-        logStyle,
-        className: baseClassName,
-      };
       const commentProps = {
         size,
         mode: log.mode,
         noName,
         coloredBold: themeStore.savedTheme.phoneUI.coloredFontBold !== false,
-        ...props,
+        ...partAttrs(log.mode),
       };
       // Server's bug? comment may actually be null
       const comment = autolinkLogType.includes(log.mode) ? (
@@ -301,20 +288,19 @@ class OneLogInner extends React.PureComponent<IPropOneLog, {}> {
       ) : (
         <Comment {...commentProps}>{sanitizeLog(log.comment)}</Comment>
       );
-      return (
-        <LogLineWrapper>
+      return renderLine(
+        log.mode,
+        <>
           {/* icon */}
-          <Icon noName={noName} {...props}>
-            {icon != null ? (
-              <img src={icon} alt="" referrerPolicy="no-referrer" />
-            ) : null}
+          <Icon noName={noName} {...partAttrs(log.mode)}>
+            {icon != null ? <IconImage $src={icon} aria-hidden="true" /> : null}
           </Icon>
           <Name
             noName={noName}
             size={size}
             shortId={log.shortId}
             onShortIdClick={onShortIdClick}
-            {...props}
+            {...partAttrs(log.mode)}
           >
             {nameText ? sanitizeLog(nameText) : null}
           </Name>
@@ -322,11 +308,11 @@ class OneLogInner extends React.PureComponent<IPropOneLog, {}> {
           <Time
             noName={noName}
             time={new Date(log.time)}
-            {...props}
             shortId={log.shortId}
             onShortIdClick={onShortIdClick}
+            {...partAttrs(log.mode)}
           />
-        </LogLineWrapper>
+        </>,
       );
     }
   }
@@ -581,6 +567,77 @@ export function computeLogStyle(mode: Log['mode'], theme: Theme): LogStyle {
   }
 }
 
+const logStyleModes: Array<Log['mode']> = [
+  'audience',
+  'couple',
+  'day',
+  'fox',
+  'gm',
+  'gmreply',
+  'gmaudience',
+  'gmheaven',
+  'gmmonologue',
+  'heaven',
+  'heavenmonologue',
+  'half-day',
+  'helperwhisper',
+  'hidden',
+  'inlog',
+  'madcouple',
+  'monologue',
+  'nextturn',
+  'poem',
+  'prepare',
+  'probability_table',
+  'streaming',
+  'system',
+  'userinfo',
+  'voteresult',
+  'voteto',
+  'werewolf',
+  'will',
+  'skill',
+  'emmaskill',
+  'wolfskill',
+  'eyeswolfskill',
+  'draculaskill',
+];
+
+function logModeClass(mode: Log['mode']): string {
+  return `jf-log-mode-${mode.replace(/_/g, '-')}`;
+}
+
+function cssValue(value: string): string {
+  return value.replace(/[;{}]/g, '');
+}
+
+function logStyleCssVarsText(logStyle: LogStyle): string {
+  const border = logStyle.borderColor
+    ? `1px dashed ${logStyle.borderColor}`
+    : 'none';
+  return [
+    `--jf-log-bg:${cssValue(logStyle.background)}`,
+    `--jf-log-color:${cssValue(logStyle.color)}`,
+    `--jf-log-border:${cssValue(border)}`,
+    `--jf-log-weight:${logStyle.bold ? 'bold' : 'normal'}`,
+  ].join(';');
+}
+
+const LogModeStyleInner = ({ theme }: { theme: Theme }) => (
+  <style>
+    {logStyleModes
+      .map(mode => {
+        const className = logModeClass(mode);
+        return `.jf-log-list .${className}{${logStyleCssVarsText(
+          computeLogStyle(mode, theme),
+        )}}`;
+      })
+      .join('\n')}
+  </style>
+);
+
+export const LogModeStyle = withTheme(LogModeStyleInner);
+
 interface IPropLogPart {
   /**
    * Whether no name is given for this log.
@@ -591,20 +648,12 @@ interface IPropLogPart {
 /**
  * Basic style of logcomponents.
  */
-const LogPart = styled.div<{
-  logStyle: LogStyle;
-}>`
-  background-color: ${props => props.logStyle.background};
-  color: ${props => props.logStyle.color};
-  border-top: ${props =>
-    props.logStyle.borderColor
-      ? `1px dashed ${props.logStyle.borderColor}`
-      : 'none'};
-  border-bottom: ${props =>
-    props.logStyle.borderColor
-      ? `1px dashed ${props.logStyle.borderColor}`
-      : 'none'};
-  font-weight: ${props => (props.logStyle.bold ? 'bold' : 'normal')};
+const LogPart = styled.div`
+  background-color: var(--jf-log-bg);
+  color: var(--jf-log-color);
+  border-top: var(--jf-log-border);
+  border-bottom: var(--jf-log-border);
+  font-weight: var(--jf-log-weight);
   line-height: inherit;
   overflow: hidden;
   word-break: break-all;
@@ -620,18 +669,28 @@ const Icon = styled(LogPart)<IPropLogPart>`
   grid-column: 1;
   min-width: 8px;
 
-  img {
-    width: 1em;
-    height: 1em;
-    vertical-align: bottom;
-    object-fit: cover;
-    ${({ noName }) => String(noName)};
-  }
-
   ${phone<IPropLogPart>`
     grid-row: ${({ noName }) => (noName ? 'span 1' : 'span 2')};
     ${({ noName }) => (noName ? '' : 'border-bottom: none;')}
   `};
+`;
+
+function cssUrl(src: string): string {
+  return `url(${JSON.stringify(src)})`;
+}
+
+const IconImage = styled.span.attrs<{ $src: string }>(props => ({
+  style: {
+    backgroundImage: cssUrl(props.$src),
+  },
+}))<{ $src: string }>`
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  vertical-align: bottom;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
 `;
 
 /**
@@ -654,17 +713,16 @@ const NameInner = ({
   children,
   shortId,
   onShortIdClick,
-  logStyle,
   className,
+  ...rest
 }: IPropName & {
-  logStyle: LogStyle;
   className?: string;
   children?: React.ReactNode;
 }) => {
   // 只在有 shortId 时显示名字文字的双击效果
   if (shortId && onShortIdClick) {
     return (
-      <LogPart logStyle={logStyle} className={className} data-shortid={shortId}>
+      <LogPart className={className} data-shortid={shortId} {...rest}>
         <NameText
           data-shortid={shortId}
           onClick={handleShortIdDoubleClick}
@@ -677,7 +735,7 @@ const NameInner = ({
   }
 
   return (
-    <LogPart logStyle={logStyle} className={className} data-shortid={shortId}>
+    <LogPart className={className} data-shortid={shortId} {...rest}>
       {children}
     </LogPart>
   );
@@ -863,7 +921,6 @@ const PoemWrapper = styled.div`
 interface IPropTime extends IPropLogPart {
   time: Date;
   className?: string;
-  logStyle: LogStyle;
   shortId?: string;
   onShortIdClick?: (shortId: string) => void;
 }
@@ -871,9 +928,9 @@ const TimeInner = ({
   time,
   noName,
   className,
-  logStyle,
   shortId,
   onShortIdClick,
+  ...rest
 }: IPropTime) => {
   const year = time.getFullYear();
   const month = ('0' + (time.getMonth() + 1)).slice(-2);
@@ -884,7 +941,7 @@ const TimeInner = ({
   const str = `${year}-${month}-${day} ${hour}:${minute}:${second}`;
 
   return (
-    <LogPart logStyle={logStyle} className={className}>
+    <LogPart className={className} {...rest}>
       <time
         data-shortid={shortId}
         style={{
