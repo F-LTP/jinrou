@@ -251,6 +251,7 @@ export class Game extends React.Component<IPropGame, {}> {
                   icons={store.icons}
                   rule={store.rule}
                   logPickup={logPickup}
+                  pickupUserids={players.map(player => player.id)}
                   onResetLogPickup={this.handleResetLogPickup}
                   onShortIdClick={this.handleShortIdClick}
                 />

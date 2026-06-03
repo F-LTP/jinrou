@@ -44,6 +44,10 @@ export interface IPropLogs {
    */
   logPickup: string | null;
   /**
+   * User ids which can be used for pickup filtering.
+   */
+  pickupUserids: string[];
+  /**
    * Icons of users.
    */
   icons: Record<string, string | undefined>;
@@ -80,15 +84,32 @@ function cssString(value: string): string {
     .replace(/\r/g, '\\D ')}"`;
 }
 
-function PickupStyle({ pickup }: { pickup: string | null }) {
-  if (pickup == null) {
-    return null;
+function uniqueValues(values: string[]): string[] {
+  const result: string[] = [];
+  const appeared = new Set<string>();
+  for (const value of values) {
+    if (appeared.has(value)) {
+      continue;
+    }
+    appeared.add(value);
+    result.push(value);
   }
+  return result;
+}
+
+function PickupStyle({ userids }: { userids: string[] }) {
   return (
     <style>
-      {`.jf-log-list[data-log-pickup-active="true"] .jf-log[data-log-userid]:not([data-log-userid=${cssString(
-        pickup,
-      )}]){opacity:0.3;}`}
+      {uniqueValues(userids)
+        .map(
+          userid =>
+            `.jf-log-list[data-log-pickup-userid=${cssString(
+              userid,
+            )}] .jf-log[data-log-userid]:not([data-log-userid=${cssString(
+              userid,
+            )}]){opacity:0.3;}`,
+        )
+        .join('\n')}
     </style>
   );
 }
@@ -187,6 +208,7 @@ export class Logs extends React.Component<IPropLogs, IStateLogs> {
       icons,
       visibility,
       logPickup,
+      pickupUserids,
       onResetLogPickup,
       onShortIdClick,
     } = this.props;
@@ -206,11 +228,11 @@ export class Logs extends React.Component<IPropLogs, IStateLogs> {
     return (
       <>
         <LogModeStyle />
-        <PickupStyle pickup={logPickup} />
+        <PickupStyle userids={pickupUserids} />
         <LogWrapper
           className="jf-log-list"
           fixedSize={fixedSize}
-          data-log-pickup-active={logPickup != null ? 'true' : undefined}
+          data-log-pickup-userid={logPickup != null ? logPickup : undefined}
           onClick={this.handleLogWrapperClick}
         >
           {mapReverse(logs.chunks, (chunk, i) => {
