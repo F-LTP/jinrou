@@ -276,6 +276,9 @@ normal2=(number)->
             ret.Madman--
             ret.Fanatic=1 #狂信者
             ret.Immoral=1
+            if number==15
+                ret.Fanatic--
+                ret.HearMadman=1
         if number==16
             ret.Immoral=1
             ret.Madman--
