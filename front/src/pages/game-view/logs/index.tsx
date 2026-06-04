@@ -101,13 +101,17 @@ function PickupStyle({ userids }: { userids: string[] }) {
   return (
     <style>
       {uniqueValues(userids)
-        .map(
-          userid =>
+        .map(userid =>
+          [
             `.jf-log-list[data-log-pickup-userid=${cssString(
               userid,
-            )}] .jf-log[data-log-userid]:not([data-log-userid=${cssString(
+            )}] .jf-log{opacity:0.3;}`,
+            `.jf-log-list[data-log-pickup-userid=${cssString(
               userid,
-            )}]){opacity:0.3;}`,
+            )}] .jf-log[data-log-userid=${cssString(
+              userid,
+            )}]:not(.jf-log-mode-system){opacity:1;}`,
+          ].join('\n'),
         )
         .join('\n')}
     </style>
