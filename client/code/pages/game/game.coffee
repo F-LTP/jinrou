@@ -74,6 +74,11 @@ exports.start=(roomid)->
                                 modal: true
                                 message: String result
                             }
+                onInvalidSpeakKind: ->
+                    dialog.showErrorDialog {
+                        modal: true
+                        message: "发言频道非法，请切换频道"
+                    }
                 onRefuseRevival: ()->
                     # 蘇生辞退ボタン
                     new Promise (resolve, reject)->
