@@ -430,6 +430,7 @@ exports.start=(roomid)->
                     castings = getLabeledGroupsOfJobrules()
                     game_start_control = gsc.place {
                         i18n: i18n
+                        roomid: roomid
                         node: target
                         castings: castings
                         roles: Shared.game.jobs

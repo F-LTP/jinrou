@@ -68,6 +68,10 @@ interface IPropCasting {
    * Event of pressing gamestart button.
    */
   onStart: (query: Record<string, string>) => void;
+  /**
+   * Save current draft.
+   */
+  onDraftSave: () => void;
 }
 
 @observer
@@ -226,6 +230,7 @@ export class Casting extends React.Component<IPropCasting, {}> {
   @bind
   protected handleCastingChange(value: CastingDefinition): void {
     this.props.store.setCurrentCasting(value);
+    this.props.onDraftSave();
   }
   @bind
   protected handleJobUpdate(
@@ -234,14 +239,17 @@ export class Casting extends React.Component<IPropCasting, {}> {
     included: boolean,
   ): void {
     this.props.store.updateJobNumber(role, value, included);
+    this.props.onDraftSave();
   }
   @bind
   protected handleCategoryUpdate(cat: string, value: number): void {
     this.props.store.updateCategoryNumber(cat, value);
+    this.props.onDraftSave();
   }
   @bind
   protected handleRuleUpdate(rule: string, value: string): void {
     this.props.store.updateRule(rule, value);
+    this.props.onDraftSave();
   }
   @bind
   protected async handleGameStart(): Promise<void> {
