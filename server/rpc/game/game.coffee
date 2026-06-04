@@ -16556,7 +16556,7 @@ module.exports.actions=(req,res,ss)->
                                 if playersnumber <= 17
                                     exceptions.push "Immoral"
                                     exceptions.push "Heretic"
-                                    exceptions.push "Prefidious"
+                                    exceptions.push "Perfidious"
                             else
                                 # サプライズ的に…
                                 if Math.random()<0.06 && !nonavs.Immoral
@@ -16564,15 +16564,15 @@ module.exports.actions=(req,res,ss)->
                                     frees--
                                 exceptions.push "Immoral"
                                 exceptions.push "Heretic"
-                                exceptions.push "Prefidious"
+                                exceptions.push "Perfidious"
                         else if playersnumber <= 17
                             exceptions.push "Immoral"
                             exceptions.push "Heretic"
-                            exceptions.push "Prefidious"
+                            exceptions.push "Perfidious"
                     else
                         exceptions.push "Immoral"
                         exceptions.push "Heretic"
-                        exceptions.push "Prefidious"
+                        exceptions.push "Perfidious"
                     # 恋人陣営
                     if frees>0
                         if 17>=playersnumber>=12
