@@ -345,7 +345,7 @@ class LogChunk extends React.PureComponent<
         {t =>
           mapReverse(splitLogsIntoBlocks(logsToRender), block => (
             <LogBlock
-              key={`${block.firstLogId}-${block.lastLogId}`}
+              key={`block-${block.firstLogId}`}
               logClass={logClass}
               logs={block.logs}
               fixedSize={fixedSize}
