@@ -104,14 +104,23 @@ export class OpenAvatarDialog extends React.PureComponent<
     const selectedRole = selectedTheme
       ? selectedTheme.roles.find(r => r.skinKey === selectedSkinKey) || null
       : null;
+    const filteredSelectedRoles = selectedTheme
+      ? this.getFilteredRoles(selectedTheme, themeFilter)
+      : [];
+    const selectedRoleVisible = selectedRole
+      ? filteredSelectedRoles.some(r => r.skinKey === selectedRole.skinKey)
+      : false;
     const isTaken = selectedRole
       ? this.props.selectedNames.includes(selectedRole.name)
       : false;
+    const filteredThemeGroups = themeGroups
+      ? themeGroups.filter(group => this.matchesThemeFilter(group, themeFilter))
+      : [];
 
     // Check if can confirm selection
     const canConfirm =
       activeTab === 'role'
-        ? selectedRole && !isTaken
+        ? selectedRole && selectedRoleVisible && !isTaken
         : customName.trim().length > 0; // customIcon 可以为空
 
     return (
@@ -173,14 +182,14 @@ export class OpenAvatarDialog extends React.PureComponent<
                 {activeTab === 'role' && (
                   <>
                     <div style={styles.selectGroup}>
-                      <label style={styles.label}>搜索主题</label>
+                      <label style={styles.label}>搜索主题或角色</label>
                       <input
                         id="avatar-theme-filter"
                         name="themeFilter"
                         type="text"
                         value={themeFilter}
                         onChange={this.handleThemeFilterChange}
-                        placeholder="输入主题名称筛选..."
+                        placeholder="输入主题名或角色名筛选..."
                         style={styles.input}
                       />
                     </div>
@@ -189,54 +198,40 @@ export class OpenAvatarDialog extends React.PureComponent<
                       <label style={styles.label}>选择主题</label>
                       <div style={styles.themeSelectContainer}>
                         <div style={styles.themeList}>
-                          {themeGroups!
-                            .filter(
-                              group =>
-                                themeFilter.trim() === '' ||
-                                group.themeName
-                                  .toLowerCase()
-                                  .includes(themeFilter.toLowerCase()),
-                            )
-                            .map(group => (
-                              <div
-                                key={group.themeName}
-                                style={{
-                                  ...styles.themeOption,
-                                  ...(selectedThemeName === group.themeName
-                                    ? styles.themeOptionSelected
-                                    : {}),
-                                }}
-                                onClick={() =>
-                                  this.handleThemeSelect(group.themeName)
+                          {filteredThemeGroups.map(group => (
+                            <div
+                              key={group.themeName}
+                              style={{
+                                ...styles.themeOption,
+                                ...(selectedThemeName === group.themeName
+                                  ? styles.themeOptionSelected
+                                  : {}),
+                              }}
+                              onClick={() =>
+                                this.handleThemeSelect(group.themeName)
+                              }
+                              onMouseEnter={e => {
+                                if (selectedThemeName !== group.themeName) {
+                                  (e.currentTarget as HTMLElement).style.backgroundColor =
+                                    '#f5f5f5';
                                 }
-                                onMouseEnter={e => {
-                                  if (selectedThemeName !== group.themeName) {
-                                    (e.currentTarget as HTMLElement).style.backgroundColor =
-                                      '#f5f5f5';
-                                  }
-                                }}
-                                onMouseLeave={e => {
-                                  if (selectedThemeName !== group.themeName) {
-                                    (e.currentTarget as HTMLElement).style.backgroundColor =
-                                      'transparent';
-                                  }
-                                }}
-                              >
-                                <div style={styles.themeOptionName}>
-                                  {group.themeName}
-                                </div>
-                                <div style={styles.themeOptionCount}>
-                                  {group.roles.length}个角色
-                                </div>
+                              }}
+                              onMouseLeave={e => {
+                                if (selectedThemeName !== group.themeName) {
+                                  (e.currentTarget as HTMLElement).style.backgroundColor =
+                                    'transparent';
+                                }
+                              }}
+                            >
+                              <div style={styles.themeOptionName}>
+                                {group.themeName}
                               </div>
-                            ))}
-                          {themeGroups!.filter(
-                            group =>
-                              themeFilter.trim() === '' ||
-                              group.themeName
-                                .toLowerCase()
-                                .includes(themeFilter.toLowerCase()),
-                          ).length === 0 && (
+                              <div style={styles.themeOptionCount}>
+                                {group.roles.length}个角色
+                              </div>
+                            </div>
+                          ))}
+                          {filteredThemeGroups.length === 0 && (
                             <div style={styles.noResult}>未找到匹配的主题</div>
                           )}
                         </div>
@@ -254,7 +249,7 @@ export class OpenAvatarDialog extends React.PureComponent<
                           style={styles.select}
                         >
                           <option value="">-- 请选择角色 --</option>
-                          {selectedTheme.roles.map(role => {
+                          {filteredSelectedRoles.map(role => {
                             const taken = this.props.selectedNames.includes(
                               role.name,
                             );
@@ -268,6 +263,11 @@ export class OpenAvatarDialog extends React.PureComponent<
                               </option>
                             );
                           })}
+                          {filteredSelectedRoles.length === 0 && (
+                            <option value="" disabled>
+                              未找到匹配的角色
+                            </option>
+                          )}
                         </select>
                       </div>
                     )}
@@ -387,6 +387,27 @@ export class OpenAvatarDialog extends React.PureComponent<
     this.setState({ themeFilter: e.target.value });
   }
 
+  private matchesThemeFilter(group: ThemeGroup, filter: string): boolean {
+    const keyword = filter.trim().toLowerCase();
+    if (keyword === '') return true;
+
+    return (
+      group.themeName.toLowerCase().includes(keyword) ||
+      group.roles.some(role => role.name.toLowerCase().includes(keyword))
+    );
+  }
+
+  private getFilteredRoles(group: ThemeGroup, filter: string): Role[] {
+    const keyword = filter.trim().toLowerCase();
+    if (keyword === '' || group.themeName.toLowerCase().includes(keyword)) {
+      return group.roles;
+    }
+
+    return group.roles.filter(role =>
+      role.name.toLowerCase().includes(keyword),
+    );
+  }
+
   @bind
   private handleThemeSelect(themeName: string): void {
     this.setState({
@@ -482,6 +503,13 @@ export class OpenAvatarDialog extends React.PureComponent<
 
       const role = theme.roles.find(r => r.skinKey === selectedSkinKey);
       if (!role || this.props.selectedNames.includes(role.name)) return;
+      if (
+        !this.getFilteredRoles(theme, this.state.themeFilter).some(
+          r => r.skinKey === role.skinKey,
+        )
+      ) {
+        return;
+      }
 
       this.props.onSelect({
         type: 'role',
