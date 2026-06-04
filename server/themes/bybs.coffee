@@ -7,13 +7,13 @@ module.exports=
     # 主题的作者
     author:""
     # 修改时间
-    lastModified:"2026-06-03T10:22:38.885Z"
+    lastModified:"2026-06-04T07:40:09.915Z"
     vote:""
     sunrise:""
     sunset:""
     icon:""
     background_color:"#000000"
-    color:"#ff00a6"
+    color:"#000000"
     lockable:true
     isAvailable:->
         # 如果想要做成有某种限制条件
@@ -226,37 +226,37 @@ module.exports=
             avatar:["https://patchwiki.biligame.com/images/limbuscompany/1/18/trkl8svuspbkcsirjxesb02k53kexo9.png","https://patchwiki.biligame.com/images/limbuscompany/8/8b/engkqtclupqm7d4xaot3gjyhsb08sq7.png"]
             name:"鸿璐-豆豆帮"
             prize:"豆豆帮帮主"
-        xi0:
+        qu0:
             # 头像链接 和 称号 可以是字符串数组，也可以是字符串
             # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
             avatar:"https://patchwiki.biligame.com/images/limbuscompany/d/d8/lznfgy2xte2iy1rag1c4op0i9tx1szs.png"
             name:"希斯克利夫"
             prize:"LCB罪人"
-        xi1:
+        qu1:
             # 头像链接 和 称号 可以是字符串数组，也可以是字符串
             # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
             avatar:["https://patchwiki.biligame.com/images/limbuscompany/a/ac/1kk6ze88fya2xz1lfs96sx7yp4er3e3.png","https://patchwiki.biligame.com/images/limbuscompany/6/6a/tdtkze5kvfxvira70e96ip2cs9npfpd.png"]
             name:"希斯克利夫-Seven协会"
             prize:"Seven协会南部4科"
-        xi2:
+        qu2:
             # 头像链接 和 称号 可以是字符串数组，也可以是字符串
             # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
             avatar:["https://patchwiki.biligame.com/images/limbuscompany/4/46/koii7vk6mvobj3zqna13nl5t1s1dwvv.png","https://patchwiki.biligame.com/images/limbuscompany/9/9f/rznf35bjtt19hisc3rcc2e35m1mah4r.png"]
             name:"希斯克利夫-N公司"
             prize:"N公司小锤"
-        xi3:
+        qu3:
             # 头像链接 和 称号 可以是字符串数组，也可以是字符串
             # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
             avatar:["https://patchwiki.biligame.com/images/limbuscompany/2/25/d4mp2oocgqeuwhkylc9eoly4dps1udx.png","https://patchwiki.biligame.com/images/limbuscompany/6/62/a2vbagj59gfvpik8tqqqfn60dvxr2zw.png"]
             name:"希斯克利夫-し协会"
             prize:"し协会南部5科"
-        xi4:
+        qu4:
             # 头像链接 和 称号 可以是字符串数组，也可以是字符串
             # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
             avatar:["https://patchwiki.biligame.com/images/limbuscompany/b/be/5qbgzhz600d20gli6u391e620ajn3mr.png","https://patchwiki.biligame.com/images/limbuscompany/6/65/7iy9taepbna5k9nzkqi08of3ay6s834.png"]
             name:"希斯克利夫-技术解放联盟"
             prize:"脑叶公司E.G.O::狐雨"
-        xi5:
+        qu5:
             # 头像链接 和 称号 可以是字符串数组，也可以是字符串
             # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
             avatar:["https://patchwiki.biligame.com/images/limbuscompany/c/c9/if418c8q16sl9p77wq9it255ztxxw1z.png","https://patchwiki.biligame.com/images/limbuscompany/8/85/ob3nmd00byh5pfcqrleywtgfnqtakj4.png"]
@@ -352,43 +352,43 @@ module.exports=
             avatar:["https://patchwiki.biligame.com/images/limbuscompany/e/eb/jspsccib5rq83seqre5hyzsfyw21hlp.png","https://patchwiki.biligame.com/images/limbuscompany/e/eb/eptf9nhnab9dm7aqwe84gd7s3wvu3cx.png"]
             name:"罗佳-黑云会"
             prize:"黑云会若众"
-        xi0:
+        xin0:
             # 头像链接 和 称号 可以是字符串数组，也可以是字符串
             # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
             avatar:"https://patchwiki.biligame.com/images/limbuscompany/a/ad/ikvmlz8tg54oetuxy0ieq2g0ck2xthf.png"
             name:"辛克莱"
             prize:"LCB罪人"
-        xi1:
+        xin1:
             # 头像链接 和 称号 可以是字符串数组，也可以是字符串
             # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
             avatar:["https://patchwiki.biligame.com/images/limbuscompany/9/9a/ipiihtsdv13vpykfu1udytayfl5hlj3.png","https://patchwiki.biligame.com/images/limbuscompany/5/59/ni48icjodvxqydjxnuvqjr0eggvh3sv.png"]
             name:"辛克莱-臼齿修船厂"
             prize:"臼齿修船厂收尾人"
-        xi2:
+        xin2:
             # 头像链接 和 称号 可以是字符串数组，也可以是字符串
             # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
             avatar:["https://patchwiki.biligame.com/images/limbuscompany/c/c3/bde9wj9d0w04suqp2ste1lfnh18lmhs.png","https://patchwiki.biligame.com/images/limbuscompany/b/bc/3o9bjb38rt86m96icczc7diqkav78ug.png"]
             name:"辛克莱-技术解放联盟"
             prize:"脑叶公司E.G.O::朱符"
-        xi3:
+        xin3:
             # 头像链接 和 称号 可以是字符串数组，也可以是字符串
             # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
             avatar:["https://patchwiki.biligame.com/images/limbuscompany/7/74/ocqh7ni5nokfwi9ei96030ovfe4b69m.png","https://patchwiki.biligame.com/images/limbuscompany/5/5d/hkch3vjjaukjza5y44yjiykcwaic69n.png"]
             name:"辛克莱-流浪乐队"
             prize:"流浪乐队头目"
-        xi4:
+        xin4:
             # 头像链接 和 称号 可以是字符串数组，也可以是字符串
             # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
             avatar:["https://patchwiki.biligame.com/images/limbuscompany/e/e5/p37xcb39g2npor18m9wr1b83347pfqc.png","https://patchwiki.biligame.com/images/limbuscompany/f/f9/282mtfdd0ae8t00hdc6lfyye808isnh.png"]
             name:"辛克莱-Zwei协会"
             prize:"Zwei协会南部6科"
-        xi5:
+        xin5:
             # 头像链接 和 称号 可以是字符串数组，也可以是字符串
             # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
             avatar:["https://patchwiki.biligame.com/images/limbuscompany/e/eb/ffniaeptakdderhjcvy2ybu9zh24gl0.png","https://patchwiki.biligame.com/images/limbuscompany/2/20/gvxmvdciz1w9nx83j87pwc7y02cu4j6.png"]
             name:"辛克莱-N公司"
             prize:"N公司准执柄者"
-        xi6:
+        xin6:
             # 头像链接 和 称号 可以是字符串数组，也可以是字符串
             # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
             avatar:["https://patchwiki.biligame.com/images/limbuscompany/2/2f/0a3xrfbhmesz7b4gt6j70nqzyv4vqzp.png","https://patchwiki.biligame.com/images/limbuscompany/1/19/huiqc7sa978d6olq1odca2uhv4q5nn1.png"]
@@ -526,3 +526,135 @@ module.exports=
             avatar:"https://i.postimg.cc/sDjc9FFh/70px.png"
             name:"冬柏"
             prize:"技术解放联盟"
+        li6:
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://i.imgs.ovh/2026/06/03/dbc1681d07353a1075a63570ea1a39ab.png"
+            name:"李箱-食指"
+            prize:"蜘蛛巢食指父辈"
+        npc12:
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://i.postimg.cc/3NHn9GFr/70px.png"
+            name:"美香"
+            prize:"臼齿修船厂"
+        npc13:
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://i.postimg.cc/tgK5C6fd/70px.png"
+            name:"雷恩"
+            prize:"臼齿修船厂"
+        npc14:
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://i.postimg.cc/SQ7rkJG8/70px-3.png"
+            name:"奥尔佳"
+            prize:"臼齿修船厂"
+        npc15:
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://i.postimg.cc/sXx6JtGm/70px.png"
+            name:"亚哈"
+            prize:"裴廓德号"
+        npc16:
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://i.postimg.cc/hjYCZp9B/70px.png"
+            name:"魁魁格"
+            prize:"裴廓德号"
+        npc17:
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://i.postimg.cc/vT60Jfz6/70px.png"
+            name:"斯达巴克"
+            prize:"裴廓德号"
+        npc18:
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://i.postimg.cc/sg6z8j8C/70px.png"
+            name:"斯塔布"
+            prize:"裴廓德号"
+        npc19:
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://i.postimg.cc/SKxFw1z2/70px.png"
+            name:"亨德利"
+            prize:"恩肖家族"
+        npc20:
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://i.postimg.cc/NjbZ78Pg/70px.png"
+            name:"林顿"
+            prize:"埃德加家族"
+        npc21:
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://i.postimg.cc/9MtWFv1W/70px.png"
+            name:"约瑟芬"
+            prize:"呼啸山庄"
+        npc22:
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://i.postimg.cc/bvJW6GK1/70px.png"
+            name:"耐莉"
+            prize:"呼啸山庄"
+        npc23:
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://i.postimg.cc/SsY5hBQs/70px.png"
+            name:"凯瑟琳"
+            prize:"呼啸山庄"
+        npc24:
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://i.postimg.cc/50MsSGJQ/70px.png"
+            name:"萨莎"
+            prize:"多裂纹事务所"
+        npc25:
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://i.postimg.cc/6qq5jMLt/70px.png"
+            name:"卡塞蒂"
+            prize:"血魔"
+        npc26:
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://i.postimg.cc/jj6HtjVC/70px.png"
+            name:"卡米尔"
+            prize:"Cinq协会"
+        npc27:
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://i.postimg.cc/PrL1NyGg/70px.png"
+            name:"葆拉"
+            prize:"Zwei协会"
+        npc28:
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://i.postimg.cc/VNpGDK9c/70px-2.png"
+            name:"堂吉诃德"
+            prize:"拉・曼却领"
+        npc29:
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://i.postimg.cc/bYWxZfr8/340a80c014620a1e.png"
+            name:"桑丘"
+            prize:"拉・曼却领"
+        npc30:
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://i.postimg.cc/mkGdGh6X/70px-3.png"
+            name:"理发师"
+            prize:"拉・曼却领"
+        npc31:
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://i.postimg.cc/1RpCrcfL/70px-2.png"
+            name:"神父"
+            prize:"拉・曼却领"
+        npc32:
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://i.postimg.cc/gksgfzys/70px-2.png"
+            name:"杜尔西内娅"
+            prize:"拉・曼却领"
