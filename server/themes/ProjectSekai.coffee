@@ -1,13 +1,13 @@
 module.exports=
     name:"Project Sekai"
     #
-    opening:"Sekai发生了异变，只有人狼游戏的胜者才能返回现实世界，否则将永远困在这里......"
+    opening:"啤酒烧烤，启动！"
     # to let players know woh they are
     skin_tip:"你的身份"
     # 主题的作者
-    author:"05q、人生"
+    author:""
     # 修改时间
-    lastModified:"2026-03-14T10:13:15.611Z"
+    lastModified:"2026-06-05T09:56:20.119Z"
     vote:""
     sunrise:""
     sunset:""
@@ -25,186 +25,186 @@ module.exports=
         Miku:
             # 头像链接 和 称号 可以是字符串数组，也可以是字符串
             # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
-            avatar:"https://s3.bmp.ovh/2026/03/13/qo6uMlLn.jpg"
+            avatar:"https://s3.bmp.ovh/2026/06/04/4fNXJAdU.png"
             name:"初音 未来"
-            prize:""
-        Meiko:
-            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
-            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
-            avatar:"https://s3.bmp.ovh/2026/03/13/Wqc6PC1w.jpg"
-            name:"Meiko"
-            prize:""
-        Rin:
-            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
-            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
-            avatar:"https://s3.bmp.ovh/2026/03/13/1oRMQ2KG.jpg"
-            name:"镜音 铃"
-            prize:""
-        Kaito:
-            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
-            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
-            avatar:"https://s3.bmp.ovh/2026/03/13/t6AgXBkO.jpg"
-            name:"Kaito"
             prize:""
         Len:
             # 头像链接 和 称号 可以是字符串数组，也可以是字符串
             # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
-            avatar:"https://s3.bmp.ovh/2026/03/13/WN1AcFdr.jpg"
-            name:"镜音 连"
+            avatar:"https://s3.bmp.ovh/2026/06/04/X8DR5NlY.png"
+            name:"镜音 连 "
+            prize:""
+        Rin:
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s3.bmp.ovh/2026/06/04/Oq4lNtve.png"
+            name:"镜音 铃"
             prize:""
         Luka:
             # 头像链接 和 称号 可以是字符串数组，也可以是字符串
             # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
-            avatar:"https://s3.bmp.ovh/2026/03/13/fv6eJGnA.jpg"
+            avatar:"https://s3.bmp.ovh/2026/06/04/8uJBXFfu.png"
             name:"巡音 流歌"
             prize:""
-        Ichika:
+        Meiko:
             # 头像链接 和 称号 可以是字符串数组，也可以是字符串
             # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
-            avatar:"https://s3.bmp.ovh/2026/03/13/pomQIUuf.jpg"
+            avatar:"https://s3.bmp.ovh/2026/06/04/voVn4IAm.png"
+            name:"Meiko"
+            prize:""
+        Kaito:
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s3.bmp.ovh/2026/06/04/4dFx3a5C.png"
+            name:"Kaito"
+            prize:""
+        Ick:
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s3.bmp.ovh/2026/06/04/DszWzkrC.png"
             name:"星乃 一歌"
-            prize:"炒面面包"
+            prize:""
         Saki:
             # 头像链接 和 称号 可以是字符串数组，也可以是字符串
             # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
-            avatar:"https://s3.bmp.ovh/2026/03/13/EKi86fGW.jpg"
+            avatar:"https://s3.bmp.ovh/2026/06/04/rUPSdQSP.png"
             name:"天马 咲希"
             prize:""
-        Honami:
+        Hnm:
             # 头像链接 和 称号 可以是字符串数组，也可以是字符串
             # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
-            avatar:"https://s3.bmp.ovh/2026/03/13/fm8odAsW.jpg"
+            avatar:"https://s3.bmp.ovh/2026/06/04/Pc4EwLks.png"
             name:"望月 穗波"
             prize:""
         Shiho:
             # 头像链接 和 称号 可以是字符串数组，也可以是字符串
             # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
-            avatar:"https://s3.bmp.ovh/2026/03/13/rp1mOezT.jpg"
+            avatar:"https://s3.bmp.ovh/2026/06/04/oDYYYCRc.png"
             name:"日野森 志步"
             prize:""
-        Minori:
+        Mnr:
             # 头像链接 和 称号 可以是字符串数组，也可以是字符串
             # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
-            avatar:"https://s3.bmp.ovh/2026/03/13/osq6sYfI.jpg"
+            avatar:"https://s3.bmp.ovh/2026/06/04/b7sr3GCS.png"
             name:"花里 实乃理"
             prize:""
-        Haruka:
+        Hrk:
             # 头像链接 和 称号 可以是字符串数组，也可以是字符串
             # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
-            avatar:"https://s3.bmp.ovh/2026/03/13/iXrh1S7w.jpg"
+            avatar:"https://s3.bmp.ovh/2026/06/04/1PTLMVgr.png"
             name:"桐谷 遥"
             prize:""
         Airi:
             # 头像链接 和 称号 可以是字符串数组，也可以是字符串
             # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
-            avatar:"https://s3.bmp.ovh/2026/03/13/EXL3O7zP.jpg"
+            avatar:"https://s3.bmp.ovh/2026/06/04/xd86Nrn1.png"
             name:"桃井 爱莉"
             prize:""
-        Shizuki:
+        Szk:
             # 头像链接 和 称号 可以是字符串数组，也可以是字符串
             # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
-            avatar:"https://s3.bmp.ovh/2026/03/13/GDIzQeTj.jpg"
+            avatar:"https://s3.bmp.ovh/2026/06/04/5U6gSIpq.png"
             name:"日野森 雫"
             prize:""
-        Kohane:
+        Khn:
             # 头像链接 和 称号 可以是字符串数组，也可以是字符串
             # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
-            avatar:"https://s3.bmp.ovh/2026/03/13/3ImaN5c9.jpg"
+            avatar:"https://s3.bmp.ovh/2026/06/04/XA5uDJLz.png"
             name:"小豆沢 心羽"
             prize:""
         An:
             # 头像链接 和 称号 可以是字符串数组，也可以是字符串
             # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
-            avatar:"https://s3.bmp.ovh/2026/03/13/iviKtZxW.jpg"
+            avatar:"https://s3.bmp.ovh/2026/06/04/HDDoW4qS.png"
             name:"白石 杏"
+            prize:""
+        Akt:
+            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
+            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
+            avatar:"https://s3.bmp.ovh/2026/06/04/5R7XXXqD.png"
+            name:"东云 彰人"
             prize:""
         Toya:
             # 头像链接 和 称号 可以是字符串数组，也可以是字符串
             # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
-            avatar:"https://s3.bmp.ovh/2026/03/13/g4UK5wEL.jpg"
+            avatar:"https://s3.bmp.ovh/2026/06/04/QxHFgiin.png"
             name:"青柳 冬弥"
             prize:""
-        Akito:
+        Tks:
             # 头像链接 和 称号 可以是字符串数组，也可以是字符串
             # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
-            avatar:"https://s3.bmp.ovh/2026/03/13/2CYCLFYw.jpg"
-            name:"东云 彰人"
-            prize:""
-        Tsukasa:
-            # 头像链接 和 称号 可以是字符串数组，也可以是字符串
-            # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
-            avatar:"https://s3.bmp.ovh/2026/03/13/yMmJJtg8.jpg"
+            avatar:"https://s3.bmp.ovh/2026/06/04/VvBUz2mK.png"
             name:"天马 司"
             prize:""
         Emu:
             # 头像链接 和 称号 可以是字符串数组，也可以是字符串
             # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
-            avatar:"https://s3.bmp.ovh/2026/03/13/fq5K4P3T.jpg"
+            avatar:"https://s3.bmp.ovh/2026/06/04/f0v1iCIJ.png"
             name:"凤 笑梦"
             prize:""
         Nene:
             # 头像链接 和 称号 可以是字符串数组，也可以是字符串
             # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
-            avatar:"https://s3.bmp.ovh/2026/03/13/wFdHM8zg.jpg"
+            avatar:"https://s3.bmp.ovh/2026/06/04/GoYa07cU.png"
             name:"草薙 宁宁"
             prize:""
         Rui:
             # 头像链接 和 称号 可以是字符串数组，也可以是字符串
             # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
-            avatar:"https://s3.bmp.ovh/2026/03/13/q1oSLl9A.jpg"
+            avatar:"https://s3.bmp.ovh/2026/06/04/OBrnniRA.png"
             name:"神代 类"
             prize:""
-        Kanade:
+        Knd:
             # 头像链接 和 称号 可以是字符串数组，也可以是字符串
             # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
-            avatar:"https://s3.bmp.ovh/2026/03/13/wtrzEutY.jpg"
+            avatar:"https://s3.bmp.ovh/2026/06/04/jlXZNTjJ.png"
             name:"宵崎 奏"
             prize:""
-        Mafuyu:
+        Mfy:
             # 头像链接 和 称号 可以是字符串数组，也可以是字符串
             # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
-            avatar:"https://s3.bmp.ovh/2026/03/13/QyjRMr5k.jpg"
+            avatar:"https://s3.bmp.ovh/2026/06/04/15iRCGk9.png"
             name:"朝比奈 真冬"
             prize:""
-        Ena:
+        Enana:
             # 头像链接 和 称号 可以是字符串数组，也可以是字符串
             # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
-            avatar:"https://s3.bmp.ovh/2026/03/13/TMJ2ACNS.jpg"
+            avatar:"https://s3.bmp.ovh/2026/06/04/0wscDl23.png"
             name:"东云 绘名"
             prize:""
-        Mizuki:
+        Mzk:
             # 头像链接 和 称号 可以是字符串数组，也可以是字符串
             # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
-            avatar:"https://s3.bmp.ovh/2026/03/13/yQYdhyOA.jpg"
+            avatar:"https://s3.bmp.ovh/2026/06/04/38ownZhr.png"
             name:"晓山 瑞希"
             prize:""
-        Miku_Leoneed:
+        LeoneedMiku:
             # 头像链接 和 称号 可以是字符串数组，也可以是字符串
             # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
-            avatar:"https://s3.bmp.ovh/2026/03/13/nnzgjpAl.jpg"
-            name:"火龙果葱"
+            avatar:"https://s3.bmp.ovh/2026/06/04/vg73iI8X.png"
+            name:"火龙果葱（Lnd）"
             prize:""
-        Miku_MoreMoreJump:
+        MMJMiku:
             # 头像链接 和 称号 可以是字符串数组，也可以是字符串
             # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
-            avatar:"https://s3.bmp.ovh/2026/03/13/eb7sr8i4.jpg"
-            name:"舞台葱"
+            avatar:"https://s3.bmp.ovh/2026/06/04/YbWYWJ1b.png"
+            name:"舞台葱（MMJ）"
             prize:""
-        Miku_VividBadSquad:
+        VBSMiku:
             # 头像链接 和 称号 可以是字符串数组，也可以是字符串
             # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
-            avatar:"https://s3.bmp.ovh/2026/03/13/RE7nm5D4.jpg"
-            name:"街葱"
+            avatar:"https://s3.bmp.ovh/2026/06/04/5MMI3H49.png"
+            name:"街葱（VBS）"
             prize:""
-        Miku_WorderlandsShowtime:
+        WSMiku:
             # 头像链接 和 称号 可以是字符串数组，也可以是字符串
             # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
-            avatar:"https://s3.bmp.ovh/2026/03/14/6T12BcOg.jpg"
-            name:"猫葱"
+            avatar:"https://s3.bmp.ovh/2026/06/04/t3R1vSf8.png"
+            name:"猫葱（WS）"
             prize:""
-        Miku_25inNightcord:
+        NightcordMiku:
             # 头像链接 和 称号 可以是字符串数组，也可以是字符串
             # 头像在显示的时候 会压缩为48*48，所以最好纵横比是1:1
-            avatar:"https://s3.bmp.ovh/2026/03/13/OO913U3N.jpg"
-            name:"白葱"
+            avatar:"https://s3.bmp.ovh/2026/06/05/HM7v0lXj.png"
+            name:"白葱（25时）"
             prize:""
