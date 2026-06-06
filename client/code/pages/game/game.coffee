@@ -2,9 +2,6 @@ this_room_id=null
 
 socket_ids=[]
 current_start_token=0
-last_stale_socket_warn=0
-recent_log_keys={}
-recent_log_key_order=[]
 
 this_rule=null  # ルールオブジェクトがある
 enter_result=null #enter
@@ -27,103 +24,6 @@ cleanup_room_runtime=->
     getjobinfo=null
     newgamebutton=null
 
-diagnostic_now=->
-    if window?.performance?.now?
-        performance.now()
-    else
-        Date.now()
-
-emit_diagnostic=(tag, payload)->
-    if window?.console?.warn?
-        console.warn "[jinrou-game-diagnostic] #{tag}", payload
-
-socket_debug_info=->
-    try
-        Index.socket.getDebugInfo?()
-    catch error
-        null
-
-warn_stale_socket=(mesname, channel, msg, start_token, roomid)->
-    now=Date.now()
-    return if now-last_stale_socket_warn<10000
-    last_stale_socket_warn=now
-    emit_diagnostic "stale-socket-handler", {
-        mesname: mesname
-        channel: channel
-        roomid: roomid
-        msgRoomid: msg?.roomid ? msg?.id ? null
-        startToken: start_token
-        currentStartToken: current_start_token
-        socketIds: socket_ids.length
-        socket: socket_debug_info()
-    }
-
-log_diagnostic_key=(log)->
-    comment=String(log?.comment ? "")
-    [
-        log?.roomid ? this_room_id ? ""
-        log?.mode ? ""
-        log?.shortId ? ""
-        log?.time ? ""
-        log?.userid ? ""
-        comment.slice 0, 80
-    ].join "|"
-
-mark_log_seen=(log)->
-    now=Date.now()
-    key=log_diagnostic_key log
-    item=recent_log_keys[key]
-    unless item?
-        item={
-            count: 0
-            first: now
-            last: now
-            warned: false
-        }
-        recent_log_keys[key]=item
-        recent_log_key_order.push key
-    item.count+=1
-    item.last=now
-    while recent_log_key_order.length>100
-        oldkey=recent_log_key_order.shift()
-        delete recent_log_keys[oldkey]
-    for oldkey in recent_log_key_order.slice()
-        if now-recent_log_keys[oldkey].last>10000
-            delete recent_log_keys[oldkey]
-            recent_log_key_order=recent_log_key_order.filter (x)->x!=oldkey
-    item
-
-warn_duplicate_log=(log, item, roomid)->
-    return if item.warned || item.count<2 || Date.now()-item.first>5000
-    item.warned=true
-    emit_diagnostic "duplicate-log-event", {
-        roomid: roomid
-        mode: log?.mode
-        shortId: log?.shortId
-        time: log?.time
-        userid: log?.userid
-        count: item.count
-        currentStartToken: current_start_token
-        socketIds: socket_ids.length
-        socket: socket_debug_info()
-    }
-
-warn_slow_add_log=(log, elapsed, beforeNumber, afterNumber, roomid)->
-    return if elapsed<50
-    emit_diagnostic "slow-add-log", {
-        roomid: roomid
-        mode: log?.mode
-        shortId: log?.shortId
-        time: log?.time
-        elapsed: Math.round(elapsed*10)/10
-        beforeLogs: beforeNumber
-        afterLogs: afterNumber
-        chunks: game_view?.store?.logs?.chunks?.length
-        currentStartToken: current_start_token
-        socketIds: socket_ids.length
-        socket: socket_debug_info()
-    }
-
 
 exports.start=(roomid)->
     cleanup_room_runtime()
@@ -131,9 +31,7 @@ exports.start=(roomid)->
     is_active=-> start_token==current_start_token
     listen=(mesname, channel, func)->
         socket_ids.push Index.socket.on mesname,channel,(msg,channel_name)->
-            unless is_active()
-                warn_stale_socket mesname, channel_name, msg, start_token, roomid
-                return
+            return unless is_active()
             func msg,channel_name
     this_rule=null
     my_player_id=null
@@ -773,14 +671,7 @@ exports.start=(roomid)->
     #ログをもらった
     getlog=(log)->
         return unless is_active()
-        item=mark_log_seen log
-        warn_duplicate_log log, item, roomid
-        beforeNumber=game_view?.store?.logs?.allLogNumber ? null
-        start=diagnostic_now()
         game_view?.store.addLog log
-        elapsed=diagnostic_now()-start
-        afterNumber=game_view?.store?.logs?.allLogNumber ? null
-        warn_slow_add_log log, elapsed, beforeNumber, afterNumber, roomid
 
     formplayers=(players)-> #jobflg: 1:生存の人 2:死人
         return unless is_active()
