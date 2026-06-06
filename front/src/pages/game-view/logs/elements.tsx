@@ -41,20 +41,8 @@ export const LogWrapper = styled.div<{
 export const FixedSizeChunkWrapper = styled.div<{
   visible: boolean;
 }>`
+  contain: paint;
   display: ${({ visible }) => (visible ? 'block' : 'none')};
-`;
-
-/**
- * React render boundary for a small group of logs.
- */
-export const LogBlockWrapper = styled.div<{
-  /**
-   * Whether logs are rendered in fixed-size mode.
-   */
-  $fixedSize: boolean;
-}>`
-  display: ${({ $fixedSize }) => ($fixedSize ? 'block' : 'contents')};
-  ${({ $fixedSize }) => ($fixedSize ? 'contain: paint;' : '')}
 `;
 
 /**

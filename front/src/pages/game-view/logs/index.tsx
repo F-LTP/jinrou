@@ -6,29 +6,13 @@ import { Rule } from '../../../defs';
 import { LogModeStyle, OneLog } from './log';
 import { StoredLog, LogStore } from './log-store';
 import { mapReverse } from '../../../util/map-reverse';
-import { I18n, TranslationFunction } from '../../../i18n';
+import { I18n } from '../../../i18n';
 import {
   LogWrapper,
   FixedSizeChunkWrapper,
-  LogBlockWrapper,
   PendingLogMessage,
 } from './elements';
 import { LogsRenderingState } from './store';
-
-const logsInBlock = 100;
-
-interface LogBlockData {
-  firstLogId: number;
-  lastLogId: number;
-  logs: StoredLog[];
-}
-
-interface LogBlockCache {
-  length: number;
-  blocks: LogBlockData[];
-}
-
-const logBlockCache = new WeakMap<StoredLog[], LogBlockCache>();
 
 export interface IPropLogs {
   /**
@@ -281,7 +265,7 @@ export class Logs extends React.Component<IPropLogs, IStateLogs> {
 /**
  * Show chunk of logs.
  */
-class LogChunk extends React.PureComponent<
+class LogChunk extends React.Component<
   {
     /**
      * Class attached to each log.
@@ -347,19 +331,21 @@ class LogChunk extends React.PureComponent<
     const chunkContent = (
       <I18n namespace="game_client">
         {t =>
-          mapReverse(splitLogsIntoBlocks(logsToRender), block => (
-            <LogBlock
-              key={`block-${block.firstLogId}`}
-              logClass={logClass}
-              logs={block.logs}
-              fixedSize={fixedSize}
-              t={t}
-              rule={rule}
-              icons={icons}
-              resolveLogById={resolveLogById}
-              onShortIdClick={onShortIdClick}
-            />
-          ))
+          mapReverse(logsToRender, log => {
+            return (
+              <OneLog
+                key={log.logid}
+                logClass={logClass}
+                t={t}
+                fixedSize={fixedSize}
+                log={log}
+                rule={rule}
+                icons={icons}
+                resolveLogById={resolveLogById}
+                onShortIdClick={onShortIdClick}
+              />
+            );
+          })
         }
       </I18n>
     );
@@ -372,101 +358,5 @@ class LogChunk extends React.PureComponent<
     } else {
       return chunkContent;
     }
-  }
-}
-
-function splitLogsIntoBlocks(logs: StoredLog[]): LogBlockData[] {
-  const cached = logBlockCache.get(logs);
-  if (cached != null && cached.length === logs.length) {
-    return cached.blocks;
-  }
-  const previousBlocks = cached != null ? cached.blocks : [];
-  const blocks: LogBlockData[] = [];
-  for (let i = 0; i < logs.length; i += logsInBlock) {
-    const previous = previousBlocks[Math.floor(i / logsInBlock)];
-    const end = Math.min(i + logsInBlock, logs.length);
-    const canReuse =
-      previous != null &&
-      previous.logs.length === end - i &&
-      previous.logs[0] === logs[i] &&
-      previous.logs[previous.logs.length - 1] === logs[end - 1];
-    const blockLogs = canReuse ? previous.logs : logs.slice(i, end);
-    if (blockLogs.length > 0) {
-      blocks.push({
-        firstLogId: blockLogs[0].logid,
-        lastLogId: blockLogs[blockLogs.length - 1].logid,
-        logs: blockLogs,
-      });
-    }
-  }
-  logBlockCache.set(logs, {
-    length: logs.length,
-    blocks,
-  });
-  return blocks;
-}
-
-class LogBlock extends React.PureComponent<{
-  /**
-   * Class attached to each log.
-   */
-  logClass: string;
-  /**
-   * Logs in this block.
-   */
-  logs: StoredLog[];
-  /**
-   * Whether logs are rendered in fixed-size mode.
-   */
-  fixedSize: boolean;
-  /**
-   * Translation function.
-   */
-  t: TranslationFunction;
-  /**
-   * Icon of each user.
-   */
-  icons: Record<string, string | undefined>;
-  /**
-   * Current rule.
-   */
-  rule: Rule | undefined;
-  /**
-   * Function to resolve log by shortId for reply reference.
-   */
-  resolveLogById?: (shortId: string) => StoredLog | null;
-  /**
-   * Callback for shortId click.
-   */
-  onShortIdClick?: (shortId: string) => void;
-}> {
-  public render() {
-    const {
-      logClass,
-      logs,
-      fixedSize,
-      t,
-      rule,
-      icons,
-      resolveLogById,
-      onShortIdClick,
-    } = this.props;
-    return (
-      <LogBlockWrapper $fixedSize={fixedSize}>
-        {mapReverse(logs, log => (
-          <OneLog
-            key={log.logid}
-            t={t}
-            logClass={logClass}
-            fixedSize={fixedSize}
-            log={log}
-            rule={rule}
-            icons={icons}
-            resolveLogById={resolveLogById}
-            onShortIdClick={onShortIdClick}
-          />
-        ))}
-      </LogBlockWrapper>
-    );
   }
 }

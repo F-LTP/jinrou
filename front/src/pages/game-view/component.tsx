@@ -10,7 +10,6 @@ import { themeStore, UserTheme } from '../../theme';
 import { I18nProvider, I18n, i18n } from '../../i18n';
 
 import {
-  Rule,
   RuleGroup,
   RoomControlHandlers,
   RoleCategoryDefinition,
@@ -194,6 +193,9 @@ export class Game extends React.Component<IPropGame, {}> {
     user,
     teamColors,
   }));
+  private makePickupUserids = memoizeOne((players: PlayerInfo[]) =>
+    players.map(player => player.id),
+  );
 
   public componentDidMount(): void {
     this.restoreSavedSpeakKind();
@@ -226,9 +228,11 @@ export class Game extends React.Component<IPropGame, {}> {
       speakState,
       logVisibility,
       rule,
+      ruleOpen,
       timer,
       players,
       roomControls,
+      logPickup,
       speakFocus,
     } = store;
     const styleMode = styleModeOf(roleInfo, gameInfo);
@@ -303,20 +307,34 @@ export class Game extends React.Component<IPropGame, {}> {
             </SpeakFormPart>
             {/* Main game screen. */}
             <MainWrapper>
-              <RulePane
-                store={store}
-                rule={rule}
-                categories={categories}
-                ruleDefs={ruleDefs}
-                ruleElement={this.ruleElement}
-                onSwipingLeft={this.handleRuleSwipeToLeft}
-                onSwipingRight={this.handleRuleSwipeToRight}
-              />
+              {/* Rule panel if open. */}
+              <RuleWrapper closed={rule == null || !ruleOpen}>
+                {rule != null ? (
+                  <RuleStickyWrapper closed={rule == null || !ruleOpen}>
+                    <RuleInnerWrapper ref={this.ruleElement}>
+                      <Swipeable
+                        onSwipingLeft={this.handleRuleSwipeToLeft}
+                        onSwipingRight={this.handleRuleSwipeToRight}
+                      >
+                        <ShowRule
+                          rule={rule}
+                          categories={categories}
+                          ruleDefs={ruleDefs}
+                        />
+                      </Swipeable>
+                    </RuleInnerWrapper>
+                  </RuleStickyWrapper>
+                ) : null}
+              </RuleWrapper>
               {/* Logs. */}
               <LogsWrapper>
-                <LogsPane
-                  store={store}
-                  players={players}
+                <Logs
+                  logs={store.logs}
+                  visibility={store.logVisibility}
+                  icons={store.icons}
+                  rule={store.rule}
+                  logPickup={logPickup}
+                  pickupUserids={this.makePickupUserids(players)}
                   onResetLogPickup={this.handleResetLogPickup}
                   onShortIdClick={this.handleShortIdClick}
                 />
@@ -537,82 +555,6 @@ export class Game extends React.Component<IPropGame, {}> {
     const { roleInfo } = this.props.store;
     const speaks = roleInfo != null ? roleInfo.speak : ['day'];
     return speaks.includes(kind);
-  }
-}
-
-interface IPropRulePane {
-  store: GameStore;
-  rule: Rule | undefined;
-  categories: RoleCategoryDefinition[];
-  ruleDefs: RuleGroup;
-  ruleElement: React.RefObject<HTMLDivElement>;
-  onSwipingLeft(): void;
-  onSwipingRight(): void;
-}
-
-@observer
-class RulePane extends React.Component<IPropRulePane, {}> {
-  public render() {
-    const {
-      store,
-      rule,
-      categories,
-      ruleDefs,
-      ruleElement,
-      onSwipingLeft,
-      onSwipingRight,
-    } = this.props;
-    const closed = rule == null || !store.ruleOpen;
-    return (
-      <RuleWrapper closed={closed}>
-        {rule != null ? (
-          <RuleStickyWrapper closed={closed}>
-            <RuleInnerWrapper ref={ruleElement}>
-              <Swipeable
-                onSwipingLeft={onSwipingLeft}
-                onSwipingRight={onSwipingRight}
-              >
-                <ShowRule
-                  rule={rule}
-                  categories={categories}
-                  ruleDefs={ruleDefs}
-                />
-              </Swipeable>
-            </RuleInnerWrapper>
-          </RuleStickyWrapper>
-        ) : null}
-      </RuleWrapper>
-    );
-  }
-}
-
-interface IPropLogsPane {
-  store: GameStore;
-  players: PlayerInfo[];
-  onResetLogPickup(): void;
-  onShortIdClick?: (shortId: string) => void;
-}
-
-@observer
-class LogsPane extends React.Component<IPropLogsPane, {}> {
-  private makePickupUserids = memoizeOne((players: PlayerInfo[]) =>
-    players.map(player => player.id),
-  );
-
-  public render() {
-    const { store, players, onResetLogPickup, onShortIdClick } = this.props;
-    return (
-      <Logs
-        logs={store.logs}
-        visibility={store.logVisibility}
-        icons={store.icons}
-        rule={store.rule}
-        logPickup={store.logPickup}
-        pickupUserids={this.makePickupUserids(players)}
-        onResetLogPickup={onResetLogPickup}
-        onShortIdClick={onShortIdClick}
-      />
-    );
   }
 }
 
