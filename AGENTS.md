@@ -1,37 +1,32 @@
 # Repository Guidelines
-Always respond in Chinese-simplified
+
 ## Project Structure & Module Organization
-- `server/` 是 CoffeeScript 后端，包含 `rpc/` 接口、`libs/` 游戏逻辑、`middleware/` 中间件与 `themes/` 预设。
-- `client/` 是旧版前端，使用 CoffeeScript、Jade/Pug 与 Stylus。
-- `front/src/` 是 TypeScript + React 前端，构建产物输出到 `client/static/front-assets/`。
-- 其他资源位于 `manual/`、`language/`、`public/`、`prizedata/`；本地配置放在 `config/`，以 `config.default/` 为模板。
+
+This is a Node.js SocketStream werewolf game application. The main server entry is `app.js`, with startup helper code in `starter.js`. Server-side CoffeeScript lives in `server/`: RPC handlers are under `server/rpc/`, middleware under `server/middleware/`, and game themes under `server/themes/`. Legacy client templates and static assets are in `client/`. The TypeScript/React frontend is in `front/src/`, with webpack output copied to `client/static/front-assets/`. Copy `config.default/` to `config/` for local runtime settings. Documentation and manuals live in `docs/` and `manual/`; Docker files are in `Dockerfile` and `docker/`.
 
 ## Build, Test, and Development Commands
-- 使用npm 8.17.0 构建或测试 可以通过nvm use 8.17.0来切换npm版本。
-- `npm install`：安装根目录后端依赖。
-- `Copy-Item -Recurse config.default config`：首次开发时复制本地配置。
-- `node app.js`：启动开发服务器，依赖 MongoDB 与 Redis。
-- `cd front && npm run watch`：前端开发模式。
-- `cd front && npm run production-build`：编译 TypeScript 并打包前端资源，是前端改动的基础冒烟检查。
-- `docker compose -f docker/docker-compose.yml up --build`：用容器启动应用与依赖服务。
-- 但是你在修改时，不需要真正去跑npm run watch等构建执行操作，因为你必须在高版本node中运行，运行时切版本会出错。
+
+- `npm install`: install root SocketStream/server dependencies.
+- `Copy-Item -Recurse config.default config`: create local configuration; edit `config/app.coffee`.
+- `node app.js`: run development mode with MongoDB and Redis available.
+- `cd front; npm install`: install frontend dependencies.
+- `cd front; npm run watch`: continuously rebuild frontend assets.
+- `cd front; npm run production-build`: build production frontend assets into `client/static/front-assets`.
+- `SS_ENV=production SS_PACK=1 node app.js`: run the production server after building assets.
+- `docker compose -f docker/docker-compose.yml up --build`: run the app with MongoDB and Redis via Docker.
 
 ## Coding Style & Naming Conventions
-- 遵循 `.editorconfig`：统一 UTF-8、默认 2 空格缩进，`*.coffee` 使用 4 空格。
-- `*.ts` 与 `*.tsx` 使用 Prettier，风格为单引号和尾随逗号。
-- CoffeeScript 代码遵循 CoffeeLint 约束，避免 tab、分号和反引号。
-- 变量与函数使用 `camelCase`，类与类型使用 `PascalCase`，文件命名尽量贴近现有模式，如 `component.tsx`、`elements.tsx`。
+
+Follow `.editorconfig`: UTF-8, final newline, spaces, 2-space indentation by default, and 4-space indentation for `.coffee` files. CoffeeScript linting is configured in `coffeelint.json`; avoid tabs, trailing whitespace, trailing semicolons, and non-camel-case classes. Frontend TypeScript uses Prettier with single quotes and trailing commas. Keep theme files named after their theme identifier where possible.
 
 ## Testing Guidelines
-- 仓库目前没有维护中的单元测试体系，`cd front && npm test` 只是占位命令。
-- 前端修改至少运行 `cd front && npm run build`。
-- 后端、模板、国际化或数据改动后，启动 `node app.js`，手动验证登录、房间列表、建房和相关游戏流程。
+
+There is no active root test script and `front/package.json` has a placeholder `npm test`. For frontend build validation, use `cd front; npm run test:manual-build`, which runs TypeScript and a webpack dev-check bundle. For server changes, run `node app.js` against local MongoDB and Redis and manually exercise affected RPC/game flows.
 
 ## Commit & Pull Request Guidelines
-- 最近提交以简短中文标题为主，不使用 `feat:`、`fix:` 这类前缀；一次提交只处理一个主题。
-- PR 需说明用户可见影响、配置或数据变更，并关联 issue。
-- 涉及 UI、文档页面或资源变更时附截图；若重新生成前端产物，请在描述中明确写出。
 
-## Agent Workflow
-- 非琐碎任务先在 `tasks/todo.md` 写可勾选计划，再实施与更新状态。
-- 只改必要文件，优先根因修复，完成前必须验证结果并在 `tasks/todo.md` 的 `Review` 记录结论。
+Recent history uses short, direct commit subjects, often in Chinese, such as `名字修正` or `主题`. Keep subjects concise and focused on one change. Pull requests should describe the behavior change, list manual verification commands, mention configuration or migration steps, and include screenshots for visible UI changes. Link related issues when available.
+
+## Security & Configuration Tips
+
+Do not commit local secrets from `config/`, database dumps, or generated runtime data. Keep `config.default/` as the documented template. Treat `prizedata/*.csv` as project data and review changes carefully before committing.
