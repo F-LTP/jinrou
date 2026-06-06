@@ -112,7 +112,7 @@ module.exports=
             
         sister:
             avatar: "https://s2.loli.net/2025/08/06/ksSCw23ZG48Qbem.png"
-            name: "黑部穗乃果"
+            name: "黑部穗乃香"
             prize: []
             
         # sister2:
