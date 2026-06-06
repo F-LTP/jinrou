@@ -4,12 +4,13 @@ import { LogVisibility } from '../defs';
 import { Rule } from '../../../defs';
 
 import { LogModeStyle, OneLog } from './log';
-import { StoredLog, LogStore } from './log-store';
+import { StoredLog, LogStore, StoredLogBlock } from './log-store';
 import { mapReverse } from '../../../util/map-reverse';
-import { I18n } from '../../../i18n';
+import { I18n, TranslationFunction } from '../../../i18n';
 import {
   LogWrapper,
   FixedSizeChunkWrapper,
+  LogBlockWrapper,
   PendingLogMessage,
 } from './elements';
 import { LogsRenderingState } from './store';
@@ -51,13 +52,6 @@ export interface IPropLogs {
 
 export interface IStateLogs {
   renderingState: LogsRenderingState;
-  /**
-   * Double-click detection state for resetting log pickup.
-   */
-  doubleClickState: {
-    lastClickTime: number;
-    clickTimeout: NodeJS.Timeout | null;
-  };
 }
 
 function cssString(value: string): string {
@@ -102,6 +96,19 @@ function PickupStyle({ userids }: { userids: string[] }) {
   );
 }
 
+class LogStyleRules extends React.PureComponent<{
+  pickupUserids: string[];
+}> {
+  public render() {
+    return (
+      <>
+        <LogModeStyle />
+        <PickupStyle userids={this.props.pickupUserids} />
+      </>
+    );
+  }
+}
+
 /**
  * Shows all logs.
  */
@@ -111,16 +118,18 @@ export class Logs extends React.Component<IPropLogs, IStateLogs> {
    * Classname attached to each log.
    */
   private readonly logClass = 'jf-log';
+  /**
+   * Double-click detection state for resetting log pickup.
+   */
+  private wrapperLastClickTime = 0;
+  private wrapperClickTimeout: number | null = null;
+
   constructor(props: IPropLogs) {
     super(props);
     this.state = {
       // what if logs is updated?
       // (getDerivedStateFromProps)
       renderingState: new LogsRenderingState(this.props.logs),
-      doubleClickState: {
-        lastClickTime: 0,
-        clickTimeout: null,
-      },
     };
   }
   public componentDidUpdate(prevProps: IPropLogs) {
@@ -131,8 +140,8 @@ export class Logs extends React.Component<IPropLogs, IStateLogs> {
   public componentWillUnmount() {
     this.state.renderingState.dispose();
     // Clear timeout if exists
-    if (this.state.doubleClickState.clickTimeout) {
-      clearTimeout(this.state.doubleClickState.clickTimeout);
+    if (this.wrapperClickTimeout != null) {
+      window.clearTimeout(this.wrapperClickTimeout);
     }
   }
 
@@ -151,41 +160,27 @@ export class Logs extends React.Component<IPropLogs, IStateLogs> {
    */
   private handleLogWrapperClick = () => {
     const now = Date.now();
-    const { lastClickTime, clickTimeout } = this.state.doubleClickState;
-    const timeDiff = now - lastClickTime;
+    const timeDiff = now - this.wrapperLastClickTime;
     const delay = 300;
 
     if (timeDiff < delay && timeDiff > 0) {
       // Double-click detected
       this.props.onResetLogPickup();
-      this.setState({
-        doubleClickState: {
-          lastClickTime: 0,
-          clickTimeout: null,
-        },
-      });
-      if (clickTimeout) {
-        clearTimeout(clickTimeout);
+      this.wrapperLastClickTime = 0;
+      if (this.wrapperClickTimeout != null) {
+        window.clearTimeout(this.wrapperClickTimeout);
+        this.wrapperClickTimeout = null;
       }
     } else {
       // Potential single-click, wait for second click
-      if (clickTimeout) {
-        clearTimeout(clickTimeout);
+      if (this.wrapperClickTimeout != null) {
+        window.clearTimeout(this.wrapperClickTimeout);
       }
-      const newTimeout = setTimeout(() => {
-        this.setState({
-          doubleClickState: {
-            lastClickTime: 0,
-            clickTimeout: null,
-          },
-        });
+      this.wrapperClickTimeout = window.setTimeout(() => {
+        this.wrapperLastClickTime = 0;
+        this.wrapperClickTimeout = null;
       }, delay);
-      this.setState({
-        doubleClickState: {
-          lastClickTime: now,
-          clickTimeout: newTimeout,
-        },
-      });
+      this.wrapperLastClickTime = now;
     }
   };
 
@@ -207,6 +202,12 @@ export class Logs extends React.Component<IPropLogs, IStateLogs> {
     }
 
     const fixedSize = true;
+    const latestChunk = logs.chunks[logs.chunks.length - 1];
+    const latestBlock =
+      latestChunk != null
+        ? latestChunk.blocks[latestChunk.blocks.length - 1]
+        : null;
+    const activeBlockId = latestBlock != null ? latestBlock.blockId : null;
     /*
      * number of logs to render (not pending).
      */
@@ -215,8 +216,7 @@ export class Logs extends React.Component<IPropLogs, IStateLogs> {
     let renderedLogCount = 0;
     return (
       <>
-        <LogModeStyle />
-        <PickupStyle userids={pickupUserids} />
+        <LogStyleRules pickupUserids={pickupUserids} />
         <LogWrapper
           className="jf-log-list"
           fixedSize={fixedSize}
@@ -242,12 +242,13 @@ export class Logs extends React.Component<IPropLogs, IStateLogs> {
               <LogChunk
                 key={chunk.day}
                 logClass={this.logClass}
-                logs={chunk.logs}
+                blocks={chunk.blocks}
                 renderedNumber={chunkRenderedLogs}
                 visible={visible}
                 fixedSize={fixedSize}
                 icons={icons}
                 rule={rule}
+                activeBlockId={activeBlockId}
                 resolveLogById={this.resolveLogById}
                 onShortIdClick={onShortIdClick}
               />
@@ -265,16 +266,16 @@ export class Logs extends React.Component<IPropLogs, IStateLogs> {
 /**
  * Show chunk of logs.
  */
-class LogChunk extends React.Component<
+class LogChunk extends React.PureComponent<
   {
     /**
      * Class attached to each log.
      */
     logClass: string;
     /**
-     * Logs to render.
+     * Stable blocks in this chunk.
      */
-    logs: StoredLog[];
+    blocks: StoredLogBlock[];
     /**
      * Whether this chunk is visible.
      */
@@ -296,6 +297,10 @@ class LogChunk extends React.Component<
      */
     rule: Rule | undefined;
     /**
+     * Id of the block that can still receive new logs.
+     */
+    activeBlockId: number | null;
+    /**
      * Function to resolve log by shortId for reply reference.
      */
     resolveLogById?: (shortId: string) => StoredLog | null;
@@ -309,38 +314,39 @@ class LogChunk extends React.Component<
   public render() {
     const {
       logClass,
-      logs,
+      blocks,
       visible,
       fixedSize,
       renderedNumber,
       rule,
       icons,
+      activeBlockId,
       resolveLogById,
       onShortIdClick,
     } = this.props;
     if (!visible && !fixedSize) {
       return null;
     }
-    const logsToRender =
-      renderedNumber >= logs.length
-        ? logs
-        : renderedNumber > 0
-        ? logs.slice(-renderedNumber)
-        : [];
 
     const chunkContent = (
       <I18n namespace="game_client">
         {t =>
-          mapReverse(logsToRender, log => {
+          makeRenderedBlocks(blocks, renderedNumber).map(entry => {
+            const BlockComponent =
+              entry.block.blockId === activeBlockId
+                ? ActiveLogBlock
+                : HistoricalLogBlock;
             return (
-              <OneLog
-                key={log.logid}
+              <BlockComponent
+                key={entry.block.blockId}
                 logClass={logClass}
-                t={t}
+                block={entry.block}
+                start={entry.start}
+                end={entry.end}
                 fixedSize={fixedSize}
-                log={log}
-                rule={rule}
                 icons={icons}
+                rule={rule}
+                t={t}
                 resolveLogById={resolveLogById}
                 onShortIdClick={onShortIdClick}
               />
@@ -360,3 +366,115 @@ class LogChunk extends React.Component<
     }
   }
 }
+
+function makeRenderedBlocks(
+  blocks: StoredLogBlock[],
+  renderedNumber: number,
+): Array<{
+  block: StoredLogBlock;
+  start: number;
+  end: number;
+}> {
+  const result: Array<{
+    block: StoredLogBlock;
+    start: number;
+    end: number;
+  }> = [];
+  let remaining = renderedNumber;
+  for (let idx = blocks.length - 1; idx >= 0; idx--) {
+    const block = blocks[idx];
+    const renderedInBlock = Math.max(0, Math.min(block.logs.length, remaining));
+    remaining -= block.logs.length;
+    if (renderedInBlock <= 0) {
+      continue;
+    }
+    result.push({
+      block,
+      start: block.logs.length - renderedInBlock,
+      end: block.logs.length,
+    });
+  }
+  return result;
+}
+
+interface IPropLogBlock {
+  /**
+   * Class attached to each log.
+   */
+  logClass: string;
+  /**
+   * Log block to render.
+   */
+  block: StoredLogBlock;
+  /**
+   * Start index of this block.
+   */
+  start: number;
+  /**
+   * End index of this block.
+   */
+  end: number;
+  /**
+   * Whether logs are rendered in fixed-size mode.
+   */
+  fixedSize: boolean;
+  /**
+   * Icon of each user.
+   */
+  icons: Record<string, string | undefined>;
+  /**
+   * Current rule.
+   */
+  rule: Rule | undefined;
+  /**
+   * Translation function.
+   */
+  t: TranslationFunction;
+  /**
+   * Function to resolve log by shortId for reply reference.
+   */
+  resolveLogById?: (shortId: string) => StoredLog | null;
+  /**
+   * Callback for shortId click.
+   */
+  onShortIdClick?: (shortId: string) => void;
+}
+
+class BaseLogBlock<P extends IPropLogBlock> extends React.PureComponent<P> {
+  public render() {
+    const {
+      logClass,
+      block,
+      start,
+      end,
+      fixedSize,
+      icons,
+      rule,
+      t,
+      resolveLogById,
+      onShortIdClick,
+    } = this.props;
+    const children: React.ReactNode[] = [];
+    for (let idx = end - 1; idx >= start; idx--) {
+      const log = block.logs[idx];
+      children.push(
+        <OneLog
+          key={log.logid}
+          logClass={logClass}
+          t={t}
+          fixedSize={fixedSize}
+          log={log}
+          rule={rule}
+          icons={icons}
+          resolveLogById={resolveLogById}
+          onShortIdClick={onShortIdClick}
+        />,
+      );
+    }
+    return <LogBlockWrapper>{children}</LogBlockWrapper>;
+  }
+}
+
+class ActiveLogBlock extends BaseLogBlock<IPropLogBlock> {}
+
+class HistoricalLogBlock extends BaseLogBlock<IPropLogBlock> {}

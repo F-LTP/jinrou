@@ -41,8 +41,15 @@ export const LogWrapper = styled.div<{
 export const FixedSizeChunkWrapper = styled.div<{
   visible: boolean;
 }>`
-  contain: paint;
+  contain: paint style;
   display: ${({ visible }) => (visible ? 'block' : 'none')};
+`;
+
+/**
+ * Wrapper of a stable log block inside a day chunk.
+ */
+export const LogBlockWrapper = styled.div`
+  contain: layout paint style;
 `;
 
 /**

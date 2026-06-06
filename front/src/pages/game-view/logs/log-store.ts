@@ -22,7 +22,18 @@ export type StoredLog = Log & {
 export interface LogChunk {
   day: number;
   logs: StoredLog[];
+  blocks: StoredLogBlock[];
 }
+
+/**
+ * Stable block of logs for rendering.
+ */
+export interface StoredLogBlock {
+  blockId: number;
+  logs: StoredLog[];
+}
+
+export const logBlockSize = 100;
 
 /**
  * Store of logs.
@@ -33,6 +44,12 @@ export class LogStore {
     {
       day: 1,
       logs: [],
+      blocks: [
+        {
+          blockId: 1,
+          logs: [],
+        },
+      ],
     },
   ];
   /**
@@ -48,6 +65,10 @@ export class LogStore {
    * Last id of log.
    */
   private lastLogId = 0;
+  /**
+   * Last id of log block.
+   */
+  private lastBlockId = 1;
 
   /**
    * Map of shortId to log for quick lookup.
@@ -78,6 +99,12 @@ export class LogStore {
       this.chunks.push({
         day: this.currentDay,
         logs: [],
+        blocks: [
+          {
+            blockId: ++this.lastBlockId,
+            logs: [],
+          },
+        ],
       });
     }
     // current chunk of logs.
@@ -91,6 +118,7 @@ export class LogStore {
       day: this.currentDay,
     };
     chunk.logs.push(stored);
+    this.getActiveBlock(chunk).logs.push(stored);
 
     // Add to shortId index for quick lookup
     if (stored.shortId) {
@@ -106,6 +134,12 @@ export class LogStore {
       {
         day: 1,
         logs: [],
+        blocks: [
+          {
+            blockId: ++this.lastBlockId,
+            logs: [],
+          },
+        ],
       },
     ];
     this.shortIdIndex.clear();
@@ -155,5 +189,21 @@ export class LogStore {
   public findByShortId(shortId: string): StoredLog | null {
     const result = this.shortIdIndex.get(shortId);
     return result !== undefined ? result : null;
+  }
+
+  /**
+   * Get the active block of the given chunk.
+   */
+  private getActiveBlock(chunk: LogChunk): StoredLogBlock {
+    const lastBlock = chunk.blocks[chunk.blocks.length - 1];
+    if (lastBlock != null && lastBlock.logs.length < logBlockSize) {
+      return lastBlock;
+    }
+    const newBlock: StoredLogBlock = {
+      blockId: ++this.lastBlockId,
+      logs: [],
+    };
+    chunk.blocks.push(newBlock);
+    return newBlock;
   }
 }
