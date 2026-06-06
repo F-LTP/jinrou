@@ -1,4 +1,13 @@
-import { computed, observable, action, runInAction, set, toJS } from 'mobx';
+import '../util/mobx-config';
+import {
+  computed,
+  observable,
+  action,
+  runInAction,
+  set,
+  toJS,
+  makeObservable,
+} from 'mobx';
 
 import { UserTheme, Theme, GlobalStyleTheme, UserProvidedTheme } from './theme';
 import { isPrimitive } from '../util/is-primitive';
@@ -68,6 +77,7 @@ export class ThemeStore {
   }
 
   constructor() {
+    makeObservable(this);
     this.loadThemeFromStorage();
   }
 

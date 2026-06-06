@@ -1,4 +1,5 @@
-import { observable, action, computed } from 'mobx';
+import '../../util/mobx-config';
+import { observable, action, computed, makeObservable } from 'mobx';
 import {
   Prize,
   PrizeUtil,
@@ -14,7 +15,9 @@ import { fillTemplate } from './logic/fill-nowprize';
  * @package
  */
 export class PrizeStore {
-  constructor(public prizeUtil: PrizeUtil) {}
+  constructor(public prizeUtil: PrizeUtil) {
+    makeObservable(this);
+  }
   /**
    * List of available prizes.
    */

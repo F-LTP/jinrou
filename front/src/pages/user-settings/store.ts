@@ -1,4 +1,5 @@
-import { observable, action } from 'mobx';
+import '../../util/mobx-config';
+import { observable, action, makeObservable } from 'mobx';
 import { i18n } from '../../i18n';
 import { deepClone } from '../../util/deep-clone';
 import {
@@ -29,6 +30,7 @@ export class UserSettingsStore {
   public defaultProfile: ColorProfileData;
 
   constructor(i18n: i18n, public onChangePhoneUI: (use: boolean) => void) {
+    makeObservable(this);
     this.defaultProfile = {
       ...defaultColorProfile1,
       name: i18n.t('color.defaultProfile'),

@@ -1,4 +1,5 @@
-import { action, computed, observable } from 'mobx';
+import '../../util/mobx-config';
+import { action, computed, observable, makeObservable } from 'mobx';
 
 import { Rule } from '../../defs';
 import { themeStore } from '../../theme';
@@ -132,6 +133,10 @@ export class GameStore {
    * All logs.
    */
   public logs: LogStore = new LogStore();
+
+  constructor() {
+    makeObservable(this);
+  }
 
   /**
    * Update current role information.

@@ -1,4 +1,11 @@
-import { action, computed, observable, runInAction } from 'mobx';
+import '../../util/mobx-config';
+import {
+  action,
+  computed,
+  observable,
+  runInAction,
+  makeObservable,
+} from 'mobx';
 
 import {
   CastingDefinition,
@@ -62,6 +69,7 @@ export class CastingStore {
     categories: RoleCategoryDefinition[],
     initialCasting: CastingDefinition,
   ) {
+    makeObservable(this);
     this.roles = roles;
     this.categories = categories;
     this.currentCasting = initialCasting;

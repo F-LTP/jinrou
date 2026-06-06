@@ -30,3 +30,11 @@ Recent history uses short, direct commit subjects, often in Chinese, such as `Âê
 ## Security & Configuration Tips
 
 Do not commit local secrets from `config/`, database dumps, or generated runtime data. Keep `config.default/` as the documented template. Treat `prizedata/*.csv` as project data and review changes carefully before committing.
+
+## Agent Notes: Log Performance
+
+When working on `front/src/pages/game-view/logs/`, preserve unrelated log features such as quote/reply behavior, filtering improvements, and the current rule-panel display mode. The rule panel must render as an independent layer and must not resize or push the log area, because layout shifts here can trigger the same performance issue as new log messages.
+
+There are two observed log stutter modes. The first is stable stutter on new messages, which can be improved by CSS isolation such as `contain: paint`. The second appears after an unclear browser/runtime state and causes new-message stutter until the browser is restarted. Treat both as likely layout/reflow or render-scope issues before changing product behavior.
+
+Avoid removing log chunk boundaries or switching rendering modes without profiling: previous experiments showed that forcing fixed-mode rendering while removing chunked log wrappers made new messages stutter again, while restoring chunk boundaries reduced the issue. If upgrading state libraries, use a conservative React 18-compatible path: prefer `mobx@6.13.x` with `mobx-react@9.2.x`, audit `mobx-react-lite` usage, and do not upgrade React in the same step unless profiling proves it is necessary.

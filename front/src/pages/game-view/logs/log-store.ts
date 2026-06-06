@@ -1,4 +1,5 @@
-import { observable, action, computed } from 'mobx';
+import '../../../util/mobx-config';
+import { observable, action, computed, makeObservable } from 'mobx';
 import { Log, LogVisibility } from '../defs';
 
 /**
@@ -53,6 +54,10 @@ export class LogStore {
    * This avoids O(n) lookup performance issues.
    */
   private shortIdIndex = new Map<string, StoredLog>();
+
+  constructor() {
+    makeObservable(this);
+  }
 
   /**
    * Number of all logs.
