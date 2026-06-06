@@ -110,10 +110,10 @@ module.exports=
         #     name: "诺亚的动物朋友"
         #     prize: []
             
-        # sister:
-        #     avatar: "https://s2.loli.net/2025/08/06/ksSCw23ZG48Qbem.png"
-        #     name: "「姐姐」"
-        #     prize: []
+        sister:
+            avatar: "https://s2.loli.net/2025/08/06/ksSCw23ZG48Qbem.png"
+            name: "黑部穗乃果"
+            prize: []
             
         # sister2:
         #     avatar: "https://s2.loli.net/2025/07/24/w1hYO5K3Mjq4dax.png"
