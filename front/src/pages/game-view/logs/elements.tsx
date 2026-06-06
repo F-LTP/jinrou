@@ -63,11 +63,6 @@ export const LogBlockWrapper = styled.div<{
 export const FixedSizeLogRow = styled.div`
   display: grid;
   grid-template-columns: ${fixedSizeGridColumnsPC};
-
-  &.is-dimmed {
-    opacity: 0.3;
-  }
-
   ${phone`
     grid-template-columns: ${fixedSizeGridColumnsPhone};
     grid-auto-flow: row dense;

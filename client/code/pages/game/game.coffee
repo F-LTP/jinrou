@@ -1,7 +1,6 @@
 this_room_id=null
 
 socket_ids=[]
-current_start_token=0
 
 this_rule=null  # ルールオブジェクトがある
 enter_result=null #enter
@@ -13,26 +12,8 @@ game_start_control = null
 # GameViewのインスタンス
 game_view = null
 
-cleanup_room_runtime=->
-    alloff socket_ids...
-    socket_ids=[]
-    game_start_control?.unmount()
-    game_start_control=null
-    game_view?.unmount()
-    game_view=null
-    reload_room=null
-    getjobinfo=null
-    newgamebutton=null
-
 
 exports.start=(roomid)->
-    cleanup_room_runtime()
-    start_token=++current_start_token
-    is_active=-> start_token==current_start_token
-    listen=(mesname, channel, func)->
-        socket_ids.push Index.socket.on mesname,channel,(msg,channel_name)->
-            return unless is_active()
-            func msg,channel_name
     this_rule=null
     my_player_id=null
     this_room_id=null
@@ -48,9 +29,7 @@ exports.start=(roomid)->
         Index.app.getApplicationConfig()
     ])
         .then(([gv, dialog, i18n, appConfig])->
-            return unless is_active()
             getenter=(result)->
-                return unless is_active()
                 if result.error?
                     # エラー
                     dialog.showErrorDialog {
@@ -70,7 +49,6 @@ exports.start=(roomid)->
                             password: true
                             autocomplete: "off"
                         }).then (pass)->
-                            return unless is_active()
                             unless pass
                                 Index.app.showUrl "/rooms"
                                 return
@@ -79,9 +57,7 @@ exports.start=(roomid)->
                     return
                 enter_result=result
                 this_room_id=roomid
-                ss.rpc "game.rooms.oneRoom", roomid,(room)->
-                    return unless is_active()
-                    initroom [gv, dialog, i18n], room
+                ss.rpc "game.rooms.oneRoom", roomid,(room)-> initroom [gv, dialog, i18n], room
             game_view = gv.place {
                 i18n: i18n
                 roomid: roomid
@@ -93,7 +69,6 @@ exports.start=(roomid)->
                 teamColors: Shared.game.makeTeamColors()
                 onSpeak: (query)->
                     ss.rpc "game.game.speak", roomid, query, (result)->
-                        return unless is_active()
                         if result?
                             dialog.showErrorDialog {
                                 modal: true
@@ -108,7 +83,6 @@ exports.start=(roomid)->
                     # 蘇生辞退ボタン
                     new Promise (resolve, reject)->
                         ss.rpc "game.game.norevive", roomid, (result)->
-                            return unless is_active()
                             if result?
                                 reject result
                             else
@@ -116,7 +90,6 @@ exports.start=(roomid)->
                 onJobQuery:(query)->
                     # Job query
                     ss.rpc "game.game.job", roomid, query, (result)->
-                        return unless is_active()
                         if result?.error?
                             dialog.showErrorDialog {
                                 modal: true
@@ -127,7 +100,6 @@ exports.start=(roomid)->
                 onWillChange:(will)->
                     # User's will is updated
                     ss.rpc "game.game.will", roomid, will, (result)->
-                        return unless is_active()
                         if result?
                             dialog.showErrorDialog {
                                 modal: true
@@ -156,14 +128,12 @@ exports.start=(roomid)->
                     join: (user)->
                         processJoin = ->
                             ss.rpc "game.rooms.join", roomid, user, (result)->
-                                return unless is_active()
                                 if result?.require == "login"
                                     # ログインが必要
                                     dialog.showLoginDialog({
                                         modal: true
                                         login: Index.app.loginPromise
                                     }).then (loggedin)->
-                                        return unless is_active()
                                         if loggedin && Index.app.userid()
                                             processJoin()
                                 else if result?.error?
@@ -188,7 +158,6 @@ exports.start=(roomid)->
                         # 脱退
                         processUnjoin = (quitThemeRoom)->
                             ss.rpc "game.rooms.unjoin", roomid,quitThemeRoom,(result)->
-                                return unless is_active()
                                 if result?.confirm == "quitThemeRoom"
                                     dialog.showConfirmDialog({
                                         modal: true,
@@ -197,7 +166,6 @@ exports.start=(roomid)->
                                         yes: i18n.t 'game_client:room.unjoinThemeRoomDialog.quit'
                                         no: i18n.t 'game_client:room.unjoinThemeRoomDialog.stay'
                                     }).then (res)->
-                                        return unless is_active()
                                         if res
                                             processUnjoin(true)
                                     return
@@ -211,7 +179,6 @@ exports.start=(roomid)->
                         processUnjoin(false)
                     ready: ()->
                         ss.rpc "game.rooms.ready", roomid,(result)->
-                            return unless is_active()
                             if result?
                                 dialog.showErrorDialog {
                                     modal: true
@@ -219,7 +186,6 @@ exports.start=(roomid)->
                                 }
                     helper: (idornull)->
                         ss.rpc "game.rooms.helper",roomid, idornull, (result)->
-                            return unless is_active()
                             if result?
                                 dialog.showErrorDialog {
                                     modal: true
@@ -231,7 +197,6 @@ exports.start=(roomid)->
                         id = obj.id
                         noentry = obj.noentry
                         ss.rpc "game.rooms.kick", roomid, id, noentry, (result)->
-                            return unless is_active()
                             if result?
                                 dialog.showErrorDialog {
                                     modal: true
@@ -239,7 +204,6 @@ exports.start=(roomid)->
                                 }
                     kickRemove: (users)->
                         ss.rpc "game.rooms.cancelban", roomid, users, (result)->
-                            return unless is_active()
                             if result?
                                 dialog.showErrorDialog {
                                     modal: true
@@ -247,7 +211,6 @@ exports.start=(roomid)->
                                 }
                     resetReady: ->
                         ss.rpc "game.rooms.unreadyall",roomid,(result)->
-                            return unless is_active()
                             if result?
                                 dialog.showErrorDialog {
                                     modal: true
@@ -255,7 +218,6 @@ exports.start=(roomid)->
                                 }
                     discard: ->
                         ss.rpc "game.rooms.del", roomid,(result)->
-                            return unless is_active()
                             if result?
                                 dialog.showErrorDialog {
                                     modal: true
@@ -291,7 +253,6 @@ exports.start=(roomid)->
         )
 
     initroom=([gv, dialog, i18n], room)->
-        return unless is_active()
         unless room?
             # show an error that such room does not exist.
             dialog.showErrorDialog({
@@ -306,7 +267,6 @@ exports.start=(roomid)->
         this_openjob_flag=false
         # 职业情報をもらった
         getjobinfo=(obj)->
-            return unless is_active()
             return unless obj.id==this_room_id
             my_player_id=obj.playerid
             # Prepare icons of players
@@ -434,7 +394,6 @@ exports.start=(roomid)->
                     # ログをもらってない場合はもらいたい
                     reload_room()
         sentlog=(result)->
-            return unless is_active()
             if result.error?
                 dialog.showErrorDialog {
                     modal: true
@@ -457,7 +416,6 @@ exports.start=(roomid)->
                     else
                         gettimer parseInt(result.timer),result.timer_mode if result.timer?
         reload_room = ->
-            return unless is_active()
             ss.rpc "game.game.getlog", roomid,sentlog
         reload_room()
         # 新しいゲーム
@@ -473,7 +431,6 @@ exports.start=(roomid)->
                 JinrouFront.loadGameStartControl()
             ])
                 .then(([i18n, gsc])=>
-                    return unless is_active()
                     # casting情報を用意
                     castings = getLabeledGroupsOfJobrules()
                     game_start_control = gsc.place {
@@ -488,14 +445,12 @@ exports.start=(roomid)->
                         initialCasting: castings[0].items[0].value
                         onStart: (query)->
                             ss.rpc "game.game.gameStart", roomid, query, (result)->
-                                return unless is_active()
                                 if result?
                                     Promise.all([
                                         JinrouFront.loadDialog()
                                         Index.app.getI18n()
                                     ])
                                         .then ([d, i18n])->
-                                            return unless is_active()
                                             errorMessage = switch result.errorType
                                                 when "invalid"
                                                     ruleName = i18n.t "rules:rule.#{result.rule}.name"
@@ -518,7 +473,6 @@ exports.start=(roomid)->
                     }
                     game_start_control.store.setPlayersNumber room.players.filter((x)->x.mode=="player").length
                 ).catch((err)->
-                    return unless is_active()
                     console.error err)
 
         $("#roomname").text room.name
@@ -567,28 +521,28 @@ exports.start=(roomid)->
         #========================================
 
         # 誰かが参加した!!!!
-        listen "join","room#{roomid}",(msg,channel)->
+        socket_ids.push Index.socket.on "join","room#{roomid}",(msg,channel)->
             room.players.push msg
             forminfo()
             game_view.store.addPlayer convertRoomPlayerToPlayerInfo msg
         # 誰かが出て行った!!!
-        listen "unjoin","room#{roomid}",(msg,channel)->
+        socket_ids.push Index.socket.on "unjoin","room#{roomid}",(msg,channel)->
             room.players=room.players.filter (x)->x.userid!=msg
             forminfo()
             game_view.store.removePlayer msg
         # kickされた
-        listen "kicked",null,(msg,channel)->
+        socket_ids.push Index.socket.on "kicked",null,(msg,channel)->
             if msg.id==roomid
                 Index.app.refresh()
         # 準備
-        listen "ready","room#{roomid}",(msg,channel)->
+        socket_ids.push Index.socket.on "ready","room#{roomid}",(msg,channel)->
             for pl in room.players
                 if pl.userid==msg.userid
                     pl.start=msg.start
                     game_view.store.updatePlayer msg.userid, {
                         flags: getPlayerInfoFlags msg.start, pl.mode
                     }
-        listen "unreadyall","room#{roomid}",(msg,channel)->
+        socket_ids.push Index.socket.on "unreadyall","room#{roomid}",(msg,channel)->
             # TODO
             game_view.runInAction ()->
                 for pl in room.players
@@ -597,7 +551,7 @@ exports.start=(roomid)->
                         game_view.store.updatePlayer pl.userid, {
                             flags: getPlayerInfoFlags false, pl.mode
                         }
-        listen "mode","room#{roomid}",(msg,channel)->
+        socket_ids.push Index.socket.on "mode","room#{roomid}",(msg,channel)->
             for pl in room.players
                 if pl.userid==msg.userid
                     pl.mode=msg.mode
@@ -607,36 +561,33 @@ exports.start=(roomid)->
                     }
 
         # ログが流れてきた!!!
-        listen "log",null,(msg,channel)->
+        socket_ids.push Index.socket.on "log",null,(msg,channel)->
             #if channel=="room#{roomid}" || channel.indexOf("room#{roomid}_")==0 || channel==Index.app.userid()
             if msg.roomid==roomid
                 # この部屋へのログ
                 getlog msg
         # 職情報を教えてもらった!!!
-        listen "getjob",null,(msg,channel)->
+        socket_ids.push Index.socket.on "getjob",null,(msg,channel)->
             if channel=="room#{roomid}" || channel.indexOf("room#{roomid}_")==0 || channel==Index.app.userid()
                 getjobinfo msg
         # 更新したほうがいい
-        listen "refresh",null,(msg,channel)->
+        socket_ids.push Index.socket.on "refresh",null,(msg,channel)->
             if msg.id==roomid
                 #Index.app.refresh()
                 ss.rpc "game.rooms.enter", roomid,sessionStorage.roompassword ? null,(result)->
-                    return unless is_active()
                     reload_room()
-                ss.rpc "game.rooms.oneRoom", roomid,(r)->
-                    return unless is_active()
-                    room=r
+                ss.rpc "game.rooms.oneRoom", roomid,(r)->room=r
         # 投票表单オープン
-        listen "voteform",null,(msg,channel)->
+        socket_ids.push Index.socket.on "voteform",null,(msg,channel)->
             if channel=="room#{roomid}" || channel.indexOf("room#{roomid}_")==0 || channel==Index.app.userid()
                 return
         # 残り時間
-        listen "time",null,(msg,channel)->
+        socket_ids.push Index.socket.on "time",null,(msg,channel)->
             if channel=="room#{roomid}" || channel.indexOf("room#{roomid}_")==0 || channel==Index.app.userid()
                 gettimer parseInt(msg.time),msg.mode
 
         # show TO BAN list to players
-        listen 'punishalert',null,(msg,channel)->
+        socket_ids.push Index.socket.on 'punishalert',null,(msg,channel)->
             if msg.id==roomid && my_player_id? && (my_player_id in msg.voters)
                 dialog.showSuddenDeathPunishDialog({
                     time: msg.time
@@ -648,7 +599,6 @@ exports.start=(roomid)->
                     unless banIDs?
                         return
                     ss.rpc "game.rooms.suddenDeathPunish", roomid, banIDs, (result)->
-                        return unless is_active()
                         if result?
                             if result.error?
                                 dialog.showErrorDialog {
@@ -658,7 +608,7 @@ exports.start=(roomid)->
                                 return
                             return
         # show result. reported as disturbing, so only show result in console.
-        listen 'punishresult',null,(msg,channel)->
+        socket_ids.push Index.socket.on 'punishresult',null,(msg,channel)->
             if msg.id==roomid
                 # Index.util.message "猝死惩罚",msg.name+" 由于猝死被禁止加入游戏。"
                 return
@@ -670,16 +620,13 @@ exports.start=(roomid)->
 
     #ログをもらった
     getlog=(log)->
-        return unless is_active()
         game_view?.store.addLog log
 
     formplayers=(players)-> #jobflg: 1:生存の人 2:死人
-        return unless is_active()
         game_view?.store.resetPlayers players.map convertGamePlayerToPlayerInfo
 
     # タイマー情報をもらった
     gettimer=(msg,mode)->
-        return unless is_active()
         remain_time=parseInt msg
         # for new frontend
         game_view?.store.update {
@@ -693,19 +640,16 @@ exports.start=(roomid)->
 
 
 exports.end=->
-    current_start_token++
-    roomid=this_room_id
-    cleanup_room_runtime()
+    # unmount react components.
+    game_start_control?.unmount()
+    game_view?.unmount()
 
-    if roomid?
-        ss.rpc "game.rooms.exit", roomid,(result)->
-            if result?
-                # error
-                console.error result
-                return
-    this_room_id=null
-    this_rule=null
-    enter_result=null
+    ss.rpc "game.rooms.exit", this_room_id,(result)->
+        if result?
+            # error
+            console.error result
+            return
+    alloff socket_ids...
     document.body.classList.remove x for x in ["day","night","finished","heaven"]
 
 exports.reconnect=->

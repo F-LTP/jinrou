@@ -1,4 +1,4 @@
-import { observable, action } from 'mobx';
+import { observable, action, computed } from 'mobx';
 import { Log, LogVisibility } from '../defs';
 
 /**
@@ -57,8 +57,10 @@ export class LogStore {
   /**
    * Number of all logs.
    */
-  @observable
-  public allLogNumber: number = 0;
+  @computed
+  public get allLogNumber(): number {
+    return this.chunks.reduce((total, chunk) => total + chunk.logs.length, 0);
+  }
 
   /**
    * Add a log to the store.
@@ -84,7 +86,6 @@ export class LogStore {
       day: this.currentDay,
     };
     chunk.logs.push(stored);
-    this.allLogNumber += 1;
 
     // Add to shortId index for quick lookup
     if (stored.shortId) {
@@ -102,9 +103,6 @@ export class LogStore {
         logs: [],
       },
     ];
-    this.currentDay = 1;
-    this.lastLogId = 0;
-    this.allLogNumber = 0;
     this.shortIdIndex.clear();
   }
   /**

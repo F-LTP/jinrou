@@ -44,6 +44,10 @@ export interface IPropLogs {
    */
   logPickup: string | null;
   /**
+   * User ids which can be used for pickup filtering.
+   */
+  pickupUserids: string[];
+  /**
    * Icons of users.
    */
   icons: Record<string, string | undefined>;
@@ -72,14 +76,46 @@ export interface IStateLogs {
   };
 }
 
-function isLogDimmed(log: StoredLog, logPickup: string | null): boolean {
-  if (logPickup == null) {
-    return false;
+function cssString(value: string): string {
+  return `"${value
+    .replace(/\\/g, '\\\\')
+    .replace(/"/g, '\\"')
+    .replace(/\n/g, '\\A ')
+    .replace(/\r/g, '\\D ')}"`;
+}
+
+function uniqueValues(values: string[]): string[] {
+  const result: string[] = [];
+  const appeared = new Set<string>();
+  for (const value of values) {
+    if (appeared.has(value)) {
+      continue;
+    }
+    appeared.add(value);
+    result.push(value);
   }
-  if (log.mode === 'system') {
-    return true;
-  }
-  return !('userid' in log) || log.userid !== logPickup;
+  return result;
+}
+
+function PickupStyle({ userids }: { userids: string[] }) {
+  return (
+    <style>
+      {uniqueValues(userids)
+        .map(userid =>
+          [
+            `.jf-log-list[data-log-pickup-userid=${cssString(
+              userid,
+            )}] .jf-log{opacity:0.3;}`,
+            `.jf-log-list[data-log-pickup-userid=${cssString(
+              userid,
+            )}] .jf-log[data-log-userid=${cssString(
+              userid,
+            )}]:not(.jf-log-mode-system){opacity:1;}`,
+          ].join('\n'),
+        )
+        .join('\n')}
+    </style>
+  );
 }
 
 /**
@@ -176,6 +212,7 @@ export class Logs extends React.Component<IPropLogs, IStateLogs> {
       icons,
       visibility,
       logPickup,
+      pickupUserids,
       onResetLogPickup,
       onShortIdClick,
     } = this.props;
@@ -195,9 +232,11 @@ export class Logs extends React.Component<IPropLogs, IStateLogs> {
     return (
       <>
         <LogModeStyle />
+        <PickupStyle userids={pickupUserids} />
         <LogWrapper
           className="jf-log-list"
           fixedSize={fixedSize}
+          data-log-pickup-userid={logPickup != null ? logPickup : undefined}
           onClick={this.handleLogWrapperClick}
         >
           {mapReverse(logs.chunks, (chunk, i) => {
@@ -223,7 +262,6 @@ export class Logs extends React.Component<IPropLogs, IStateLogs> {
                 renderedNumber={chunkRenderedLogs}
                 visible={visible}
                 fixedSize={fixedSize}
-                logPickup={logPickup}
                 icons={icons}
                 rule={rule}
                 resolveLogById={this.resolveLogById}
@@ -262,10 +300,6 @@ class LogChunk extends React.PureComponent<
      */
     fixedSize: boolean;
     /**
-     * Picked-up user id.
-     */
-    logPickup: string | null;
-    /**
      * Number of logs to render.
      */
     renderedNumber: number;
@@ -294,7 +328,6 @@ class LogChunk extends React.PureComponent<
       logs,
       visible,
       fixedSize,
-      logPickup,
       renderedNumber,
       rule,
       icons,
@@ -320,7 +353,6 @@ class LogChunk extends React.PureComponent<
               logClass={logClass}
               logs={block.logs}
               fixedSize={fixedSize}
-              logPickup={logPickup}
               t={t}
               rule={rule}
               icons={icons}
@@ -388,10 +420,6 @@ class LogBlock extends React.PureComponent<{
    */
   fixedSize: boolean;
   /**
-   * Picked-up user id.
-   */
-  logPickup: string | null;
-  /**
    * Translation function.
    */
   t: TranslationFunction;
@@ -417,7 +445,6 @@ class LogBlock extends React.PureComponent<{
       logClass,
       logs,
       fixedSize,
-      logPickup,
       t,
       rule,
       icons,
@@ -433,7 +460,6 @@ class LogBlock extends React.PureComponent<{
             logClass={logClass}
             fixedSize={fixedSize}
             log={log}
-            dimmed={isLogDimmed(log, logPickup)}
             rule={rule}
             icons={icons}
             resolveLogById={resolveLogById}

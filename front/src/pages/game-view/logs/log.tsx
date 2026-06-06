@@ -71,10 +71,6 @@ export interface IPropOneLog {
    */
   log: Log;
   /**
-   * Whether this log is dimmed by pickup filtering.
-   */
-  dimmed: boolean;
-  /**
    * Set of icon URLs for users.
    */
   icons: Record<string, string | undefined>;
@@ -110,7 +106,6 @@ class OneLogInner extends React.PureComponent<IPropOneLog, {}> {
       logClass,
       fixedSize,
       log,
-      dimmed,
       rule,
       icons,
       resolveLogById,
@@ -118,12 +113,16 @@ class OneLogInner extends React.PureComponent<IPropOneLog, {}> {
     } = this.props;
     currentShortIdClick = onShortIdClick;
     const baseClassName = logClass;
+    const logUserid = 'userid' in log ? log.userid : undefined;
+    const logUserAttrs =
+      logUserid != null ? { 'data-log-userid': logUserid } : {};
     const classNameForMode = (mode: Log['mode']) =>
-      `${baseClassName} ${logModeClass(mode)}${dimmed ? ' is-dimmed' : ''}`;
+      `${baseClassName} ${logModeClass(mode)}`;
     const lineAttrs = (mode: Log['mode']) =>
       fixedSize
         ? ({
             className: classNameForMode(mode),
+            ...logUserAttrs,
           } as Record<string, any>)
         : {};
     const partAttrs = (mode: Log['mode']) =>
@@ -131,6 +130,7 @@ class OneLogInner extends React.PureComponent<IPropOneLog, {}> {
         ? {}
         : ({
             className: classNameForMode(mode),
+            ...logUserAttrs,
           } as Record<string, any>);
     const renderLine = (mode: Log['mode'], children: React.ReactNode) =>
       fixedSize ? (
@@ -660,10 +660,6 @@ const LogPart = styled.div`
   overflow-wrap: break-word;
   word-break: break-word;
   font-size: var(--base-font-size);
-
-  &.is-dimmed {
-    opacity: 0.3;
-  }
 `;
 
 /**
