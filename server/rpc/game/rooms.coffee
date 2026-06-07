@@ -15,6 +15,7 @@ room: {
   }
   password: Hashed Password
   comment: String
+  villageRules: String
   mode: "waiting"/"playing"/"end"
   made: Time(Number)(作成された日時）
   blind:""/"yes"/"complete"
@@ -46,6 +47,7 @@ module.exports=
                 return
             if result.made < Date.now()-Config.rooms.fresh*3600000
                 result.old=true
+            result.villageRules ?= ""
             cb result
 
 Server=
@@ -137,6 +139,7 @@ module.exports.actions=(req,res,ss)->
                     # old rooms do not have watchspeak set.
                     # watchspeak defaults to true.
                     x.watchspeak = true
+                x.villageRules ?= ""
                 if x.theme
                     theme = Server.game.themes.getTheme x.theme
                     unless theme == null
@@ -172,6 +175,7 @@ module.exports.actions=(req,res,ss)->
                 return
             for x in results
                 if x.room?
+                    x.room.villageRules ?= ""
                     if x.room.password?
                         x.room.needpassword = true
                         x.room.password = undefined
@@ -200,6 +204,7 @@ module.exports.actions=(req,res,ss)->
             # ふるいかどうか
             if result.made < Date.now()-Config.rooms.fresh*3600000
                 result.old=true
+            result.villageRules ?= ""
             # パスワードをアレする
             result.password = !!result.password
             if result.theme
@@ -222,6 +227,10 @@ module.exports.actions=(req,res,ss)->
             return
         if query.comment && query.comment.length > Config.maxlength.room.comment
             res {error: i18n.t "error.newRoom.commentTooLong"}
+            return
+        villageRules = query.villageRules ? ""
+        if villageRules.length > Config.maxlength.room.villageRules
+            res {error: i18n.t "error.newRoom.villageRulesTooLong"}
             return
         maxNumber = parseInt query.number, 10
         if maxNumber < 5
@@ -291,6 +300,7 @@ module.exports.actions=(req,res,ss)->
                         }}
                         return
             room.comment=query.comment ? ""
+            room.villageRules=villageRules
             #unless room.blind
             #   room.players.push req.session.user
             unless room.number

@@ -515,6 +515,27 @@ exports.start=(roomid)->
             icon.classList.add 'fa-info-circle'
             icon.title = room.comment
             iconlist.appendChild icon
+        if room.villageRules
+            tooltip = document.createElement 'span'
+            tooltip.classList.add 'roomname-village-rules'
+            tooltip.tabIndex = 0
+            tooltip.title = "村规说明"
+            icon = document.createElement 'i'
+            icon.classList.add 'fa'
+            icon.classList.add 'fa-fw'
+            icon.classList.add 'fa-scroll'
+            panel = document.createElement 'div'
+            panel.classList.add 'roomname-village-rules-panel'
+            panel.textContent = room.villageRules
+            tooltip.appendChild icon
+            iconlist.appendChild tooltip
+            document.body.appendChild panel
+            tooltip.addEventListener 'click', (e)->
+                e.preventDefault()
+                panel.classList.toggle 'open'
+            document.addEventListener 'click', (e)->
+                unless tooltip.contains(e.target) || panel.contains(e.target)
+                    panel.classList.remove 'open'
         $("#roomname").append roomnumber, iconlist
         if room.mode=="waiting"
             game_view.store.resetPlayers room.players.map convertRoomPlayerToPlayerInfo

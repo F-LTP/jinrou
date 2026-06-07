@@ -19,6 +19,12 @@ export interface IPlaceOptions {
    * List of available themes.
    */
   themes: ThemeDoc[];
+  /**
+   * Defaults used for new rooms.
+   */
+  roomDefaults?: {
+    villageRules?: string;
+  };
 }
 export interface IPlaceResult {
   store: NewRoomStore;
@@ -30,6 +36,7 @@ export function place({
   node,
   onCreate,
   themes,
+  roomDefaults,
 }: IPlaceOptions): IPlaceResult {
   const store = new NewRoomStore();
   const createHandler = (query: unknown) => {
@@ -44,7 +51,12 @@ export function place({
   };
   const com = (
     <I18nProvider i18n={i18n}>
-      <NewRoom store={store} onCreate={createHandler} themes={themes} />
+      <NewRoom
+        store={store}
+        onCreate={createHandler}
+        themes={themes}
+        roomDefaults={roomDefaults}
+      />
     </I18nProvider>
   );
 

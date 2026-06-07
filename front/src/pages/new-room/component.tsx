@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { i18n, I18nProvider } from '../../i18n';
-import { Wrapper } from './elements';
+import { TemplateControls, Wrapper } from './elements';
 import {
   Controls,
   ControlsWrapper,
@@ -10,13 +10,13 @@ import {
   ControlsMain,
   InlineControl,
 } from '../../common/forms/controls-wrapper';
-import { Input } from '../../common/forms/text';
+import { Input, Textarea } from '../../common/forms/text';
 import { RadioButtons } from '../../common/forms/radio';
 import { useI18n } from '../../i18n/react';
 import { NewRoomStore } from './store';
 import { observer } from 'mobx-react-lite';
 import { FontAwesomeIcon } from '../../util/icon';
-import { WideButton } from '../../common/button';
+import { NormalButton, WideButton } from '../../common/button';
 import { CheckButton } from '../../common/forms/check-button';
 import { Select } from '../../common/forms/select';
 import { showConfirmDialog } from '../../dialog';
@@ -35,17 +35,64 @@ export interface ThemeDoc {
 export interface IPropNewRoom {
   themes: ThemeDoc[];
   store: NewRoomStore;
+  roomDefaults?: {
+    villageRules?: string;
+  };
   onCreate(query: unknown): void;
 }
 
+interface VillageRuleTemplate {
+  id: string;
+  name: string;
+  content: string;
+  updatedAt: string;
+}
+
+const villageRuleTemplatesStorageKey = 'jinrou-village-rule-templates';
+
+function loadVillageRuleTemplates(): VillageRuleTemplate[] {
+  try {
+    const raw = localStorage.getItem(villageRuleTemplatesStorageKey);
+    if (raw == null) {
+      return [];
+    }
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) {
+      return [];
+    }
+    return parsed.filter(
+      (template): template is VillageRuleTemplate =>
+        typeof template?.id === 'string' &&
+        typeof template?.name === 'string' &&
+        typeof template?.content === 'string' &&
+        typeof template?.updatedAt === 'string',
+    );
+  } catch (e) {
+    console.error(e);
+    return [];
+  }
+}
+
+function saveVillageRuleTemplates(templates: VillageRuleTemplate[]): void {
+  localStorage.setItem(
+    villageRuleTemplatesStorageKey,
+    JSON.stringify(templates),
+  );
+}
+
 export const NewRoom: React.FunctionComponent<IPropNewRoom> = observer(
-  ({ themes, store, onCreate }) => {
+  ({ themes, store, roomDefaults, onCreate }) => {
     const t = useI18n('newroom_client');
     const nameInputRef = React.useRef<HTMLInputElement | null>(null);
     const passwordInputRef = React.useRef<HTMLInputElement | null>(null);
     const commentInputRef = React.useRef<HTMLInputElement | null>(null);
+    const villageRulesInputRef = React.useRef<HTMLTextAreaElement | null>(null);
     const maxNumberInputRef = React.useRef<HTMLInputElement | null>(null);
     const themeSelectRef = React.useRef<HTMLSelectElement | null>(null);
+    const templateSelectRef = React.useRef<HTMLSelectElement | null>(null);
+    const [villageRuleTemplates, setVillageRuleTemplates] = React.useState<
+      VillageRuleTemplate[]
+    >(() => loadVillageRuleTemplates());
     // memory of whether submit button was explicitly clicked (or pressed).
     const enterPressedRef = React.useRef(false);
 
@@ -71,6 +118,57 @@ export const NewRoom: React.FunctionComponent<IPropNewRoom> = observer(
         } catch (e) {
           console.error(e);
         }
+      }
+    }, []);
+    const applyVillageRuleTemplate = React.useCallback(
+      (selectedId: string) => {
+        const template = villageRuleTemplates.find(t => t.id === selectedId);
+        if (template != null && villageRulesInputRef.current != null) {
+          villageRulesInputRef.current.value = template.content;
+        }
+      },
+      [villageRuleTemplates],
+    );
+    const saveVillageRuleTemplate = React.useCallback(() => {
+      const name = window.prompt(t('villageRules.templateNamePrompt'));
+      const normalizedName = name?.trim();
+      if (!normalizedName) {
+        return;
+      }
+      const content = villageRulesInputRef.current?.value || '';
+      const now = new Date().toISOString();
+      setVillageRuleTemplates(current => {
+        const oldTemplate = current.find(t => t.name === normalizedName);
+        const nextTemplate = {
+          id:
+            oldTemplate?.id ||
+            `${Date.now()}-${Math.random()
+              .toString(36)
+              .slice(2)}`,
+          name: normalizedName,
+          content,
+          updatedAt: now,
+        };
+        const next = [
+          nextTemplate,
+          ...current.filter(t => t.name !== normalizedName),
+        ];
+        saveVillageRuleTemplates(next);
+        return next;
+      });
+    }, [t]);
+    const deleteVillageRuleTemplate = React.useCallback(() => {
+      const selectedId = templateSelectRef.current?.value;
+      if (!selectedId) {
+        return;
+      }
+      setVillageRuleTemplates(current => {
+        const next = current.filter(t => t.id !== selectedId);
+        saveVillageRuleTemplates(next);
+        return next;
+      });
+      if (templateSelectRef.current != null) {
+        templateSelectRef.current.value = '';
       }
     }, []);
     const passwordOptions = React.useMemo(
@@ -159,9 +257,7 @@ export const NewRoom: React.FunctionComponent<IPropNewRoom> = observer(
           return;
         }
 
-        const getValue = (
-          ref: React.RefObject<HTMLInputElement | HTMLSelectElement | null>,
-        ) => {
+        const getValue = (ref: { current: { value: string } | null }) => {
           return ref.current != null ? ref.current.value : '';
         };
         const query = {
@@ -169,6 +265,7 @@ export const NewRoom: React.FunctionComponent<IPropNewRoom> = observer(
           usepassword: store.usePassword ? 'on' : '',
           password: store.usePassword ? getValue(passwordInputRef) : void 0,
           comment: getValue(commentInputRef),
+          villageRules: getValue(villageRulesInputRef),
           number: getValue(maxNumberInputRef),
           blind: store.blind,
           theme: getValue(themeSelectRef),
@@ -241,6 +338,42 @@ export const NewRoom: React.FunctionComponent<IPropNewRoom> = observer(
             </ControlsHeader>
             <ControlsMain>
               <Input type="text" name="room-comment" ref={commentInputRef} />
+            </ControlsMain>
+            {/* village rules input */}
+            <ControlsHeader>
+              <ControlsName>{t('villageRules.title')}</ControlsName>
+              {store.descriptionShown ? (
+                <ControlsDescription>
+                  {t('villageRules.description')}
+                </ControlsDescription>
+              ) : null}
+            </ControlsHeader>
+            <ControlsMain>
+              <Textarea
+                name="village-rules"
+                rows={6}
+                defaultValue={roomDefaults?.villageRules || ''}
+                ref={villageRulesInputRef}
+              />
+              <TemplateControls>
+                <Select
+                  ref={templateSelectRef}
+                  onChange={e => applyVillageRuleTemplate(e.target.value)}
+                >
+                  <option value="">{t('villageRules.template.none')}</option>
+                  {villageRuleTemplates.map(template => (
+                    <option key={template.id} value={template.id}>
+                      {template.name}
+                    </option>
+                  ))}
+                </Select>
+                <NormalButton type="button" onClick={saveVillageRuleTemplate}>
+                  {t('villageRules.template.save')}
+                </NormalButton>
+                <NormalButton type="button" onClick={deleteVillageRuleTemplate}>
+                  {t('villageRules.template.delete')}
+                </NormalButton>
+              </TemplateControls>
             </ControlsMain>
           </ControlsWrapper>
           {/* max number of room. */}
