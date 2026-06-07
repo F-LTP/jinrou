@@ -716,7 +716,8 @@ const MainWrapper = styled.div`
   display: flex;
   flex-flow: row nowrap;
   position: relative;
-  overflow-x: hidden;
+  overflow-x: clip;
+  overflow-y: visible;
 `;
 
 /**
