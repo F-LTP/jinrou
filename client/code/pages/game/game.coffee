@@ -375,6 +375,8 @@ exports.start=(roomid)->
                             type: 'endless'
                             joined: false
                             blind: !!room.blind
+                            theme: room.theme? && !!room.theme
+                            themeName: room.theme
                         }
                     else
                         null

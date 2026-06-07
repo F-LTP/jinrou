@@ -41,6 +41,14 @@ export interface RoomDuringEndless {
    * Whether this room is blind mode.
    */
   blind: boolean;
+  /**
+   * Whether this room has a theme.
+   */
+  theme: boolean;
+  /**
+   * Theme name if exists.
+   */
+  themeName?: string;
 }
 /**
  * State of room after the end.

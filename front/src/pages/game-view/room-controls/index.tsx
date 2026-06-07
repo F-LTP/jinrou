@@ -117,11 +117,13 @@ export class RoomControls extends React.Component<IPropRoomControls, {}> {
     const blind =
       (roomControls.type === 'prelude' || roomControls.type === 'endless') &&
       roomControls.blind;
-    const hasTheme = roomControls.type === 'prelude' && roomControls.theme;
+    const hasTheme =
+      (roomControls.type === 'prelude' || roomControls.type === 'endless') &&
+      roomControls.theme;
 
     // Check if this is an OpenAvatar room
     const isOpenAvatar =
-      roomControls.type === 'prelude' &&
+      (roomControls.type === 'prelude' || roomControls.type === 'endless') &&
       roomControls.themeName === 'openavatar';
 
     // if the room is in blind mode,
