@@ -480,6 +480,7 @@ export class SpeakForm extends React.PureComponent<
                         items={this.state.autocomplete.items}
                         searchTerm={this.state.autocomplete.searchTerm}
                         position={this.state.autocomplete.position}
+                        anchor={this.comment}
                         selectedIndex={this.state.autocomplete.selectedIndex}
                         onSelect={this.handleAutocompleteSelect}
                         onClose={this.handleAutocompleteClose}

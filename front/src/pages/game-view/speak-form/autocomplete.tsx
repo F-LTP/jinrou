@@ -36,6 +36,10 @@ export interface AutocompleteProps {
    */
   position: { top: number; left: number };
   /**
+   * Element that the dropdown should stay aligned with.
+   */
+  anchor?: HTMLElement | null;
+  /**
    * Currently selected index.
    */
   selectedIndex: number;
@@ -56,6 +60,7 @@ export const AutocompleteDropdown: React.FC<AutocompleteProps> = ({
   items,
   searchTerm,
   position,
+  anchor,
   selectedIndex,
   onSelect,
   onClose,
@@ -79,10 +84,7 @@ export const AutocompleteDropdown: React.FC<AutocompleteProps> = ({
       if (rafId !== null) return;
 
       rafId = requestAnimationFrame(() => {
-        // Find the input element and recalculate its position
-        const input = document.querySelector(
-          'textarea[data-ml-comment="true"]',
-        ) as HTMLTextAreaElement;
+        const input = anchor;
         if (input) {
           const rect = input.getBoundingClientRect();
           setCurrentPosition({
@@ -100,7 +102,7 @@ export const AutocompleteDropdown: React.FC<AutocompleteProps> = ({
     window.addEventListener('resize', updatePosition);
 
     // Use ResizeObserver to detect when the input's parent resizes
-    const input = document.querySelector('textarea[data-ml-comment="true"]');
+    const input = anchor;
     let resizeObserver: any = null;
 
     if (input && input.parentElement) {
@@ -117,7 +119,7 @@ export const AutocompleteDropdown: React.FC<AutocompleteProps> = ({
         resizeObserver.disconnect();
       }
     };
-  }, [items.length, position]); // Add position as dependency
+  }, [anchor, items.length, position]); // Add position as dependency
 
   // Scroll to selected item when selectedIndex changes
   React.useEffect(() => {

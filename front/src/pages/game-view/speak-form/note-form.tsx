@@ -3,6 +3,8 @@ import styled from '../../../util/styled';
 import { bind } from '../../../util/bind';
 import { TranslationFunction } from '../../../i18n';
 import { PlayerInfo } from '../defs';
+import { themeStore } from '../../../theme';
+import { AutocompleteDropdown, AutocompleteItem } from './autocomplete';
 
 interface IPropNoteForm {
   t: TranslationFunction;
@@ -24,6 +26,26 @@ interface IPropNoteForm {
    */
   onNoteChange: (content: string) => void;
 }
+
+interface AutocompleteState {
+  show: boolean;
+  position: { top: number; left: number };
+  searchTerm: string;
+  items: AutocompleteItem[];
+  triggerStart: number;
+  triggerChar: string;
+  shortcuts: AutocompleteItem[];
+  selectedIndex: number;
+}
+
+interface NoteFormState {
+  autocomplete: AutocompleteState;
+}
+
+const defaultQuickInputShortcuts: AutocompleteItem[] = [
+  { label: '●', value: '●', type: 'shortcut', searchKey: '黑' },
+  { label: '○', value: '○', type: 'shortcut', searchKey: '白' },
+];
 
 // Storage key for note.
 const NOTE_STORAGE_KEY = 'jinrou-note-content';
@@ -58,7 +80,22 @@ const MAX_HISTORY = 50;
 /**
  * Form of note.
  */
-export class NoteForm extends React.PureComponent<IPropNoteForm> {
+export class NoteForm extends React.PureComponent<
+  IPropNoteForm,
+  NoteFormState
+> {
+  public state: NoteFormState = {
+    autocomplete: {
+      show: false,
+      position: { top: 0, left: 0 },
+      searchTerm: '',
+      items: [],
+      triggerStart: 0,
+      triggerChar: '',
+      shortcuts: defaultQuickInputShortcuts,
+      selectedIndex: 0,
+    },
+  };
   protected textareaRef = React.createRef<HTMLTextAreaElement>();
   /**
    * History stack for undo functionality.
@@ -96,6 +133,7 @@ export class NoteForm extends React.PureComponent<IPropNoteForm> {
               id="note-content"
               name="noteContent"
               onChange={this.handleChange}
+              onKeyDown={this.handleKeyDown}
             />
           </p>
           <PresetsSection>
@@ -177,6 +215,17 @@ export class NoteForm extends React.PureComponent<IPropNoteForm> {
             )}
           </PresetsSection>
         </Content>
+        {this.state.autocomplete.show && (
+          <AutocompleteDropdown
+            items={this.state.autocomplete.items}
+            searchTerm={this.state.autocomplete.searchTerm}
+            position={this.state.autocomplete.position}
+            anchor={this.textareaRef.current}
+            selectedIndex={this.state.autocomplete.selectedIndex}
+            onSelect={this.handleAutocompleteSelect}
+            onClose={this.handleAutocompleteClose}
+          />
+        )}
       </Wrapper>
     );
   }
@@ -261,6 +310,235 @@ export class NoteForm extends React.PureComponent<IPropNoteForm> {
 
     // Auto-save after inserting text.
     saveNoteToStorage(newValue);
+  }
+
+  /**
+   * Handle autocomplete trigger detection.
+   */
+  @bind
+  protected handleAutocompleteTrigger(textarea: HTMLTextAreaElement): void {
+    const value = textarea.value;
+    const cursorPos = textarea.selectionStart || value.length;
+    const shortcuts = this.state.autocomplete.shortcuts;
+
+    const triggerConfig = themeStore.savedTheme.phoneUI.autocompleteTrigger || {
+      comma: true,
+      slash: true,
+      at: false,
+    };
+    const triggers: string[] = [];
+    if (triggerConfig.comma) triggers.push('、');
+    if (triggerConfig.slash) triggers.push('/');
+    if (triggerConfig.at) triggers.push('@');
+
+    let lastTriggerIndex = -1;
+    let triggerChar = '';
+
+    for (const trigger of triggers) {
+      const index = value.lastIndexOf(trigger, cursorPos);
+      if (index > lastTriggerIndex) {
+        lastTriggerIndex = index;
+        triggerChar = trigger;
+      }
+    }
+
+    if (lastTriggerIndex !== -1 && lastTriggerIndex < cursorPos) {
+      const searchTerm = value.substring(lastTriggerIndex + 1, cursorPos);
+      const items = this.getFilteredItems(searchTerm, shortcuts);
+
+      if (items.length > 0 || searchTerm.length > 0) {
+        this.setState({
+          autocomplete: {
+            ...this.state.autocomplete,
+            show: true,
+            position: this.calculateDropdownPosition(textarea),
+            searchTerm,
+            items,
+            triggerStart: lastTriggerIndex,
+            triggerChar,
+            selectedIndex: 0,
+          },
+        });
+        return;
+      }
+    }
+
+    this.setState({
+      autocomplete: {
+        ...this.state.autocomplete,
+        show: false,
+        searchTerm: '',
+        items: [],
+        triggerStart: 0,
+        triggerChar: '',
+        selectedIndex: 0,
+      },
+    });
+  }
+
+  /**
+   * Get filtered autocomplete items.
+   */
+  @bind
+  protected getFilteredItems(
+    searchTerm: string,
+    shortcuts: AutocompleteItem[],
+  ): AutocompleteItem[] {
+    const items: AutocompleteItem[] = [];
+    const lowerSearchTerm = searchTerm.toLowerCase();
+
+    for (const player of this.props.players) {
+      if (player.name.toLowerCase().includes(lowerSearchTerm)) {
+        items.push({
+          label: player.name,
+          value: player.name,
+          type: 'player',
+          searchKey: player.name,
+        });
+      }
+    }
+
+    for (const shortcut of shortcuts) {
+      if (shortcut.searchKey.toLowerCase().includes(lowerSearchTerm)) {
+        items.push(shortcut);
+      }
+    }
+
+    return items;
+  }
+
+  /**
+   * Calculate dropdown position based on the note textarea.
+   */
+  @bind
+  protected calculateDropdownPosition(
+    textarea: HTMLTextAreaElement,
+  ): { top: number; left: number } {
+    const rect = textarea.getBoundingClientRect();
+    const vv = (window as any).visualViewport;
+
+    if (vv) {
+      const keyboardHeight = window.innerHeight - vv.height;
+      return {
+        top: rect.bottom - keyboardHeight + 4,
+        left: rect.left,
+      };
+    }
+
+    return {
+      top: rect.bottom + 4,
+      left: rect.left,
+    };
+  }
+
+  /**
+   * Insert selected autocomplete item into the note.
+   */
+  @bind
+  protected handleAutocompleteSelect(item: AutocompleteItem): void {
+    const textarea = this.textareaRef.current;
+    if (!textarea) return;
+
+    const { autocomplete } = this.state;
+    const value = textarea.value;
+    const before = value.substring(0, autocomplete.triggerStart);
+    const after = value.substring(
+      autocomplete.triggerStart + autocomplete.searchTerm.length + 1,
+    );
+    const newValue = before + item.value + after;
+
+    this.saveToHistory();
+
+    textarea.value = newValue;
+    const newPos = autocomplete.triggerStart + item.value.length;
+    textarea.setSelectionRange(newPos, newPos);
+    textarea.focus();
+
+    this.history.push(newValue);
+    this.lastSavedValue = newValue;
+    this.historyIndex++;
+    saveNoteToStorage(newValue);
+
+    this.setState({
+      autocomplete: {
+        ...autocomplete,
+        show: false,
+        searchTerm: '',
+        items: [],
+        triggerStart: 0,
+        triggerChar: '',
+        selectedIndex: 0,
+      },
+    });
+  }
+
+  /**
+   * Close autocomplete dropdown.
+   */
+  @bind
+  protected handleAutocompleteClose(): void {
+    this.setState({
+      autocomplete: {
+        ...this.state.autocomplete,
+        show: false,
+        searchTerm: '',
+        items: [],
+        triggerStart: 0,
+        triggerChar: '',
+        selectedIndex: 0,
+      },
+    });
+  }
+
+  /**
+   * Handle keyboard navigation for note autocomplete.
+   */
+  @bind
+  protected handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>): void {
+    const { autocomplete } = this.state;
+
+    if (!autocomplete.show || autocomplete.items.length === 0) {
+      return;
+    }
+
+    if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+      e.preventDefault();
+      this.setState({
+        autocomplete: {
+          ...autocomplete,
+          selectedIndex: Math.min(
+            autocomplete.selectedIndex + 1,
+            autocomplete.items.length - 1,
+          ),
+        },
+      });
+      return;
+    }
+
+    if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+      e.preventDefault();
+      this.setState({
+        autocomplete: {
+          ...autocomplete,
+          selectedIndex: Math.max(autocomplete.selectedIndex - 1, 0),
+        },
+      });
+      return;
+    }
+
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const selectedItem = autocomplete.items[autocomplete.selectedIndex];
+      if (selectedItem) {
+        this.handleAutocompleteSelect(selectedItem);
+      }
+      return;
+    }
+
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      this.handleAutocompleteClose();
+    }
   }
 
   /**
@@ -368,6 +646,7 @@ export class NoteForm extends React.PureComponent<IPropNoteForm> {
     saveNoteToStorage(content);
     // Save to history when manually editing.
     this.saveToHistory();
+    this.handleAutocompleteTrigger(e.currentTarget);
   }
 }
 
