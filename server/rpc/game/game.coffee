@@ -119,10 +119,12 @@ PsychicResult =
     renderToString: (res, i18n)->
         # string is just rendered.
         if "string" == typeof res
+                        lover:null
             return i18n.t "roles:psychic.#{res}"
         # if array, join them using delimiter.
         delimiter = i18n.t "roles:psychic._delimiter"
         return res.map((r)-> i18n.t "roles:psychic.#{r}").join delimiter
+                        lover:null
 
 # guard_logにおける襲撃の種類
 AttackKind =
@@ -1321,12 +1323,20 @@ class Game
                     Human:0
                     Diviner:0
                     Werewolf:0
+                    Cupid:0
                     dead:0
                 for obj in @quantum_patterns
-                    count[obj[x.id].jobtype]++
+                    if obj[x.id].jobtype == "Diviner"
+                        count.Diviner++
+                    else if obj[x.id].jobtype == "Werewolf"
+                        count.Werewolf++
+                    else if obj[x.id].jobtype == "Cupid"
+                        count.Cupid++
+                    else
+                        count.Human++
                     if obj[x.id].dead==true
                         count.dead++
-                sum=count.Human+count.Diviner+count.Werewolf
+                sum=count.Human+count.Diviner+count.Werewolf+count.Cupid
                 pflag=JSON.parse x.flag
                 if sum==0
                     # 世界が崩壊した
@@ -1335,6 +1345,7 @@ class Game
                         Human:0
                         Diviner:0
                         Werewolf:0
+                        Cupid:0
                         dead:0
                     }
                     # ログ用
@@ -1352,23 +1363,24 @@ class Game
                 else
                     x.setFlag JSON.stringify {
                         number:pflag?.number
-                        Human:count.Human/sum
+                        Human:(count.Human+count.Cupid)/sum
                         Diviner:count.Diviner/sum
                         Werewolf:count.Werewolf/sum
+                        Cupid:count.Cupid/sum
                         dead:count.dead/sum
                     }
                     # ログ用
                     if @rule.quantumwerewolf_diviner=="on"
                         probability_table[x.id]={
                             name:x.name
-                            Human:count.Human/sum
+                            Human:(count.Human+count.Cupid)/sum
                             Diviner:count.Diviner/sum
                             Werewolf:count.Werewolf/sum
                         }
                     else
                         probability_table[x.id]={
                             name:x.name
-                            Human:(count.Human+count.Diviner)/sum
+                            Human:(count.Human+count.Cupid+count.Diviner)/sum
                             Werewolf:count.Werewolf/sum
                         }
                     if @rule.quantumwerewolf_dead!="no" || count.dead==sum
@@ -2479,6 +2491,10 @@ class Game
                 else if assured_wolf.dead==total_wolf
                     # 全滅した
                     team="Human"
+                else if aliveps.some((x)-> x.isFriend())
+                    friendTeamAlive = aliveps.filter((x)-> x.isFriend() || (x.isJobType("QuantumPlayer") && JSON.parse(x.flag||"{}").Cupid == 1)).length
+                    if friendTeamAlive == aliveps.length
+                        team="Friend"
             else
                 # もうひとつもないんだ・・・
                 log=
@@ -7033,6 +7049,8 @@ class QuantumPlayer extends Player
             jobname = @game.i18n.t "roles:jobname.Diviner"
         else if flag.Werewolf==1
             jobname = @game.i18n.t "roles:jobname.Werewolf"
+        else if flag.Cupid==1
+            jobname = @game.i18n.t "roles:jobname.Cupid"
 
         numstr=""
         if flag.number?
@@ -7047,7 +7065,7 @@ class QuantumPlayer extends Player
         return ret
     sleeping:->
         tarobj=JSON.parse(@target || "{}")
-        tarobj.Diviner? && tarobj.Werewolf?   # 両方指定してあるか
+        tarobj.Diviner? && tarobj.Werewolf? && (tarobj.Cupid2? || tarobj.Cupid? || tarobj.Cupid=="")   # 両方指定してあるか
     sunset:(game)->
         #  @flagに{Human:(確率),Diviner:(確率),Werewolf:(確率),dead:(確率)}的なのが入っているぞ!
         obj=JSON.parse(@flag || "{}")
@@ -7058,10 +7076,18 @@ class QuantumPlayer extends Player
             tarobj.Diviner=""   # なし
         if obj.Werewolf==0 || (game.rule.quantumwerewolf_firstattack!="on" && game.day==1)
             tarobj.Werewolf=""
+        if obj.Cupid==0
+            tarobj.Cupid=""
+        else
+            tarobj.Cupid=null
+        tarobj.Cupid1=null
+        tarobj.Cupid2=null
 
         @setTarget JSON.stringify tarobj
     isFormTarget:(jobtype)->
         if jobtype=="_Quantum_Diviner" || jobtype=="_Quantum_Werewolf"
+            return true
+        if jobtype=="_Quantum_Cupid"
             return true
         super
     job:(game,playerid,query)->
@@ -7076,6 +7102,27 @@ class QuantumPlayer extends Player
                 to:@id
                 comment: game.i18n.t "roles:Diviner.select", {name: @name, target: pl.name}
             splashlog game.id,game,log
+        else if query.jobtype=="_Quantum_Cupid"
+            if tarobj.Cupid2?
+                return game.i18n.t "error.common.alreadyUsed"
+            if @id==playerid
+                return game.i18n.t "error.common.noSelectSelf"
+            if tarobj.Cupid1? && tarobj.Cupid1==playerid
+                return game.i18n.t "roles:Cupid.noSelectTwice"
+            if !tarobj.Cupid1?
+                tarobj.Cupid1=playerid
+                log=
+                    mode:"skill"
+                    to:@id
+                    comment: game.i18n.t "roles:Cupid.select1", {name: @name, target: pl.name}
+                splashlog game.id,game,log
+            else
+                tarobj.Cupid2=playerid
+                log=
+                    mode:"skill"
+                    to:@id
+                    comment: game.i18n.t "roles:Cupid.select", {name: @name, target: pl.name}
+                splashlog game.id,game,log
         else if query.jobtype=="_Quantum_Werewolf" && !tarobj.Werewolf?
             if @id==playerid
                 return game.i18n.t "error.common.noSelectSelf"
@@ -7154,6 +7201,24 @@ class QuantumPlayer extends Player
                             true
                     else
                         true
+        if tarobj.Cupid2
+            pl1=game.getPlayer tarobj.Cupid1
+            pl2=game.getPlayer tarobj.Cupid2
+            if pl1? && pl2?
+                pats=game.quantum_patterns.filter (obj)->
+                    obj[@id].jobtype=="Cupid" && obj[@id].dead==false
+                pats.forEach (obj)=>
+                    obj[pl1.id].lover=pl2.id
+                    obj[pl2.id].lover=pl1.id
+                game.quantum_patterns=pats
+                # 用真实好友复合在现实游戏中固定目标
+                for [a,b] in [[pl1,pl2],[pl2,pl1]]
+                    unless a.isFriend()
+                        newpl=Player.factory null, game, a, null, Friend
+                        newpl.cmplFlag=b.id
+                        a.transProfile newpl
+                        a.transform game, newpl, true
+                game.splashjobinfo [game.getPlayer(pl1.id), game.getPlayer(pl2.id)]
 
     isWinner:(game,team)->
         flag=JSON.parse @flag
@@ -7163,8 +7228,10 @@ class QuantumPlayer extends Player
         if flag.Werewolf==1 && team=="Werewolf"
             # 人狼がかったぞ!!!!!
             true
-        else if flag.Werewolf==0 && team=="Human"
-            # 人間がかったぞ!!!!!
+        else if (flag.Werewolf==0 || flag.Cupid==1) && team=="Human"
+            # 人間陣営として扱う
+            true
+        else if team=="Friend" && flag.Cupid==1
             true
         else
             # よくわからないぞ!
@@ -7177,8 +7244,8 @@ class QuantumPlayer extends Player
         if flag.Werewolf == 1
             # 人狼に確定しているので人狼陣営
             return "Werewolf"
-        if flag.Werewolf == 0
-            # 人狼でないことが確定しているので村人陣営
+        if flag.Werewolf == 0 || flag.Cupid == 1
+            # 人狼でないこと、または Cupid として確定しているので村人陣営
             return "Human"
         # 未確定なのでなし
         return ""
@@ -7201,6 +7268,13 @@ class QuantumPlayer extends Player
         unless tarobj.Werewolf?
             result.push {
                 type: "_Quantum_Werewolf"
+                options: @makeJobSelection game, false
+                formType: FormType.required
+                objid: @objid
+            }
+        unless tarobj.Cupid2? || tarobj.Cupid==""
+            result.push {
+                type: "_Quantum_Cupid"
                 options: @makeJobSelection game, false
                 formType: FormType.required
                 objid: @objid
@@ -7231,6 +7305,10 @@ class QuantumPlayer extends Player
             # ワタシハシンダ
             pats.forEach (obj)=>
                 obj[@id].dead=true
+                if obj[@id].lover?
+                    partner=obj[obj[@id].lover]
+                    if partner?
+                        partner.dead=true
         game.quantum_patterns=pats
 
 class RedHood extends Player

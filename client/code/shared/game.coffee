@@ -1287,6 +1287,7 @@ exports.getrulefunc=(name)->
                             if number>=30
                                 ret.Werewolf++
             ret.Diviner=1   #占い
+            ret.Cupid=1      #丘比特
             ret
 
     # ほかはオブジェクトから探す

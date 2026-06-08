@@ -31,6 +31,7 @@ specialName:
   NekikillTarget: '姬狐的能力'
   _Quantum_Diviner: '占卜师的能力'
   _Quantum_Werewolf: '人狼的袭击'
+  _Quantum_Cupid: '丘比特的能力'
 
 # Message for normal selection form.  normalMessage:
 messages:
@@ -78,6 +79,7 @@ messages:
   Hoodlum: '请依次选择你憎恨的对象'
   _Quantum_Diviner: '请选择要占卜的对象'
   _Quantum_Werewolf: '请选择一个要袭击的对象'
+  _Quantum_Cupid: '请依次选择两名恋人'
   Counselor: '请选择你要策反的对象'
   Miko: '用神圣的力量守护自己'
   FascinatingWolf: '请选择要诱惑的对象'

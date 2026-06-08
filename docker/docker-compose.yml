@@ -2,7 +2,7 @@
 version: '3'
 services:
   mongod:
-    image: mongo
+    image: mongo:3.2
     container_name: mongod
     restart: unless-stopped
     environment:
