@@ -22,5 +22,5 @@ services:
       - "./config.docker:/jinrou/config"
       - "../client/static/front-assets:/jinrou/client/static/front-assets"
     depends_on:
-      - mongod
       - redis
+      - mongod

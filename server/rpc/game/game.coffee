@@ -1353,6 +1353,7 @@ class Game
                         name:x.name
                         Human:0
                         Werewolf:0
+                        Cupid:0   # 新增字段
                     }
                     if @rule.quantumwerewolf_dead=="on"
                         #死亡確率も
@@ -1363,7 +1364,7 @@ class Game
                 else
                     x.setFlag JSON.stringify {
                         number:pflag?.number
-                        Human:(count.Human+count.Cupid)/sum
+                        Human:count.Human/sum
                         Diviner:count.Diviner/sum
                         Werewolf:count.Werewolf/sum
                         Cupid:count.Cupid/sum
@@ -1373,15 +1374,17 @@ class Game
                     if @rule.quantumwerewolf_diviner=="on"
                         probability_table[x.id]={
                             name:x.name
-                            Human:(count.Human+count.Cupid)/sum
+                            Human:(count.Human)/sum
                             Diviner:count.Diviner/sum
                             Werewolf:count.Werewolf/sum
+                            Cupid:count.Cupid/sum   # 新增
                         }
                     else
                         probability_table[x.id]={
                             name:x.name
-                            Human:(count.Human+count.Cupid+count.Diviner)/sum
+                            Human:(count.Human+count.Diviner)/sum
                             Werewolf:count.Werewolf/sum
+                            Cupid:count.Cupid/sum                    # 新增
                         }
                     if @rule.quantumwerewolf_dead!="no" || count.dead==sum
                         # 死亡率も
@@ -7123,6 +7126,7 @@ class QuantumPlayer extends Player
                     to:@id
                     comment: game.i18n.t "roles:Cupid.select", {name: @name, target: pl.name}
                 splashlog game.id,game,log
+                @cupidChoice = [tarobj.Cupid1, tarobj.Cupid2]
         else if query.jobtype=="_Quantum_Werewolf" && !tarobj.Werewolf?
             if @id==playerid
                 return game.i18n.t "error.common.noSelectSelf"
@@ -7202,23 +7206,22 @@ class QuantumPlayer extends Player
                     else
                         true
         if tarobj.Cupid2
-            pl1=game.getPlayer tarobj.Cupid1
-            pl2=game.getPlayer tarobj.Cupid2
-            if pl1? && pl2?
-                pats=game.quantum_patterns.filter (obj)->
-                    obj[@id].jobtype=="Cupid" && obj[@id].dead==false
-                pats.forEach (obj)=>
-                    obj[pl1.id].lover=pl2.id
-                    obj[pl2.id].lover=pl1.id
-                game.quantum_patterns=pats
-                # 用真实好友复合在现实游戏中固定目标
-                for [a,b] in [[pl1,pl2],[pl2,pl1]]
-                    unless a.isFriend()
-                        newpl=Player.factory null, game, a, null, Friend
-                        newpl.cmplFlag=b.id
-                        a.transProfile newpl
-                        a.transform game, newpl, true
-                game.splashjobinfo [game.getPlayer(pl1.id), game.getPlayer(pl2.id)]
+            pl1 = game.getPlayer tarobj.Cupid1
+            pl2 = game.getPlayer tarobj.Cupid2
+        if pl1? && pl2?
+        # 在所有量子模式中，如果当前玩家是 Cupid 且存活，则建立恋人关系
+            for obj in game.quantum_patterns
+                if obj[@id].jobtype == "Cupid" && obj[@id].dead == false
+                    obj[pl1.id].lover = pl2.id
+                    obj[pl2.id].lover = pl1.id
+        # 为实际玩家附加 Friend 复合类（仅在真实游戏中生效，不影响量子模式）
+            for [a,b] in [[pl1,pl2],[pl2,pl1]]
+                unless a.isFriend()
+                    newpl = Player.factory null, game, a, null, Friend
+                    newpl.cmplFlag = b.id
+                    a.transProfile newpl
+                    a.transform game, newpl, true
+            game.splashjobinfo [game.getPlayer(pl1.id), game.getPlayer(pl2.id)]
 
     isWinner:(game,team)->
         flag=JSON.parse @flag
@@ -7228,14 +7231,22 @@ class QuantumPlayer extends Player
         if flag.Werewolf==1 && team=="Werewolf"
             # 人狼がかったぞ!!!!!
             true
-        else if (flag.Werewolf==0 || flag.Cupid==1) && team=="Human"
-            # 人間陣営として扱う
-            true
-        else if team=="Friend" && flag.Cupid==1
-            true
-        else
+        # Cupid 胜利条件：他所牵线的恋人双方都存活且都是 Friend 阵营
+        if flag.Cupid == 1
+            if @cupidChoice && @cupidChoice.length == 2
+                [id1, id2] = @cupidChoice
+                p1 = game.getPlayer(id1)
+                p2 = game.getPlayer(id2)
+                if p1 && p2 && !p1.dead && !p2.dead && p1.isFriend() && p2.isFriend()
+                    return true
+            return false
+
+    # 普通村民或占卜师（量子模式下非狼非 Cupid 的 QuantumPlayer 视为村民）
+        if (flag.Werewolf == 0 || flag.Werewolf == undefined) && team == "Human"
+            return true
+        
             # よくわからないぞ!
-            false
+        return false
     getTeamDisp:->
         flag = JSON.parse @flag
         unless flag?
